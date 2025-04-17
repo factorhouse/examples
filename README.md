@@ -4,7 +4,8 @@
 
 ## Kpow
 
-- 🛠️ More to come
+- [Consumer Offset Management](./offset-management/)
+  - Python producer and consumer clients that are used to demonstrate consumer offset management in Kpow.
 
 ## Flex
 
