@@ -5,7 +5,7 @@
 ## Kpow
 
 - [Consumer Offset Management](./offset-management/)
-  - Python producer and consumer clients that are used to demonstrate consumer offset management in Kpow.
+  - Python producer and consumer clients that are used to demonstrate Kpow's consumer offset management capabilities.
 
 ## Flex
 
