@@ -4,9 +4,11 @@
 
 ## Kpow
 
-- **Manage Kafka Consumer Offsets with Kpow**(./offset-management/)
-  - [Manage Kafka Consumer Offsets with Kpow (Blog)](https://factorhouse.io/blog/how-to/manage-kafka-consumer-offsets-with-kpow/)
-  - [Source](./offset-management/) - Python producer and consumer clients that are used to demonstrate Kpow's consumer offset management capabilities.
+- Manage Kafka Consumer Offsets with Kpow
+  - [Manage Kafka Consumer Offsets with Kpow](https://factorhouse.io/blog/how-to/manage-kafka-consumer-offsets-with-kpow/) (blog)
+  - [Source](./offset-management/) - Python Kafka producer and consumer clients that are used to showcase consumer group offset management capabilities of Kpow.
+- Kafka Avro Clients with Schema Registry
+  - [Source](./orders-avro-clients/) - Python Kafka producer and consumer that are are used to demonstrate Avro (de)serialization and schema registry integration.
 
 ## Flex
 

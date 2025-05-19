@@ -1,3 +1,3 @@
-## Kafka producer and consumer clients
+## Kafka apps to showcase consumer offset management
 
-The Python Kafka producer and consumer clients in this folder are use to demonstrate consumer group offset management capabilities of Kpow.
+Python Kafka producer and consumer clients in this folder are use to showcase consumer group offset management capabilities of Kpow.
