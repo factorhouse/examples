@@ -4,8 +4,9 @@
 
 ## Kpow
 
-- [Consumer Offset Management](./offset-management/)
-  - Python producer and consumer clients that are used to demonstrate Kpow's consumer offset management capabilities.
+- **Manage Kafka Consumer Offsets with Kpow**(./offset-management/)
+  - [Manage Kafka Consumer Offsets with Kpow (Blog)](https://factorhouse.io/blog/how-to/manage-kafka-consumer-offsets-with-kpow/)
+  - [Source](./offset-management/) - Python producer and consumer clients that are used to demonstrate Kpow's consumer offset management capabilities.
 
 ## Flex
 
@@ -13,8 +14,12 @@
 
 # Integration
 
-- [Setting Up Kpow with Confluent Cloud](https://factorhouse.io/blog/how-to/setup-confluent/)
-  - A guide to integrating Kpow with Confluent Cloud: deploy Kpow locally using Docker Compose, configure it to connect securely to your Confluent Cloud resources, and use its UI to monitor and manage your Kafka cluster.
+- [Setting Up Kpow with Confluent Cloud](https://factorhouse.io/blog/how-to/set-up-kpow-with-confluent-cloud/)
+  - A step-by-step guide to configuring Kpow with Confluent Cloud resources including Kafka clusters, Schema Registry, Kafka Connect, and kSQLDB.
+- [Set Up Kpow with Amazon Managed Streaming for Apache Kafka](https://factorhouse.io/blog/how-to/set-up-kpow-with-aws/)
+  - A comprehensive, step by step guide to provisioning AWS MSK infrastructure, configuring authentication with the OAUTHBEARER mechanism using AWS IAM, setting up a client EC2 instance within the same VPC, and deploying Kpow.
+- [Set Up Kpow with Google Cloud Managed Service for Apache Kafka](https://factorhouse.io/blog/how-to/set-up-kpow-with-gcp/)
+  - A practical, step-by-step guide on setting up a Google Cloud Managed Service for Apache Kafka cluster and connecting it from Kpow using the OAUTHBEARER mechanism.
 
 # Local Development
 
