@@ -26,14 +26,16 @@ if __name__ == "__main__":
     BOOTSTRAP_SERVERS = os.getenv("BOOTSTRAP_SERVERS", "localhost:9092")
     TOPIC_NAME = os.getenv("TOPIC_NAME", "orders")
     SCHEMA_REGISTRY_URL = os.getenv("SCHEMA_REGISTRY_URL", "http://localhost:8081")
-    try:
-        MODEL_VERSION = int(os.getenv("MODEL_VERSION", "1"))
-    except (ValueError, TypeError):
-        MODEL_VERSION = 1
+    MODEL_VERSION = os.getenv("MODEL_VERSION")
+    if MODEL_VERSION is not None:
+        try:
+            MODEL_VERSION = int(MODEL_VERSION)
+        except (ValueError, TypeError):
+            MODEL_VERSION = None
 
     client_conf = {
         "bootstrap.servers": BOOTSTRAP_SERVERS,
-        "group.id": f"{TOPIC_NAME}-group-{MODEL_VERSION}",
+        "group.id": f"{TOPIC_NAME}-group-{(MODEL_VERSION or 'generic')}",
         "auto.offset.reset": "earliest",
         "enable.auto.commit": False,
     }
@@ -42,13 +44,20 @@ if __name__ == "__main__":
         "basic.auth.user.info": "admin:admin",
     }
     schema_registry_client = SchemaRegistryClient(registry_conf)
-    avro_descrializer = AvroDeserializer(
-        schema_registry_client=schema_registry_client,
-        schema_str=OrderV1.schema_str() if MODEL_VERSION == 1 else OrderV2.schema_str(),
-        from_dict=lambda d, ctx: OrderV1.from_dict(d, ctx)
-        if MODEL_VERSION == 1
-        else OrderV2.from_dict(d, ctx),
-    )
+    if MODEL_VERSION is None:
+        avro_descrializer = AvroDeserializer(
+            schema_registry_client=schema_registry_client, from_dict=None
+        )
+    else:
+        avro_descrializer = AvroDeserializer(
+            schema_registry_client=schema_registry_client,
+            schema_str=OrderV1.schema_str()
+            if MODEL_VERSION == 1
+            else OrderV2.schema_str(),
+            from_dict=lambda d, ctx: OrderV1.from_dict(d, ctx)
+            if MODEL_VERSION == 1
+            else OrderV2.from_dict(d, ctx),
+        )
 
     consumer = Consumer(client_conf)
     consumer.subscribe([TOPIC_NAME], on_assign=on_assign)
@@ -63,9 +72,8 @@ if __name__ == "__main__":
                 val = avro_descrializer(
                     event.value(), SerializationContext(TOPIC_NAME, MessageField.VALUE)
                 )
-                partition = event.partition()
                 if val is not None:
-                    logger.info(f"Received: {val} from partition {partition}")
+                    logger.info(f"Received: {val}")
                 else:
                     logger.warning("Deserialized value is None")
                 consumer.commit()
