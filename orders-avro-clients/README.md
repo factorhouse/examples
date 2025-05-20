@@ -15,7 +15,7 @@ cd examples
 
 We can get our Kafka environment including **Kpow** up and running using [Factor House Local](https://github.com/factorhouse/factorhouse-local). We can use either the Kpow Community or Enterprise edition. **To get started, let's make sure a valid Kpow license is available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
-```
+```bash
 git clone https://github.com/factorhouse/factorhouse-local.git
 docker compose -f ./factorhouse-local/compose-kpow-community.yml up -d
 ```
