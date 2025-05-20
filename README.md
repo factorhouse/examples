@@ -8,7 +8,9 @@
   - [Manage Kafka Consumer Offsets with Kpow](https://factorhouse.io/blog/how-to/manage-kafka-consumer-offsets-with-kpow/) (blog)
   - [Source](./offset-management/) - Python Kafka producer and consumer clients that are used to showcase consumer group offset management capabilities of Kpow.
 - Kafka Avro Clients with Schema Registry
-  - [Source](./orders-avro-clients/) - Python Kafka producer and consumer that are are used to demonstrate Avro (de)serialization and schema registry integration.
+  - [Source](./fh-local-kafka-avro-clients/) - Python Kafka producer and consumer that are are used to demonstrate Avro (de)serialization and schema registry integration.
+- Kafka Connect via Kpow UI and API
+  - [Source](./fh-local-kafka-connect/) - This example demonstrates how to interact with Kafka Connect through both the Kpow UI and its Connect API. We’ll walk through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
 
 ## Flex
 
