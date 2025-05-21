@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "SupplierStats",
+  "namespace": "io.factorhouse.avro",
+  "fields": [
+    { "name": "window_start", "type": "string" },
+    { "name": "window_end", "type": "string" },
+    { "name": "supplier", "type": "string" },
+    { "name": "total_price", "type": "double" },
+    { "name": "count", "type": "long" }
+  ]
+}
