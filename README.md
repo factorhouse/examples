@@ -11,6 +11,8 @@
   - [Source](./fh-local-kafka-avro-clients/) - Python Kafka producer and consumer that are are used to demonstrate Avro (de)serialization and schema registry integration.
 - Kafka Connect via Kpow UI and API
   - [Source](./fh-local-kafka-connect/) - This example demonstrates how to interact with Kafka Connect through both the Kpow UI and its Connect API. We’ll walk through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
+- Kafka Streams with Kpow Streams Agent
+  - [Source](./fh-local-kafka-streams/) - The Kafka Streams application reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
 
 ## Flex
 
