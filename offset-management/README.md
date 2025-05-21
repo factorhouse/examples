@@ -40,3 +40,11 @@ python offset-management/producer.py
 # consumer
 python offset-management/consumer.py
 ```
+
+### Shutdown Environment
+
+Stop and remove the Docker containers.
+
+```bash
+docker compose -f ./factorhouse-local/compose-kpow-community.yml down
+```

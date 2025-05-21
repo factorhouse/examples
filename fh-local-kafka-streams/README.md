@@ -79,3 +79,11 @@ Clicking on a node or topic reveals detailed information about that entity in a 
 The **consumer topology** is also visualized. The edge labels in this view can show **Lag**, **Read/s**, or **None**, depending on the selected metric.
 
 ![](./images/streams-04.png)
+
+### Shutdown Environment
+
+Stop and remove the Docker containers.
+
+```bash
+docker compose -f ./factorhouse-local/compose-kpow-trial.yml down
+```
