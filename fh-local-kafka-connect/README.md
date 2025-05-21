@@ -35,13 +35,17 @@ We will use the MSK Data Generator (source) and Confluent S3 (sink) connectors. 
 
 ![](./images/connect-ui-02.png)
 
-4. Import the source connector configuration file (`./fh-local-kafka-connect/connect-msk-datagen-source.json`) and hit _Create_.
+4. Import the source connector configuration file (`./fh-local-kafka-connect/orders-source.json`) and hit _Create_.
 
 ![](./images/connect-ui-03.png)
 
 5. Once created, we can check the source connector and its tasks in the Kpow UI.
 
 ![](./images/connect-ui-04.png)
+
+The value schema for the `orders` topic (`orders-value`) is registered as a **record** type. However, by default, the source connector generates a **union** schema (e.g., `["null", "record"]`) to allow for nullable records. The S3 Sink Connector, on the other hand, expects a value schema of type **record**, not a union. To resolve this mismatch, a custom [Single Message Transform (SMT)](https://kafka.apache.org/documentation/#connect_transforms) — `io.factorhouse.smt.UnwrapUnionTransform` — is used to unwrap the union and expose only the record type. **Note:** Do not configure tombstone records when using this transform, as null values will be skipped.
+
+![](./images/connect-ui-05.png)
 
 This connector will start producing mock order data to a Kafka topic (`orders`).
 
@@ -51,10 +55,10 @@ Next, we'll create the Confluent S3 sink connector using the Kpow API.
 
 1. Generate base64 encoded value of an API key.
 
-_Factor House Local_ pre-configures several users. For this demo, we'll use the `user:password` credentials. Note that the user has the _kafka-users_ role, which includes the `CONNECT_CREATE` and `CONNECT_DELETE` permissions.
+_Factor House Local_ pre-configures several users. For this demo, we'll use the `admin:admin` credentials. Note that the user has the _kafka-users_ role, which includes the `CONNECT_CREATE` and `CONNECT_DELETE` permissions.
 
 ```bash
-AUTH_HEADER=$(echo "Authorization: Basic $(echo -n 'user:password' | base64)")
+AUTH_HEADER=$(echo "Authorization: Basic $(echo -n 'admin:admin' | base64)")
 ```
 
 2. Get Kafka Connect cluster ID
@@ -83,12 +87,12 @@ This `CONNECT_ID` will be used in subsequent API calls to manage connectors.
 
 3. Create the Sink Connector
 
-Now, make a POST request with the S3 sink connector configuration (`fh-local-kafka-connect/connect-s3-sink.json`).
+Now, make a POST request with the S3 sink connector configuration (`fh-local-kafka-connect/orders-sink.json`).
 
 ```bash
 curl -s -i -X POST -H "$AUTH_HEADER" -H "Accept:application/json" -H  "Content-Type:application/json" \
   http://localhost:4000/connect/v1/apache/$CONNECT_ID/connectors \
-  -d @fh-local-kafka-connect/connect-s3-sink.json
+  -d @fh-local-kafka-connect/orders-sink.json
 # {
 #     "name": "orders-sink",
 #     "metadata": {
@@ -169,7 +173,7 @@ curl -X DELETE -H "$AUTH_HEADER" \
 
 Navigate to the _Connect_ section, and click _Delete connector_ option.
 
-![](./images/connect-ui-05.png)
+![](./images/connect-ui-06.png)
 
 ### Shutdown Environment
 

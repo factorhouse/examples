@@ -6,8 +6,11 @@
 
     "key.converter": "org.apache.kafka.connect.storage.StringConverter",
     "key.converter.schemas.enable": false,
-    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-    "value.converter.schemas.enable": false,
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schemas.enable": true,
+    "value.converter.schema.registry.url": "http://schema:8081",
+    "value.converter.basic.auth.credentials.source": "USER_INFO",
+    "value.converter.basic.auth.user.info": "admin:admin",
 
     "genv.orders.order_id.with": "#{Internet.uuid}",
     "genv.orders.bid_time.with": "#{date.past '5','SECONDS'}",
@@ -15,15 +18,20 @@
     "genv.orders.item.with": "#{Commerce.productName}",
     "genv.orders.supplier.with": "#{regexify '(Alice|Bob|Carol|Alex|Joe|James|Jane|Jack)'}",
 
-    "transforms": "extractKey,flattenKey,convertBidTime,formatBidTime",
+    "transforms": "unwrapUnion,extractKey,flattenKey,convertBidTime,formatBidTime",
+
+    "transforms.unwrapUnion.type": "io.factorhouse.smt.UnwrapUnionTransform",
+
     "transforms.extractKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
     "transforms.extractKey.fields": "order_id",
     "transforms.flattenKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
     "transforms.flattenKey.field": "order_id",
+
     "transforms.convertBidTime.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
     "transforms.convertBidTime.field": "bid_time",
     "transforms.convertBidTime.target.type": "Timestamp",
     "transforms.convertBidTime.format": "EEE MMM dd HH:mm:ss zzz yyyy",
+
     "transforms.formatBidTime.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
     "transforms.formatBidTime.field": "bid_time",
     "transforms.formatBidTime.target.type": "string",
