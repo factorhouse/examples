@@ -43,7 +43,7 @@ We will use the MSK Data Generator (source) and Confluent S3 (sink) connectors. 
 
 ![](./images/connect-ui-04.png)
 
-The value schema for the `orders` topic (`orders-value`) is registered as a **record** type. However, by default, the source connector generates a **union** schema (e.g., `["null", "record"]`) to allow for nullable records. The S3 Sink Connector, on the other hand, expects a value schema of type **record**, not a union. To resolve this mismatch, a custom [Single Message Transform (SMT)](https://kafka.apache.org/documentation/#connect_transforms) — `io.factorhouse.smt.UnwrapUnionTransform` — is used to unwrap the union and expose only the record type. **Note:** Do not configure tombstone records when using this transform, as null values will be skipped.
+The value schema for the `orders` topic (`orders-value`) is registered as a **record** type. However, by default, the source connector generates a **union** schema (e.g., `["null", "record"]`) to allow for nullable records. The S3 Sink Connector, on the other hand, expects a value schema of type **record**, not a union. To resolve this mismatch, a custom [Single Message Transform (SMT)](https://kafka.apache.org/documentation/#connect_transforms) — `io.factorhouse.smt.UnwrapUnionTransform` - is used to unwrap the union and expose only the record type. **Note:** Do not configure [tombstone records](https://github.com/MichaelDrogalis/voluble?tab=readme-ov-file#tombstoning) when using this transform, as null values are incompatible with the unwrapped record schema.
 
 ![](./images/connect-ui-05.png)
 
