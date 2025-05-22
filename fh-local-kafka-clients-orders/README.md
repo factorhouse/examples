@@ -29,7 +29,7 @@ python -m venv venv
 source venv/bin/activate
 # windows
 # .\venv\Scripts\activate
-pip install -r fh-local-kafka-avro-clients/requirements.txt
+pip install -r fh-local-kafka-clients-orders/requirements.txt
 ```
 
 Start the producer.
@@ -38,7 +38,7 @@ Start the producer.
 - `MAX_RECORDS` controls the maximum number of records to produce. Or don't set for producing messages indefinitely.
 
 ```bash
-MODEL_VERSION=<num> MAX_RECORDS=<num> python fh-local-kafka-avro-clients/producer.py
+MODEL_VERSION=<num> MAX_RECORDS=<num> python fh-local-kafka-clients-orders/producer.py
 ```
 
 Start the consumer.
@@ -47,10 +47,10 @@ Start the consumer.
 
 ```bash
 # deserialize generic records
-python fh-local-kafka-avro-clients/consumer.py
+python fh-local-kafka-clients-orders/consumer.py
 
 # deserialize specific records
-MODEL_VERSION=<num> python fh-local-kafka-avro-clients/consumer.py
+MODEL_VERSION=<num> python fh-local-kafka-clients-orders/consumer.py
 ```
 
 ### Shutdown Environment

@@ -54,7 +54,7 @@ sourceSets {
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    archiveBaseName.set("fh-local-kafka-streams")
+    archiveBaseName.set("fh-local-kafka-streams-stats")
     archiveClassifier.set("")
     archiveVersion.set("1.0")
     mergeServiceFiles()

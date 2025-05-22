@@ -23,13 +23,13 @@ It offers a comprehensive Docker Compose-based environment for running [Factor H
 
 ### Factor House Local Labs
 
-- [Kafka Avro Clients with Schema Registry](./fh-local-kafka-avro-clients/)
+- [Kafka Avro Clients with Schema Registry](./fh-local-kafka-clients-orders/)
   - Python Kafka producer and consumer that are are used to demonstrate Avro (de)serialization and schema registry integration.
-- [Kafka Connect via Kpow UI and API](./fh-local-kafka-connect/)
+- [Kafka Connect via Kpow UI and API](./fh-local-kafka-connect-orders/)
   - This example demonstrates how to interact with Kafka Connect through both the Kpow UI and its Connect API. We’ll walk through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
-- [Kafka Streams with Kpow Streams Agent](./fh-local-kafka-streams/)
+- [Kafka Streams with Kpow Streams Agent](./fh-local-kafka-streams-stats/)
   - The Kafka Streams application reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
-- [Flink SQL with Kafka Source and Sink for Supplier Statistics](./fh-local-flink-sql-client/)
+- [Flink SQL with Kafka Source and Sink for Supplier Statistics](./fh-local-flink-sql-client-stats/)
   - This example demonstrates a Kafka SQL source connector that ingests order records from a Kafka topic into a Flink SQL source table, alongside a Kafka SQL sink connector that aggregates supplier statistics over 5-second tumbling windows and writes the results to a Kafka sink topic using Confluent Avro.
 
 ## Support

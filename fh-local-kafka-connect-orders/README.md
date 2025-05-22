@@ -35,7 +35,7 @@ We will use the MSK Data Generator (source) and Confluent S3 (sink) connectors. 
 
 ![](./images/connect-ui-02.png)
 
-4. Import the source connector configuration file (`./fh-local-kafka-connect/orders-source.json`) and hit _Create_.
+4. Import the source connector configuration file (`./fh-local-kafka-connect-orders/orders-source.json`) and hit _Create_.
 
 ![](./images/connect-ui-03.png)
 
@@ -87,12 +87,12 @@ This `CONNECT_ID` will be used in subsequent API calls to manage connectors.
 
 3. Create the Sink Connector
 
-Now, make a POST request with the S3 sink connector configuration (`fh-local-kafka-connect/orders-sink.json`).
+Now, make a POST request with the S3 sink connector configuration (`fh-local-kafka-connect-orders/orders-sink.json`).
 
 ```bash
 curl -s -i -X POST -H "$AUTH_HEADER" -H "Accept:application/json" -H  "Content-Type:application/json" \
   http://localhost:4000/connect/v1/apache/$CONNECT_ID/connectors \
-  -d @fh-local-kafka-connect/orders-sink.json
+  -d @fh-local-kafka-connect-orders/orders-sink.json
 # {
 #     "name": "orders-sink",
 #     "metadata": {

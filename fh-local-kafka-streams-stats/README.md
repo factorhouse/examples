@@ -28,7 +28,7 @@ CONNECT_ID=$(curl -s -H "$AUTH_HEADER" http://localhost:4000/connect/v1/clusters
 
 curl -s -i -X POST -H "$AUTH_HEADER" -H "Accept:application/json" -H  "Content-Type:application/json" \
   http://localhost:4000/connect/v1/apache/$CONNECT_ID/connectors \
-  -d @fh-local-kafka-connect/orders-source.json
+  -d @fh-local-kafka-connect-orders/orders-source.json
 ```
 
 ### Start Kafka Streams Application
@@ -50,10 +50,10 @@ We can launch the Kafka Streams application in two ways, catering to different s
 ./gradlew shadowJar
 
 # Resulting JAR:
-# build/libs/fh-local-kafka-streams-1.0.jar
+# build/libs/fh-local-kafka-streams-stats-1.0.jar
 
 👉 Run the Fat JAR:
-java -jar build/libs/fh-local-kafka-streams-1.0.jar
+java -jar build/libs/fh-local-kafka-streams-stats-1.0.jar
 ```
 
 We demonstrate how to start the applications in development mode using Gradle. Once the application is running, it appears in the **Streams** menu.

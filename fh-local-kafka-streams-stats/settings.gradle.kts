@@ -1,4 +1,4 @@
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
-rootProject.name = "fh-local-kafka-streams"
+rootProject.name = "fh-local-kafka-streams-stats"
