@@ -1,4 +1,4 @@
-## Kafka apps to demonstrate Avro (de)serialization and schema registry integration
+## Kafka Clients for Orders with Avro and Schema Registry
 
 Python Kafka producer and consumer clients in this folder are use to demonstrate Avro (de)serialization and schema registry integration.
 
