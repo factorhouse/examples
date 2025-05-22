@@ -1,24 +1,12 @@
 ![factorhouse](./images/factorhouse.jfif)
 
-# Product Feature
-
-## Kpow
+## Product Feature
 
 - [Manage Kafka Consumer Offsets with Kpow](./offset-management/)
   - Python Kafka producer and consumer clients that are used to showcase consumer group offset management capabilities of Kpow.
   - [Manage Kafka Consumer Offsets with Kpow](https://factorhouse.io/blog/how-to/manage-kafka-consumer-offsets-with-kpow/) (blog post)
-- [Kafka Avro Clients with Schema Registry](./fh-local-kafka-avro-clients/)
-  - Python Kafka producer and consumer that are are used to demonstrate Avro (de)serialization and schema registry integration.
-- [Kafka Connect via Kpow UI and API](./fh-local-kafka-connect/)
-  - This example demonstrates how to interact with Kafka Connect through both the Kpow UI and its Connect API. We’ll walk through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
-- [Kafka Streams with Kpow Streams Agent](./fh-local-kafka-streams/)
-  - The Kafka Streams application reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
 
-## Flex
-
-- 🚧 More to come
-
-# Integration
+## Integration
 
 - [Setting Up Kpow with Confluent Cloud](https://factorhouse.io/blog/how-to/set-up-kpow-with-confluent-cloud/)
   - A step-by-step guide to configuring Kpow with Confluent Cloud resources including Kafka clusters, Schema Registry, Kafka Connect, and kSQLDB.
@@ -27,11 +15,22 @@
 - [Set Up Kpow with Google Cloud Managed Service for Apache Kafka](https://factorhouse.io/blog/how-to/set-up-kpow-with-gcp/)
   - A practical, step-by-step guide on setting up a Google Cloud Managed Service for Apache Kafka cluster and connecting it from Kpow using the OAUTHBEARER mechanism.
 
-# Local Development
+## Factor House Local
 
 Looking for local development environment? Check out the [factorhouse-local](https://github.com/factorhouse/factorhouse-local) project.
 
 It offers a comprehensive Docker Compose-based environment for running [Factor House products](https://factorhouse.io/) - Kpow and Flex - alongside essential supporting infrastructure. It includes pre-configured stacks for various scenarios, such as Kafka development and monitoring with Kpow, real-time analytics with Flex and Apache Pinot, and more, enabling users to explore and test these tools in a local setup.
+
+### Factor House Local Labs
+
+- [Kafka Avro Clients with Schema Registry](./fh-local-kafka-avro-clients/)
+  - Python Kafka producer and consumer that are are used to demonstrate Avro (de)serialization and schema registry integration.
+- [Kafka Connect via Kpow UI and API](./fh-local-kafka-connect/)
+  - This example demonstrates how to interact with Kafka Connect through both the Kpow UI and its Connect API. We’ll walk through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
+- [Kafka Streams with Kpow Streams Agent](./fh-local-kafka-streams/)
+  - The Kafka Streams application reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
+- [Flink SQL with Kafka Source and Sink for Supplier Statistics](./fh-local-flink-sql-client/)
+  - This example demonstrates a Kafka SQL source connector that ingests order records from a Kafka topic into a Flink SQL source table, alongside a Kafka SQL sink connector that aggregates supplier statistics over 5-second tumbling windows and writes the results to a Kafka sink topic using Confluent Avro.
 
 ## Support
 
