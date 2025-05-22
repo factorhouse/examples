@@ -28,7 +28,7 @@ We will create a source connector that generates fake order records to a Kafka t
 
 Once created, we can check the connector and its tasks in the Kpow UI.
 
-![](./images/kafka-connector-01.png)
+![](./images/kafka-connector.png)
 
 ### Start SQL Client
 
