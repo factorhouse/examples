@@ -11,7 +11,7 @@ git clone https://github.com/factorhouse/examples.git
 cd examples
 ```
 
-### Start Kafka Environment and MinIO
+### Start Kafka and analtyics environment
 
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up a Kafka environment that includes **Kpow** and MinIO. This setup uses the **Kpow Enterprise edition**, as we'll later rely on the Kpow API - an enterprise-only feature. **Before you begin, ensure you have a valid Kpow license.** For guidance on requesting and configuring a license, see [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
@@ -22,7 +22,7 @@ docker compose -p kpow -f ./factorhouse-local/compose-kpow-trial.yml up -d \
   && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
 ```
 
-### Start Source Connector via UI
+### Deploy source connector via UI
 
 We will use the MSK Data Generator (source) and Confluent S3 (sink) connectors. Let's first create the source connector using the Kpow UI.
 
@@ -49,7 +49,7 @@ The value schema for the `orders` topic (`orders-value`) is registered as a **re
 
 This connector will start producing mock order data to a Kafka topic (`orders`).
 
-### Start Sink Connector via API
+### Deploy sink connector via API
 
 Next, we'll create the Confluent S3 sink connector using the Kpow API.
 
@@ -135,7 +135,7 @@ curl -s -H "$AUTH_HEADER" http://localhost:4000/connect/v1/apache/$CONNECT_ID/co
 # }
 ```
 
-### Verify Data Flow
+### Verify data flow
 
 1. Check Topic Data
 
@@ -149,7 +149,7 @@ Each file contains at most 100 records in [JSON Lines](https://jsonlines.org/) f
 
 ![](./images/connect-api-02.png)
 
-### Delete Connectors
+### Delete connectors
 
 Now, let's clean up by deleting the connectors.
 
@@ -175,7 +175,7 @@ Navigate to the _Connect_ section, and click _Delete connector_ option.
 
 ![](./images/connect-ui-06.png)
 
-### Shutdown Environment
+### Shutdown environment
 
 Finally, stop and remove the Docker containers.
 

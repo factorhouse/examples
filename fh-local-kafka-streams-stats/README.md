@@ -11,7 +11,7 @@ git clone https://github.com/factorhouse/examples.git
 cd examples
 ```
 
-### Start Kafka Environment
+### Start Kafka environment
 
 We can get our Kafka environment including **Kpow** up and running using [Factor House Local](https://github.com/factorhouse/factorhouse-local). This setup uses the **Kpow Enterprise edition**, as we'll use the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) - an enterprise-only feature. **Before you begin, ensure you have a valid Kpow license.** For guidance on requesting and configuring a license, see [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
@@ -20,18 +20,15 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 docker compose -f ./factorhouse-local/compose-kpow-trial.yml up -d
 ```
 
-### Start Source Connector via API
+### Deploy source connector
 
-```bash
-AUTH_HEADER=$(echo "Authorization: Basic $(echo -n 'admin:admin' | base64)")
-CONNECT_ID=$(curl -s -H "$AUTH_HEADER" http://localhost:4000/connect/v1/clusters | jq ".clusters[0].id" | tr -d '"')
+We will create a source connector that generates fake order records to a Kafka topic (`orders`). See the [Kafka Connect via Kpow UI and API](../fh-local-kafka-connect-orders/) lab for details about how to create the connector.
 
-curl -s -i -X POST -H "$AUTH_HEADER" -H "Accept:application/json" -H  "Content-Type:application/json" \
-  http://localhost:4000/connect/v1/apache/$CONNECT_ID/connectors \
-  -d @fh-local-kafka-connect-orders/orders-source.json
-```
+Once created, we can check the connector and its tasks in the Kpow UI.
 
-### Start Kafka Streams Application
+![](./images/kafka-connector.png)
+
+### Start Kafka Streams application
 
 To build and run the application locally, ensure that **JDK 17** and **Gradle 7.0+** are installed.
 
@@ -80,7 +77,7 @@ The **consumer topology** is also visualized. The edge labels in this view can s
 
 ![](./images/streams-04.png)
 
-### Shutdown Environment
+### Shutdown environment
 
 Stop and remove the Docker containers.
 

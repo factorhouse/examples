@@ -11,7 +11,7 @@ git clone https://github.com/factorhouse/examples.git
 cd examples
 ```
 
-### Start Kafka, Flink and Analytics Environments
+### Start Kafka, Flink and analytics environments
 
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex** as well as the analytics environment for Iceberg. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
@@ -23,7 +23,7 @@ docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
   && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
 ```
 
-### Start Source Connector
+### Deploy source connector
 
 We will create a source connector that generates fake order records to a Kafka topic (`orders`). See the [Kafka Connect via Kpow UI and API](../fh-local-kafka-connect-orders/) lab for details about how to create the connector.
 
@@ -31,7 +31,7 @@ Once created, we can check the connector and its tasks in the Kpow UI.
 
 ![](./images/kafka-connector.png)
 
-### Start SQL Client
+### Create pipeline
 
 This example runs in the Flink SQL client, which can be started as shown below.
 
@@ -39,7 +39,7 @@ This example runs in the Flink SQL client, which can be started as shown below.
 docker exec -it jobmanager ./bin/sql-client.sh
 ```
 
-#### Load Dependent JARs
+#### Load dependent JARs
 
 We begin by loading the necessary JAR files for the Apache Kafka SQL connector and Confluent Avro format support.
 
@@ -57,7 +57,7 @@ show jars;
 -- 2 rows in set
 ```
 
-#### Create a Source Table
+#### Create source table
 
 The source table is defined using the **Kafka SQL connector**, enabling Flink to consume **Avro-encoded messages** from the `orders` Kafka topic. To support time-based processing and potential windowed aggregations, a computed timestamp field and an event-time watermark are introduced:
 
@@ -90,7 +90,7 @@ CREATE TABLE orders (
 -- select * from orders;
 ```
 
-#### Create a Sink Table
+#### Create sink table
 
 A sink table, `orders_sink`, is defined to write processed order records to **object storage** (e.g., **MinIO**) in **Parquet format**. The data is **partitioned by bid date, hour, and minute** to enable efficient querying and organization.
 
@@ -102,7 +102,6 @@ SET 'execution.checkpointing.interval' = '60000';
 
 CREATE TABLE orders_sink(
     bid_date     STRING,
-    bid_hour     STRING,
     order_id     STRING,
     item         STRING,
     price        DECIMAL(10, 2),
@@ -123,7 +122,6 @@ CREATE TABLE orders_sink(
 INSERT INTO orders_sink
 SELECT
     DATE_FORMAT(bid_ts, 'yyyy-MM-dd'),
-    DATE_FORMAT(bid_ts, 'HH'),
     order_id,
     item,
     CAST(price AS DECIMAL(10, 2)),
@@ -149,7 +147,7 @@ In addition to monitoring the job, we can verify the output by inspecting the Pa
 
 ![](./images/minio-01.png)
 
-### Shutdown Environment
+### Shutdown environment
 
 Finally, stop and remove the Docker containers.
 
