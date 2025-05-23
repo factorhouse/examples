@@ -1,6 +1,6 @@
 ## Kafka Connect for Orders Sink in Iceberg
 
-This example demonstrates how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an Iceberg table stored in object storage (MinIO) using the Iceberg connector. Since Flink SQL does not support defining Iceberg's hidden partitioning, the sink table is created using Spark SQL instead.
+This example demonstrates how to stream Avro-encoded Kafka messages into an Iceberg table using Kafka Connect. The sink table is pre-created with Spark SQL to define custom partition columns. Once the connector is deployed via Kpow, records are written to MinIO in partitioned Parquet files.
 
 ## How to start
 
