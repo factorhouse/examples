@@ -35,8 +35,8 @@ It offers a comprehensive Docker Compose-based environment for running [Factor H
   - In progress
 - [Lab 6: Flink SQL for Orders Sink with Parquet](./fh-local-flink-sql-orders-parquet/)
   - This example demonstrates how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an object storage sink (MinIO) in Parquet format using the Filesystem connector.
-- Lab 7: Flink SQL for Orders Sink in Iceberg
-  - In progress
+- [Lab 7: Flink SQL for Orders Sink in Iceberg](./fh-local-flink-sql-orders-iceberg/)
+  - This example demonstrates how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an Iceberg table stored in object storage (MinIO) using the Iceberg connector. Since Flink SQL does not support defining Iceberg's hidden partitioning, the sink table is created using Spark SQL instead.
 - Lab 8: Flink Table Application for Orders Sink in Iceberg
   - In progress
 - Lab 9: Kafka Connect for Orders Sink in Iceberg
