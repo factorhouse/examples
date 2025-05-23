@@ -33,8 +33,8 @@ It offers a comprehensive Docker Compose-based environment for running [Factor H
   - This example demonstrates a Kafka SQL source connector that ingests order records from a Kafka topic into a Flink SQL source table, alongside a Kafka SQL sink connector that aggregates supplier statistics over 5-second tumbling windows and writes the results to a Kafka sink topic using Confluent Avro.
 - Lab 5: Flink DataStream Application for Supplier Statistics
   - In progress
-- Lab 6: Flink SQL for Orders Sink with Parquet
-  - In progress
+- [Lab 6: Flink SQL for Orders Sink with Parquet](./fh-local-flink-sql-orders-parquet/)
+  - This example demonstrates how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an object storage sink (MinIO) in Parquet format using the Filesystem connector.
 - Lab 7: Flink SQL for Orders Sink in Iceberg
   - In progress
 - Lab 8: Flink Table Application for Orders Sink in Iceberg

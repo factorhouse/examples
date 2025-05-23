@@ -13,7 +13,7 @@ cd examples
 
 ### Start Kafka and Flink Environments
 
-We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex**. We can use either the Kpow Community or Enterprise edition. **To begin, ensure a valid Kpow license is available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
+We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex**. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
 ```bash
 git clone https://github.com/factorhouse/factorhouse-local.git
@@ -58,12 +58,10 @@ show jars;
 
 #### Create a Source Table
 
-The source table can be created using the Kafka SQL connector, which allows Flink to consume Avro-encoded messages from a Kafka topic (`orders`). Two computed fields are introduced to prepare the data for time-based processing and aggregation:
+The source table is defined using the **Kafka SQL connector**, enabling Flink to consume **Avro-encoded messages** from the `orders` Kafka topic. To support time-based processing and potential windowed aggregations, a computed timestamp field and an event-time watermark are introduced:
 
-- `bid_ts` is derived from the original `bid_time` string using the `TO_TIMESTAMP` function, which parses the ISO 8601 format (`yyyy-MM-dd'T'HH:mm:ssX`) into a proper SQL `TIMESTAMP`.
-- `price_d` casts the `price` string into a `DECIMAL(10, 2)` for accurate numeric computation.
-
-A **watermark** is configured on the `bid_ts` field using `WATERMARK FOR bid_ts AS bid_ts - INTERVAL '5' SECOND`. This watermarking strategy helps Flink understand the event time progression and manage out-of-order events, enabling proper windowed aggregations.
+- **`bid_ts`** is a computed field that parses the ISO 8601 `bid_time` string into a proper SQL `TIMESTAMP` using the `TO_TIMESTAMP` function.
+- A **watermark** is defined on `bid_ts` using `WATERMARK FOR bid_ts AS bid_ts - INTERVAL '5' SECOND`. This watermark allows Flink to track event time progress and handle out-of-order events, which is required for time-based operations such as windowed aggregations or joins.
 
 This setup allows Flink to perform event-time processing over incoming Kafka messages, with schema management handled automatically by the Avro format and Schema Registry.
 
@@ -75,7 +73,6 @@ CREATE TABLE orders (
   supplier     STRING,
   bid_time     STRING,
   bid_ts     AS TO_TIMESTAMP(bid_time, 'yyyy-MM-dd''T''HH:mm:ssX'),
-  price_d    AS CAST(price AS DECIMAL(10, 2)),
   WATERMARK FOR bid_ts AS bid_ts - INTERVAL '5' SECOND
 ) WITH (
   'connector' = 'kafka',
@@ -109,7 +106,7 @@ The sink is backed by a Kafka topic (`orders-supplier-stats`) and uses _Confluen
 
 There are some important considerations.
 
-- **Parallelism**: The default parallelism is explicitly set to 3 using `SET 'parallelism.default' = '3';`. This value should not exceed the number of partitions in the Kafka topic; otherwise, some parallel tasks will not be able to write data, and no messages will be produced. If in doubt, it's safer to match the parallelism to the number of partitions.
+- **Parallelism**: The default parallelism is explicitly set to 3 using `SET 'parallelism.default' = '3'`. This value should not exceed the number of partitions in the Kafka topic; otherwise, some parallel tasks will not be able to write data, and no messages will be produced. If in doubt, it's safer to match the parallelism to the number of partitions.
 - **Topic creation**: If the Kafka topic `orders-supplier-stats` does not exist and Kafka is configured with `auto.create.topics.enable=true`, it will be automatically created with default settings. These typically include **3 partitions and a replication factor of 1 or 3**, depending on your broker configuration.
 - **Timestamp formatting**: The `window_start` and `window_end` fields are formatted using the `DATE_FORMAT(..., 'yyyy-MM-dd''T''HH:mm:ss''Z''')` pattern to produce ISO 8601-style UTC timestamps (ending with `'Z'`).
 
@@ -136,7 +133,8 @@ CREATE TABLE supplier_stats (
   'key.format' = 'raw',
   'key.fields' = 'supplier',
   'value.format' = 'avro-confluent',
-  'sink.partitioner' = 'fixed'
+  'sink.partitioner' = 'fixed',
+  'sink.parallelism' = '3'
 );
 
 INSERT INTO supplier_stats
@@ -144,7 +142,7 @@ SELECT
   DATE_FORMAT(window_start, 'yyyy-MM-dd''T''HH:mm:ss''Z''') AS window_start,
   DATE_FORMAT(window_end,   'yyyy-MM-dd''T''HH:mm:ss''Z''') AS window_end,
   supplier,
-  SUM(price_d) AS total_price,
+  SUM(CAST(price AS DECIMAL(10, 2))) AS total_price,
   count(*) AS `count`
 FROM TABLE(
   TUMBLE(TABLE orders, DESCRIPTOR(bid_ts), INTERVAL '5' SECOND))

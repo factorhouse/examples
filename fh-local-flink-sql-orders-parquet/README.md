@@ -1,0 +1,160 @@
+## Flink SQL for Orders Sink with Parquet
+
+This example demonstrates how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an object storage sink (MinIO) in Parquet format using the Filesystem connector.
+
+## How to start
+
+### Clone project repository
+
+```bash
+git clone https://github.com/factorhouse/examples.git
+cd examples
+```
+
+### Start Kafka, Flink and Analytics Environments
+
+We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex** as well as the analytics environment for Iceberg. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
+
+```bash
+git clone https://github.com/factorhouse/factorhouse-local.git
+
+docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
+  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml up -d \
+  && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
+```
+
+### Start Source Connector
+
+We will create a source connector that generates fake order records to a Kafka topic (`orders`). See the [Kafka Connect via Kpow UI and API](../fh-local-kafka-connect-orders/) lab for details about how to create the connector.
+
+Once created, we can check the connector and its tasks in the Kpow UI.
+
+![](./images/kafka-connector.png)
+
+### Start SQL Client
+
+This example runs in the Flink SQL client, which can be started as shown below.
+
+```bash
+docker exec -it jobmanager ./bin/sql-client.sh
+```
+
+#### Load Dependent JARs
+
+We begin by loading the necessary JAR files for the Apache Kafka SQL connector and Confluent Avro format support.
+
+```sql
+ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';
+ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+
+show jars;
+-- +-------------------------------------------------------------+
+-- |                                                        jars |
+-- +-------------------------------------------------------------+
+-- |     /tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar |
+-- | /tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar |
+-- +-------------------------------------------------------------+
+-- 2 rows in set
+```
+
+#### Create a Source Table
+
+The source table is defined using the **Kafka SQL connector**, enabling Flink to consume **Avro-encoded messages** from the `orders` Kafka topic. To support time-based processing and potential windowed aggregations, a computed timestamp field and an event-time watermark are introduced:
+
+- **`bid_ts`** is a computed field that parses the ISO 8601 `bid_time` string into a proper SQL `TIMESTAMP` using the `TO_TIMESTAMP` function.
+- A **watermark** is defined on `bid_ts` using `WATERMARK FOR bid_ts AS bid_ts - INTERVAL '5' SECOND`. This watermark allows Flink to track event time progress and handle out-of-order events, which is required for time-based operations such as windowed aggregations or joins.
+
+> 💡 The watermark definition can be omitted in this lab because the goal is simply to write Kafka records to an object storage (_MinIO_) without performing time-base transformations. However, including it prepares the pipeline for future event-time logic.
+
+```sql
+CREATE TABLE orders (
+  order_id     STRING,
+  item         STRING,
+  price        STRING,
+  supplier     STRING,
+  bid_time     STRING,
+  bid_ts     AS TO_TIMESTAMP(bid_time, 'yyyy-MM-dd''T''HH:mm:ssX'),
+  WATERMARK FOR bid_ts AS bid_ts - INTERVAL '5' SECOND
+) WITH (
+  'connector' = 'kafka',
+  'topic' = 'orders',
+  'properties.bootstrap.servers' = 'kafka-1:19092',
+  'format' = 'avro-confluent',
+  'avro-confluent.schema-registry.url' = 'http://schema:8081',
+  'avro-confluent.basic-auth.credentials-source' = 'USER_INFO',
+  'avro-confluent.basic-auth.user-info' = 'admin:admin',
+  'avro-confluent.schema-registry.subject' = 'orders-value',
+  'scan.startup.mode' = 'earliest-offset'
+);
+
+-- select * from orders;
+```
+
+#### Create a Sink Table
+
+A sink table, `orders_sink`, is defined to write processed order records to **object storage** (e.g., **MinIO**) in **Parquet format**. The data is **partitioned by bid date, hour, and minute** to enable efficient querying and organization.
+
+The table uses the **Filesystem connector** with the `s3a://` scheme for writing to S3-compatible storage. Partition commit policies and rolling options are configured to optimize file size and latency.
+
+```sql
+SET 'parallelism.default' = '3';
+SET 'execution.checkpointing.interval' = '60000';
+
+CREATE TABLE orders_sink(
+    bid_date     STRING,
+    bid_hour     STRING,
+    order_id     STRING,
+    item         STRING,
+    price        DECIMAL(10, 2),
+    supplier     STRING,
+    bid_ts       TIMESTAMP(3)
+) PARTITIONED BY (bid_date, bid_hour) WITH (
+    'connector' = 'filesystem',
+    'path' = 's3a://fh-dev-bucket/orders/',
+    'format' = 'parquet',
+    'sink.parallelism' = '3',
+    'sink.partition-commit.delay' = '1 min',
+    'sink.partition-commit.policy.kind' = 'success-file',
+    'sink.rolling-policy.file-size' = '128 MB',
+    'sink.rolling-policy.rollover-interval' = '15 min',
+    'sink.rolling-policy.check-interval' = '1 min'
+);
+
+INSERT INTO orders_sink
+SELECT
+    DATE_FORMAT(bid_ts, 'yyyy-MM-dd'),
+    DATE_FORMAT(bid_ts, 'HH'),
+    order_id,
+    item,
+    CAST(price AS DECIMAL(10, 2)),
+    supplier,
+    bid_ts
+FROM orders;
+```
+
+| 🛠 Note: To enable MinIO access, the following settings are included in the [`flink-conf.yaml`](https://github.com/factorhouse/factorhouse-local/blob/main/resources/flex/flink/flink-conf.yaml):
+
+```yaml
+fs.s3a.access.key: admin
+fs.s3a.secret.key: password
+fs.s3a.endpoint: http://minio:9000
+fs.s3a.path.style.access: true
+```
+
+We can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+
+![](./images/flex-01.png)
+
+In addition to monitoring the job, we can verify the output by inspecting the Parquet files written by the sink. As shown in the screenshot below, the records are successfully written to the configured partitions in the MinIO bucket (`fh-dev-bucket`).
+
+![](./images/minio-01.png)
+
+### Shutdown Environment
+
+Finally, stop and remove the Docker containers.
+
+```bash
+docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml down \
+  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml down
+```
