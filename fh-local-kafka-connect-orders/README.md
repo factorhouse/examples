@@ -27,11 +27,11 @@ docker compose -p kpow -f ./factorhouse-local/compose-kpow-trial.yml up -d \
 We will use the MSK Data Generator (source) and Confluent S3 (sink) connectors. Let's first create the source connector using the Kpow UI.
 
 1. Navigate to the Kpow UI (http://localhost:3030) and go to the _Connect_ section.
-2. Click Create connector to get started.
+2. Click _Create connector_ to get started.
 
 ![](./images/connect-ui-01.png)
 
-3. Select the _MSK Data Generator_ connector
+3. Select the _GeneratorSourceConnector_ connector
 
 ![](./images/connect-ui-02.png)
 
@@ -39,7 +39,7 @@ We will use the MSK Data Generator (source) and Confluent S3 (sink) connectors. 
 
 ![](./images/connect-ui-03.png)
 
-5. Once created, we can check the source connector and its tasks in the Kpow UI.
+5. Once deployed, we can check the source connector and its tasks in the Kpow UI.
 
 ![](./images/connect-ui-04.png)
 

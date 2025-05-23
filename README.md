@@ -39,8 +39,8 @@ It offers a comprehensive Docker Compose-based environment for running [Factor H
   - This example demonstrates how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an Iceberg table stored in object storage (MinIO) using the Iceberg connector. Since Flink SQL does not support defining Iceberg's hidden partitioning, the sink table is created using Spark SQL instead.
 - Lab 8: Flink Table Application for Orders Sink in Iceberg
   - In progress
-- Lab 9: Kafka Connect for Orders Sink in Iceberg
-  - In progress
+- [Lab 9: Kafka Connect for Orders Sink in Iceberg](./fh-local-kafka-connect-iceberg/)
+  - This example demonstrates how to stream Avro-encoded Kafka messages into an Iceberg table using Kafka Connect. The sink table is pre-created with Spark SQL to define custom partition columns. Once the connector is deployed via Kpow, records are written to MinIO in partitioned Parquet files.
 - Lab 10: Spark SQL for Orders Sink in Iceberg
   - In progress
 - Lab 11: Flink SQL Gateway for Supplier Statistics
