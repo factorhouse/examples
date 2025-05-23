@@ -17,7 +17,7 @@
 
 ## Factor House Local
 
-Looking for local development environment? Check out the [factorhouse-local](https://github.com/factorhouse/factorhouse-local) project.
+Looking for local development environment? Check out [Factor House Local](https://github.com/factorhouse/factorhouse-local) project.
 
 It provides a collection of pre-configured Docker Compose environments that demonstrate modern data platform architectures. Each setup is purpose-built around a specific use case and incorporates widely adopted technologies such as Kafka, Flink, Spark, Iceberg, and Pinot. These environments are further enhanced by enterprise-grade tools from Factor House: [**Kpow**](https://factorhouse.io/kpow), for Kafka management and control, and [**Flex**](https://factorhouse.io/flex/), for seamless integration with Flink.
 
