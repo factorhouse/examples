@@ -1,0 +1,36 @@
+{
+  "name": "orders-iceberg-sink",
+  "config": {
+    "connector.class": "io.tabular.iceberg.connect.IcebergSinkConnector",
+    "tasks.max": "3",
+    "topics": "orders",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schema:8081",
+    "value.converter.basic.auth.credentials.source": "USER_INFO",
+    "value.converter.basic.auth.user.info": "admin:admin",
+
+    "iceberg.catalog": "demo",
+    "iceberg.catalog.type": "rest",
+    "iceberg.catalog.uri": "http://rest:8181",
+    "iceberg.catalog.warehouse": "s3://warehouse",
+    "iceberg.catalog.io-impl": "org.apache.iceberg.aws.s3.S3FileIO",
+    "iceberg.catalog.s3.endpoint": "http://minio:9000",
+    "iceberg.catalog.s3.region": "us-east-1",
+    "iceberg.catalog.s3.access-key-id": "admin",
+    "iceberg.catalog.s3.secret-access-key": "password",
+    "iceberg.catalog.s3.path-style-access": "true",
+    "iceberg.catalog.client.connect-timeout-ms": "10000",
+    "iceberg.catalog.client.read-timeout-ms": "60000",
+
+    "iceberg.tables": "db.orders",
+    "iceberg.control.commit.interval-ms": "10000",
+
+    "transforms": "convertTimestamp",
+    "transforms.convertTimestamp.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+    "transforms.convertTimestamp.field": "bid_time",
+    "transforms.convertTimestamp.target.type": "Timestamp",
+    "transforms.convertTimestamp.format": "yyyy-MM-dd'T'HH:mm:ssX"
+  }
+}
