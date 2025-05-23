@@ -13,7 +13,7 @@ cd examples
 
 ### Start Kafka, Flink and analytics environments
 
-We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex** as well as the analytics environment for Iceberg. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
+We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex** as well as an analytics environment for Iceberg. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
 ```bash
 git clone https://github.com/factorhouse/factorhouse-local.git
@@ -27,7 +27,7 @@ docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
 
 We will create a source connector that generates fake order records to a Kafka topic (`orders`). See the [Kafka Connect via Kpow UI and API](../fh-local-kafka-connect-orders/) lab for details about how to create the connector.
 
-Once created, we can check the connector and its tasks in the Kpow UI.
+Once deployed, we can check the connector and its tasks in Kpow.
 
 ![](./images/kafka-connector.png)
 

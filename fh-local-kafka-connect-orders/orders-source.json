@@ -24,6 +24,7 @@
 
     "transforms.extractKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
     "transforms.extractKey.fields": "order_id",
+
     "transforms.flattenKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
     "transforms.flattenKey.field": "order_id",
 
