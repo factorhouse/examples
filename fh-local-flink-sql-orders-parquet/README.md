@@ -107,7 +107,7 @@ CREATE TABLE orders_sink(
     price        DECIMAL(10, 2),
     supplier     STRING,
     bid_ts       TIMESTAMP(3)
-) PARTITIONED BY (bid_date, bid_hour) WITH (
+) PARTITIONED BY (bid_date) WITH (
     'connector' = 'filesystem',
     'path' = 's3a://fh-dev-bucket/orders/',
     'format' = 'parquet',
