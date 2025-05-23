@@ -31,6 +31,22 @@ It offers a comprehensive Docker Compose-based environment for running [Factor H
   - The Kafka Streams application reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
 - [Lab 4: Flink SQL with Kafka Source and Sink for Supplier Statistics](./fh-local-flink-sql-client-stats/)
   - This example demonstrates a Kafka SQL source connector that ingests order records from a Kafka topic into a Flink SQL source table, alongside a Kafka SQL sink connector that aggregates supplier statistics over 5-second tumbling windows and writes the results to a Kafka sink topic using Confluent Avro.
+- Lab 5: Flink DataStream Application for Supplier Statistics
+  - In progress
+- Lab 6: Flink SQL for Orders Sink with Parquet
+  - In progress
+- Lab 7: Flink SQL for Orders Sink in Iceberg
+  - In progress
+- Lab 8: Flink Table Application for Orders Sink in Iceberg
+  - In progress
+- Lab 9: Kafka Connect for Orders Sink in Iceberg
+  - In progress
+- Lab 10: Spark SQL for Orders Sink in Iceberg
+  - In progress
+- Lab 11: Flink SQL Gateway for Supplier Statistics
+  - In progress
+- Lab 12: Pinot Analytics for Supplier Statistics
+  - In progress
 
 ## Support
 
