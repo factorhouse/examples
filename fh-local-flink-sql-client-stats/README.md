@@ -58,10 +58,7 @@ show jars;
 
 #### Create source table
 
-The source table is defined using the **Kafka SQL connector**, enabling Flink to consume **Avro-encoded messages** from the `orders` Kafka topic. To support time-based processing and potential windowed aggregations, a computed timestamp field and an event-time watermark are introduced:
-
-- **`bid_ts`** is a computed field that parses the ISO 8601 `bid_time` string into a proper SQL `TIMESTAMP` using the `TO_TIMESTAMP` function.
-- A **watermark** is defined on `bid_ts` using `WATERMARK FOR bid_ts AS bid_ts - INTERVAL '5' SECOND`. This watermark allows Flink to track event time progress and handle out-of-order events, which is required for time-based operations such as windowed aggregations or joins.
+The source table is defined using the **Kafka SQL connector**, enabling Flink to consume **Avro-encoded messages** from the `orders` Kafka topic. To support time-based processing and windowed aggregations, an event-time watermark is introduced on `bid_time` using `WATERMARK FOR bid_time AS bid_time - INTERVAL '5' SECOND`. This watermark allows Flink to track event time progress and handle out-of-order events, which is required for time-based operations such as windowed aggregations or joins.
 
 This setup allows Flink to perform event-time processing over incoming Kafka messages, with schema management handled automatically by the Avro format and Schema Registry.
 
@@ -71,9 +68,8 @@ CREATE TABLE orders (
   item         STRING,
   price        STRING,
   supplier     STRING,
-  bid_time     STRING,
-  bid_ts     AS TO_TIMESTAMP(bid_time, 'yyyy-MM-dd''T''HH:mm:ssX'),
-  WATERMARK FOR bid_ts AS bid_ts - INTERVAL '5' SECOND
+  bid_time     TIMESTAMP(3),
+  WATERMARK FOR bid_time AS bid_time - INTERVAL '5' SECOND
 ) WITH (
   'connector' = 'kafka',
   'topic' = 'orders',
@@ -100,7 +96,7 @@ A sink table (`supplier_stats`) is defined to collect per-supplier statistics co
 - The total price of all bids within the window, and
 - The total number of bids received.
 
-This aggregation is performed using Flink's `TUMBLE` function, which groups events into fixed-size, non-overlapping time windows based on the `bid_ts` field from the source table. The results of the aggregation query are inserted into the sink table.
+This aggregation is performed using Flink's `TUMBLE` function, which groups events into fixed-size, non-overlapping time windows based on the `bid_time` field from the source table. The results of the aggregation query are inserted into the sink table.
 
 The sink is backed by a Kafka topic (`orders-supplier-stats`) and uses _Confluent Avro_ for both the value serialization. The key is set to the `supplier` field and uses a `fixed` partitioner, ensuring that all records for the same supplier are written to the same partition.
 
@@ -145,7 +141,7 @@ SELECT
   SUM(CAST(price AS DECIMAL(10, 2))) AS total_price,
   count(*) AS `count`
 FROM TABLE(
-  TUMBLE(TABLE orders, DESCRIPTOR(bid_ts), INTERVAL '5' SECOND))
+  TUMBLE(TABLE orders, DESCRIPTOR(bid_time), INTERVAL '5' SECOND))
 GROUP BY window_start, window_end, supplier;
 ```
 

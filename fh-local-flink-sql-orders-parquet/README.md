@@ -59,10 +59,7 @@ show jars;
 
 #### Create source table
 
-The source table is defined using the **Kafka SQL connector**, enabling Flink to consume **Avro-encoded messages** from the `orders` Kafka topic. To support time-based processing and potential windowed aggregations, a computed timestamp field and an event-time watermark are introduced:
-
-- **`bid_ts`** is a computed field that parses the ISO 8601 `bid_time` string into a proper SQL `TIMESTAMP` using the `TO_TIMESTAMP` function.
-- A **watermark** is defined on `bid_ts` using `WATERMARK FOR bid_ts AS bid_ts - INTERVAL '5' SECOND`. This watermark allows Flink to track event time progress and handle out-of-order events, which is required for time-based operations such as windowed aggregations or joins.
+The source table is defined using the **Kafka SQL connector**, enabling Flink to consume **Avro-encoded messages** from the `orders` Kafka topic. To support time-based processing and potential windowed aggregations, an event-time watermark is introduced on `bid_time` using `WATERMARK FOR bid_time AS bid_time - INTERVAL '5' SECOND`. This watermark allows Flink to track event time progress and handle out-of-order events, which is required for time-based operations such as windowed aggregations or joins.
 
 > 💡 The watermark definition can be omitted in this lab because the goal is simply to write Kafka records to an object storage (_MinIO_) without performing time-base transformations. However, including it prepares the pipeline for future event-time logic.
 
@@ -72,9 +69,8 @@ CREATE TABLE orders (
   item         STRING,
   price        STRING,
   supplier     STRING,
-  bid_time     STRING,
-  bid_ts     AS TO_TIMESTAMP(bid_time, 'yyyy-MM-dd''T''HH:mm:ssX'),
-  WATERMARK FOR bid_ts AS bid_ts - INTERVAL '5' SECOND
+  bid_time     TIMESTAMP(3),
+  WATERMARK FOR bid_time AS bid_time - INTERVAL '5' SECOND
 ) WITH (
   'connector' = 'kafka',
   'topic' = 'orders',
@@ -106,7 +102,7 @@ CREATE TABLE orders_sink(
     item         STRING,
     price        DECIMAL(10, 2),
     supplier     STRING,
-    bid_ts       TIMESTAMP(3)
+    bid_time     TIMESTAMP(3)
 ) PARTITIONED BY (bid_date) WITH (
     'connector' = 'filesystem',
     'path' = 's3a://fh-dev-bucket/orders/',
@@ -121,12 +117,12 @@ CREATE TABLE orders_sink(
 
 INSERT INTO orders_sink
 SELECT
-    DATE_FORMAT(bid_ts, 'yyyy-MM-dd'),
+    DATE_FORMAT(bid_time, 'yyyy-MM-dd'),
     order_id,
     item,
     CAST(price AS DECIMAL(10, 2)),
     supplier,
-    bid_ts
+    bid_time
 FROM orders;
 ```
 

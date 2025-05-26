@@ -1,6 +1,6 @@
 import uuid
-import datetime
 import dataclasses
+from datetime import datetime, timezone
 
 from confluent_kafka.serialization import SerializationContext
 from faker import Faker
@@ -14,7 +14,7 @@ faker.add_provider(faker_commerce.Provider)
 def create_item(version: int = 1):
     item = {
         "order_id": str(uuid.uuid4()),
-        "bid_time": datetime.datetime.now().isoformat(timespec="milliseconds"),
+        "bid_time": round(datetime.now(timezone.utc).timestamp() * 1000),
         "price": faker.pyfloat(
             right_digits=2, min_value=1, max_value=150, positive=True
         ),
@@ -31,13 +31,16 @@ def create_item(version: int = 1):
 @dataclasses.dataclass
 class OrderBase:
     order_id: str
-    bid_time: str
+    bid_time: datetime  # logicalType: timestamp-millis
     price: float
     item: str
     supplier: str
 
     @classmethod
     def from_dict(cls, d: dict, ctx: SerializationContext):
+        bid_time = d.get("bid_time")
+        if bid_time is not None:
+            d["bid_time"] = datetime.fromtimestamp(bid_time / 1000, tz=timezone.utc)
         return cls(**d)
 
     def to_dict(self, ctx: SerializationContext):
@@ -67,7 +70,7 @@ class OrderV1(OrderBase):
         return OrderBase._make_schema(
             [
                 {"name": "order_id", "type": "string"},
-                {"name": "bid_time", "type": "string"},
+                {"name": "bid_time", "type": "long", "logicalType": "timestamp-millis"},
                 {"name": "price", "type": "double"},
                 {"name": "item", "type": "string"},
                 {"name": "supplier", "type": "string"},
@@ -88,7 +91,7 @@ class OrderV2(OrderBase):
         return OrderBase._make_schema(
             [
                 {"name": "order_id", "type": "string"},
-                {"name": "bid_time", "type": "string"},
+                {"name": "bid_time", "type": "long", "logicalType": "timestamp-millis"},
                 {"name": "price", "type": "double"},
                 {"name": "item", "type": "string"},
                 {"name": "supplier", "type": "string"},

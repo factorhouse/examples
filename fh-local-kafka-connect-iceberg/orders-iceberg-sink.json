@@ -25,12 +25,6 @@
     "iceberg.catalog.client.read-timeout-ms": "60000",
 
     "iceberg.tables": "db.orders",
-    "iceberg.control.commit.interval-ms": "10000",
-
-    "transforms": "convertTimestamp",
-    "transforms.convertTimestamp.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
-    "transforms.convertTimestamp.field": "bid_time",
-    "transforms.convertTimestamp.target.type": "Timestamp",
-    "transforms.convertTimestamp.format": "yyyy-MM-dd'T'HH:mm:ssX"
+    "iceberg.control.commit.interval-ms": "10000"
   }
 }
