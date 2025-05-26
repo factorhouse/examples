@@ -77,6 +77,10 @@ The **consumer topology** is also visualized. The edge labels in this view can s
 
 ![](./images/streams-04.png)
 
+Finally, we can inspect the messages in the `orders-supplier-stats` topic. For proper Avro decoding in Kpow, set the **Key Deserializer** to _String_, the **Value Deserializer** to _AVRO_, and select _Local Schema Registry_. Then, click the _Search_ button to view the records.
+
+![](./images/messages-01.png)
+
 ### Shutdown environment
 
 Stop and remove the Docker containers.

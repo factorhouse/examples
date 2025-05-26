@@ -75,7 +75,7 @@ object StreamsApp {
             source
                 .map { _, value ->
                     val supplier = value["supplier"]?.toString() ?: "UNKNOWN"
-                    val price = value["price"] as? Double ?: 0.0
+                    val price = value["price"]?.toString()?.toDoubleOrNull() ?: 0.0
                     KeyValue(supplier, price)
                 }.groupByKey(Grouped.with(keySerde, Serdes.Double()))
                 .windowedBy(TimeWindows.ofSizeAndGrace(windowSize, gradePeriod))
