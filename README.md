@@ -24,7 +24,7 @@ It provides a collection of pre-configured Docker Compose environments that demo
 ### Factor House Local Labs
 
 - [Lab 1: Kafka Clients for Orders with Avro and Schema Registry](./fh-local-kafka-clients-orders/)
-  - Python Kafka producer and consumer that are are used to demonstrate Avro (de)serialization and schema registry integration.
+  - This folder contains Python-based Kafka producer and consumer clients that demonstrate Avro (de)serialization with Confluent Schema Registry integration, showcasing schema evolution using both generic and specific records to illustrate how changes - such as adding new fields - affect message production and consumption.
 - [Lab 2: Kafka Connect for Orders via the Kpow UI and API](./fh-local-kafka-connect-orders/)
   - This example demonstrates how to interact with Kafka Connect through both the Kpow UI and its Connect API. We’ll walk through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
 - [Lab 3: Kafka Streams for Supplier Statistics with the Kpow Streams Agent](./fh-local-kafka-streams-stats/)
