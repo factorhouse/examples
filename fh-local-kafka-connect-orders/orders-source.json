@@ -18,13 +18,12 @@
     "genv.orders.item.with": "#{Commerce.productName}",
     "genv.orders.supplier.with": "#{regexify '(Alice|Bob|Carol|Alex|Joe|James|Jane|Jack)'}",
 
-    "transforms": "unwrapUnion,extractKey,flattenKey,convertBidTime,formatBidTime",
+    "transforms": "unwrapUnion,extractKey,flattenKey,convertBidTime",
 
     "transforms.unwrapUnion.type": "io.factorhouse.smt.UnwrapUnionTransform",
 
     "transforms.extractKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
     "transforms.extractKey.fields": "order_id",
-
     "transforms.flattenKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
     "transforms.flattenKey.field": "order_id",
 
@@ -32,11 +31,6 @@
     "transforms.convertBidTime.field": "bid_time",
     "transforms.convertBidTime.target.type": "Timestamp",
     "transforms.convertBidTime.format": "EEE MMM dd HH:mm:ss zzz yyyy",
-
-    "transforms.formatBidTime.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
-    "transforms.formatBidTime.field": "bid_time",
-    "transforms.formatBidTime.target.type": "string",
-    "transforms.formatBidTime.format": "yyyy-MM-dd'T'HH:mm:ss'Z'",
 
     "global.throttle.ms": "500",
     "global.history.records.max": "1000"
