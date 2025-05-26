@@ -1,6 +1,6 @@
 ## Kafka Clients for Orders with Avro and Schema Registry
 
-This folder contains Python-based Kafka producer and consumer clients that demonstrate Avro (de)serialization with Confluent Schema Registry integration, showcasing schema evolution using both generic and specific records to illustrate how changes - such as adding new fields - affect message production and consumption.
+This lab includes a hands-on example using Python-based Kafka producers and consumers to work with Avro serialization and Confluent Schema Registry. It showcases schema evolution with both generic and specific records.
 
 ## How to start
 

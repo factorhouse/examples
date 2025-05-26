@@ -1,6 +1,6 @@
 ## Flink SQL for Orders Sink with Parquet
 
-This example demonstrates how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an object storage sink (MinIO) in Parquet format using the Filesystem connector.
+This lab ingests Avro-encoded orders from Kafka into a Flink SQL source table and writes them to MinIO as Parquet files using the Filesystem connector.
 
 ## How to start
 

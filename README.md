@@ -24,23 +24,23 @@ It provides a collection of pre-configured Docker Compose environments that demo
 ### Factor House Local Labs
 
 - [Lab 1: Kafka Clients for Orders with Avro and Schema Registry](./fh-local-kafka-clients-orders/)
-  - This folder contains Python-based Kafka producer and consumer clients that demonstrate Avro (de)serialization with Confluent Schema Registry integration, showcasing schema evolution using both generic and specific records to illustrate how changes - such as adding new fields - affect message production and consumption.
+  - This lab includes a hands-on example using Python-based Kafka producers and consumers to work with Avro serialization and Confluent Schema Registry. It showcases schema evolution with both generic and specific records.
 - [Lab 2: Kafka Connect for Orders via the Kpow UI and API](./fh-local-kafka-connect-orders/)
-  - This example demonstrates how to interact with Kafka Connect through both the Kpow UI and its Connect API. We’ll walk through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
+  - This lab demonstrates how to deploy Kafka connectors via the Kpow UI and API. It walks through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
 - [Lab 3: Kafka Streams for Supplier Statistics with the Kpow Streams Agent](./fh-local-kafka-streams-stats/)
-  - The Kafka Streams application reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
+  - This lab introduces a Kafka Streams application that reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
 - [Lab 4: Flink SQL with Kafka Source and Sink for Supplier Statistics](./fh-local-flink-sql-client-stats/)
-  - This example demonstrates a Kafka SQL source connector that ingests order records from a Kafka topic into a Flink SQL source table, alongside a Kafka SQL sink connector that aggregates supplier statistics over 5-second tumbling windows and writes the results to a Kafka sink topic using Confluent Avro.
+  - This lab illustrates a Flink SQL pipeline that reads Avro-encoded order records from a Kafka topic into a source table, performs 5-second tumbling window aggregations to compute supplier statistics, and writes the results to a Kafka sink table with Confluent Avro format.
 - Lab 5: Flink DataStream Application for Supplier Statistics
   - In progress
 - [Lab 6: Flink SQL for Orders Sink with Parquet](./fh-local-flink-sql-orders-parquet/)
-  - This example demonstrates how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an object storage sink (MinIO) in Parquet format using the Filesystem connector.
+  - This lab ingests Avro-encoded orders from Kafka into a Flink SQL source table and writes them to MinIO as Parquet files using the Filesystem connector.
 - [Lab 7: Flink SQL for Orders Sink in Iceberg](./fh-local-flink-sql-orders-iceberg/)
-  - This example demonstrates how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an Iceberg table stored in object storage (MinIO) using the Iceberg connector. Since Flink SQL does not support defining Iceberg's hidden partitioning, the sink table is created using Spark SQL instead.
+  - This lab shows how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an Iceberg table stored in object storage (MinIO) using the Iceberg connector. Since Flink SQL does not support defining Iceberg's hidden partitioning, the sink table is created using Spark SQL instead.
 - Lab 8: Flink Table Application for Orders Sink in Iceberg
   - In progress
 - [Lab 9: Kafka Connect for Orders Sink in Iceberg](./fh-local-kafka-connect-iceberg/)
-  - This example demonstrates how to stream Avro-encoded Kafka messages into an Iceberg table using Kafka Connect. The sink table is pre-created with Spark SQL to define custom partition columns. Once the connector is deployed via Kpow, records are written to MinIO in partitioned Parquet files.
+  - This lab demonstrates streaming Avro messages from Kafka into an Iceberg table using Kafka Connect. The target table is pre-defined via Spark SQL with custom partitions using Iceberg's hidden partitioning, and data is written to MinIO as partitioned Parquet files once deployed through Kpow.
 - Lab 10: Spark SQL for Orders Sink in Iceberg
   - In progress
 - Lab 11: Flink SQL Gateway for Supplier Statistics

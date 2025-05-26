@@ -1,6 +1,6 @@
 ## Kafka Connect for Orders via the Kpow UI and API
 
-This example demonstrates how to interact with Kafka Connect through both the Kpow UI and its Connect API. We’ll walk through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
+This lab demonstrates how to deploy Kafka connectors via the Kpow UI and API. It walks through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
 
 ## How to start
 

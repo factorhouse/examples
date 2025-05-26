@@ -1,6 +1,6 @@
 ## Flink SQL with Kafka Source and Sink for Supplier Statistics
 
-This example demonstrates a Kafka SQL source connector that ingests order records from a Kafka topic into a Flink SQL source table, alongside a Kafka SQL sink connector that aggregates supplier statistics over 5-second tumbling windows and writes the results to a Kafka sink topic using Confluent Avro.
+This lab illustrates a Flink SQL pipeline that reads Avro-encoded order records from a Kafka topic into a source table, performs 5-second tumbling window aggregations to compute supplier statistics, and writes the results to a Kafka sink table with Confluent Avro format.
 
 ## How to start
 
