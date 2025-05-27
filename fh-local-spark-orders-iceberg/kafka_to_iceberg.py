@@ -11,6 +11,8 @@ def from_avro(col, config):
     """
     Avro deserialization
 
+    Source: https://github.com/AbsaOSS/ABRiS/blob/master/documentation/python-documentation.md
+
     :param col (PySpark column / str): column name "key" or "value"
     :param config (za.co.absa.abris.config.FromAvroConfig): abris config, generated from abris_config helper function
     :return: PySpark Column
@@ -23,6 +25,8 @@ def from_avro(col, config):
 def from_avro_abris_config(config_map, topic, is_key):
     """
     Create from avro abris config with a schema url
+
+    Source: https://github.com/AbsaOSS/ABRiS/blob/master/documentation/python-documentation.md
 
     :param config_map (dict[str, str]): configuration map to pass to deserializer, ex: {'schema.registry.url': 'http://localhost:8081'}
     :param topic (str): kafka topic
