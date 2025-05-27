@@ -36,7 +36,7 @@ Once deployed, we can check the connector and its tasks in Kpow.
 Flink SQL doesn't support [Iceberg's hidden partitioning](https://iceberg.apache.org/docs/nightly/partitioning/#icebergs-hidden-partitioning). Therefore, we will create the sink table using Spark SQL.
 
 ```bash
-docker exec -it spark-iceberg spark-sql
+docker exec -it spark-iceberg /opt/spark/bin/spark-sql
 ```
 
 ```sql
@@ -169,7 +169,7 @@ We can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`local
 
 ![](./images/flex-01.png)
 
-In addition to monitoring the job, we can verify the output by inspecting the Parquet files written by the sink. As shown in the screenshot below, the records are successfully written to the configured partitions in the MinIO bucket (`warehouse`).
+In addition to monitoring the job, we can verify the output by inspecting the Parquet files written by the sink. These files are accessible via MinIO at `http://localhost:9001` using `admin` as the username and `password` as the password. As shown in the screenshot below, the records have been successfully written to the appropriate partitions in the `warehouse` bucket.
 
 ![](./images/minio-01.png)
 
