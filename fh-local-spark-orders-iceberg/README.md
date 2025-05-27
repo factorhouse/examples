@@ -74,9 +74,9 @@ We can verify the output by inspecting the Parquet files written by the sink. Th
 
 ![](./images/minio-01.png)
 
-Additionally, we can monitor the job via the Spark History Server at `http://localhost:18080`:
+Additionally, you can monitor the job in real time using the Spark Web UI at `http://localhost:4040` while the application is running, or review completed jobs later via the Spark History Server at `http://localhost:18080`.
 
-![](./images/history-server-01.png)
+![](./images/web-ui-01.png)
 
 ### Shutdown environment
 
