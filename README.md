@@ -43,8 +43,8 @@ It provides a collection of pre-configured Docker Compose environments that demo
   - This lab demonstrates streaming Avro messages from Kafka into an Iceberg table using Kafka Connect. The target table is pre-defined via Spark SQL with custom partitions using Iceberg's hidden partitioning, and data is written to MinIO as partitioned Parquet files once deployed through Kpow.
 - [Lab 10: Spark SQL for Orders Sink in Iceberg](./fh-local-spark-orders-iceberg/)
   - This lab shows how to stream Avro-encoded order records from a Kafka topic into a PySpark Structured Streaming job and write them to an Iceberg table in MinIO. The Avro schema is resolved via Schema Registry using ABRiS, and all dependencies are bundled in an Uber JAR.
-- Lab 11: Flink SQL Gateway for Supplier Statistics
-  - In progress
+- [Lab 11: Flink SQL Gateway for Supplier Statistics](./fh-local-flink-sql-gateway-stats/)
+  - This lab demonstrates a Flink SQL streaming pipeline that consumes Avro-encoded order records from a Kafka topic into a source table, and performs 5-second tumbling window aggregations to compute supplier statistics. The results are fetched in real time via the Flink SQL Gateway REST API and printed directly by the running Python application.
 - Lab 12: Pinot Analytics for Supplier Statistics
   - In progress
 
