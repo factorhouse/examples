@@ -122,9 +122,14 @@ GROUP BY window_start, window_end, supplier;
 From the project root:
 
 ```bash
+# Create and activate a virtual environment
 python -m venv venv
 source venv/bin/activate
+
+# Install required Python packages
 pip install -r fh-local-flink-sql-gateway-stats/requirements.txt
+
+# Run the Flink SQL runner application
 python fh-local-flink-sql-gateway-stats/flink_sql_runner.py
 ```
 
