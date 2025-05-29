@@ -23,7 +23,9 @@ It provides a collection of pre-configured Docker Compose environments that demo
 
 ### Factor House Local Labs
 
-![Factor House Local Labs](./images/fh-local-labs.png)
+<p align="center">
+  <img width="500" height="400" src="./images/fh-local-labs.png">
+</p>
 
 - [Lab 1: Kafka Clients for Orders with Avro and Schema Registry](./fh-local-kafka-clients-orders/)
   - This lab includes a hands-on example using Python-based Kafka producers and consumers to work with Avro serialization and Confluent Schema Registry. It showcases schema evolution with both generic and specific records.
