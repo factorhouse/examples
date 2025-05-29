@@ -24,7 +24,7 @@ It provides a collection of pre-configured Docker Compose environments that demo
 ### Factor House Local Labs
 
 <p align="center">
-  <img width="500" height="400" src="./images/fh-local-labs.png">
+  <img src="./images/fh-local-labs.png">
 </p>
 
 - [Lab 1: Kafka Clients for Orders with Avro and Schema Registry](./fh-local-kafka-clients-orders/)
