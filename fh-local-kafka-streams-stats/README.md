@@ -28,7 +28,7 @@ Once deployed, we can check the connector and its tasks in Kpow.
 
 ![](./images/kafka-connector.png)
 
-### Start Kafka Streams application
+### Running Kafka Streams application
 
 To build and run the application locally, ensure that **JDK 17** and **Gradle 7.0+** are installed.
 

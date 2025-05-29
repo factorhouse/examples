@@ -33,10 +33,10 @@ It provides a collection of pre-configured Docker Compose environments that demo
   - This lab demonstrates how to deploy Kafka connectors via the Kpow UI and API. It walks through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
 - [Lab 3: Kafka Streams for Supplier Statistics with the Kpow Streams Agent](./fh-local-kafka-streams-stats/)
   - This lab introduces a Kafka Streams application that reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
-- [Lab 4: Flink SQL with Kafka Source and Sink for Supplier Statistics](./fh-local-flink-sql-client-stats/)
+- [Lab 4: Flink SQL for Supplier Statistics](./fh-local-flink-sql-client-stats/)
   - This lab illustrates a Flink SQL pipeline that reads Avro-encoded order records from a Kafka topic into a source table, performs 5-second tumbling window aggregations to compute supplier statistics, and writes the results to a Kafka sink table with Confluent Avro format.
-- Lab 5: Flink DataStream Application for Supplier Statistics
-  - In progress
+- [Lab 5: Flink DataStream Application for Supplier Statistics](./fh-local-flink-ds-stats/)
+  - This lab showcases a Flink application that reads Avro-encoded order records from a Kafka topic, performs 5-second tumbling window aggregations by `supplier_id`, and writes the resulting supplier statistics to a new Kafka topic using Confluent Avro serialization. The application uses event time semantics with watermarks and demonstrates how to build a real-time analytics pipeline with Kafka, Avro, and Flink's DataStream API.
 - [Lab 6: Flink SQL for Orders Sink with Parquet](./fh-local-flink-sql-orders-parquet/)
   - This lab ingests Avro-encoded orders from Kafka into a Flink SQL source table and writes them to MinIO as Parquet files using the Filesystem connector.
 - [Lab 7: Flink SQL for Orders Sink in Iceberg](./fh-local-flink-sql-orders-iceberg/)
