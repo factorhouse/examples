@@ -1,4 +1,4 @@
-## Flink SQL with Kafka Source and Sink for Supplier Statistics
+## Flink DataStream Application for Supplier Statistics
 
 This lab illustrates a Flink SQL pipeline that reads Avro-encoded order records from a Kafka topic into a source table, performs 5-second tumbling window aggregations to compute supplier statistics, and writes the results to a Kafka sink table with Confluent Avro format.
 
