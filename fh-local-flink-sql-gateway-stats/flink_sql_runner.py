@@ -6,6 +6,41 @@ import inspect
 import argparse
 import dataclasses
 
+BASE_URL = os.getenv("BASE_URL", "http://localhost:9090")
+DDL_STMT = inspect.cleandoc("""
+    CREATE TABLE orders (
+        order_id     STRING,
+        item         STRING,
+        price        STRING,
+        supplier     STRING,
+        bid_time     TIMESTAMP(3),
+        WATERMARK FOR bid_time AS bid_time - INTERVAL '5' SECOND
+    ) WITH (
+        'connector' = 'kafka',
+        'topic' = 'orders',
+        'properties.bootstrap.servers' = 'kafka-1:19092',
+        'format' = 'avro-confluent',
+        'avro-confluent.schema-registry.url' = 'http://schema:8081',
+        'avro-confluent.basic-auth.credentials-source' = 'USER_INFO',
+        'avro-confluent.basic-auth.user-info' = 'admin:admin',
+        'avro-confluent.schema-registry.subject' = 'orders-value',
+        'scan.startup.mode' = 'earliest-offset'
+    );
+""")
+DML_STMT = inspect.cleandoc("""
+    SELECT
+        DATE_FORMAT(window_start, 'yyyy-MM-dd''T''HH:mm:ss''Z''') AS window_start,
+        DATE_FORMAT(window_end,   'yyyy-MM-dd''T''HH:mm:ss''Z''') AS window_end,
+        supplier,
+        SUM(CAST(price AS DECIMAL(10, 2))) AS total_price,
+        count(*) AS `count`
+    FROM TABLE(
+        TUMBLE(TABLE orders, DESCRIPTOR(bid_time), INTERVAL '5' SECOND))
+    GROUP BY window_start, window_end, supplier;
+""")
+
+http = urllib3.PoolManager()
+
 
 @dataclasses.dataclass
 class SupplierStats:
@@ -103,60 +138,26 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--max-seconds",
+        "-m",
         type=int,
         default=-1,
         help="Max seconds (if > 0) to collect streaming results (default: -1)",
     )
     args = parser.parse_args()
 
-    HTTP = urllib3.PoolManager()
-    BASE_URL = os.getenv("BASE_URL", "http://localhost:9090")
-    DDL_STMT = inspect.cleandoc("""
-        CREATE TABLE orders (
-            order_id     STRING,
-            item         STRING,
-            price        STRING,
-            supplier     STRING,
-            bid_time     TIMESTAMP(3),
-            WATERMARK FOR bid_time AS bid_time - INTERVAL '5' SECOND
-        ) WITH (
-            'connector' = 'kafka',
-            'topic' = 'orders',
-            'properties.bootstrap.servers' = 'kafka-1:19092',
-            'format' = 'avro-confluent',
-            'avro-confluent.schema-registry.url' = 'http://schema:8081',
-            'avro-confluent.basic-auth.credentials-source' = 'USER_INFO',
-            'avro-confluent.basic-auth.user-info' = 'admin:admin',
-            'avro-confluent.schema-registry.subject' = 'orders-value',
-            'scan.startup.mode' = 'earliest-offset'
-        );
-    """)
-
-    DML_STMT = inspect.cleandoc("""
-        SELECT
-            DATE_FORMAT(window_start, 'yyyy-MM-dd''T''HH:mm:ss''Z''') AS window_start,
-            DATE_FORMAT(window_end,   'yyyy-MM-dd''T''HH:mm:ss''Z''') AS window_end,
-            supplier,
-            SUM(CAST(price AS DECIMAL(10, 2))) AS total_price,
-            count(*) AS `count`
-        FROM TABLE(
-            TUMBLE(TABLE orders, DESCRIPTOR(bid_time), INTERVAL '5' SECOND))
-        GROUP BY window_start, window_end, supplier;
-    """)
-
     session_handle = None
     operation_handle = None
     try:
-        session_handle = get_session_handle(HTTP, BASE_URL)
-        execute_statement(HTTP, BASE_URL, session_handle, DDL_STMT)
+        session_handle = get_session_handle(http, BASE_URL)
+        execute_statement(http, BASE_URL, session_handle, DDL_STMT)
         time.sleep(2)
-        operation_handle = execute_statement(HTTP, BASE_URL, session_handle, DML_STMT)
+        operation_handle = execute_statement(http, BASE_URL, session_handle, DML_STMT)
         query_results(
-            HTTP, BASE_URL, session_handle, operation_handle, args.max_seconds
+            http, BASE_URL, session_handle, operation_handle, args.max_seconds
         )
     except KeyboardInterrupt:
         print("🛑 Interrupted by user.")
     except Exception as e:
         print(f"Error: {e}")
     finally:
-        cancel_operation(HTTP, BASE_URL, session_handle, operation_handle)
+        cancel_operation(http, BASE_URL, session_handle, operation_handle)

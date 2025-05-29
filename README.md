@@ -45,8 +45,8 @@ It provides a collection of pre-configured Docker Compose environments that demo
   - This lab shows how to stream Avro-encoded order records from a Kafka topic into a PySpark Structured Streaming job and write them to an Iceberg table in MinIO. The Avro schema is resolved via Schema Registry using ABRiS, and all dependencies are bundled in an Uber JAR.
 - [Lab 11: Flink SQL Gateway for Supplier Statistics](./fh-local-flink-sql-gateway-stats/)
   - This lab demonstrates a Flink SQL streaming pipeline that consumes Avro-encoded order records from a Kafka topic into a source table, and performs 5-second tumbling window aggregations to compute supplier statistics. The results are fetched in real time via the Flink SQL Gateway REST API and printed directly by the running Python application.
-- Lab 12: Pinot Analytics for Supplier Statistics
-  - In progress
+- [Lab 12: Pinot Analytics for Supplier Statistics](./fh-local-pinot-stats/)
+  - This lab walks through a real-time analytics pipeline where Avro-encoded order records are streamed from a Kafka topic into Apache Pinot. A simulated 5-second tumbling window aggregation computes supplier statistics using Pinot's multi-stage query engine. The results are queried and printed in real time by a Python application.
 
 ## Support
 
