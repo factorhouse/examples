@@ -44,11 +44,11 @@ The **Factor House Local labs** provide a fast and practical entry point for dev
 - [Lab 7: Flink SQL - Ingesting Kafka Order Records into Iceberg Table](./fh-local-flink-sql-orders-iceberg/)
   - Build a streaming pipeline that reads Kafka order records with Flink SQL and writes to an Iceberg table on MinIO. The Iceberg sink table is created via Spark SQL to enable hidden partitioning.
 - [Lab 8: Flink Table API - Loading Order Events from Kafka into Iceberg](./fh-local-flink-table-iceberg/)
-  - Deploy a Kafka-to-Iceberg pipeline using Flink's Table API. This lab demonstrates how to configure the job, compile it as a shadow JAR, and run it in Docker or Flex. Sink table is defined via Spark SQL due to Flink's partitioning limitations.
+  - Deploy a Kafka-to-Iceberg pipeline using Flink's Table API. This lab demonstrates how to configure the job, compile it as a shadow JAR, and deploy via CLI and Flex. Sink table is defined via Spark SQL due to Flink's partitioning limitations.
 - [Lab 9: Kafka Connect - Streaming Order Data from Kafka into Iceberg](./fh-local-kafka-connect-iceberg/)
   - Use Kafka Connect to stream Avro records from Kafka into an Iceberg table in MinIO. The lab covers connector deployment via Kpow and how to configure hidden partitioning using a Spark-defined table schema.
 - [Lab 10: Spark Structured Streaming - Delivering Kafka Order Records into Iceberg Table](./fh-local-spark-orders-iceberg/)
-  - Build a PySpark Structured Streaming job that ingests Kafka order data, deserializes Avro using ABRiS and Schema Registry, and writes the results to Iceberg. The job is packaged as a fat JAR and outputs partitioned Parquet files to MinIO.
+  - Build a PySpark Structured Streaming job that ingests Kafka order data, deserializes Avro messages using [ABRiS](https://github.com/AbsaOSS/ABRiS), and writes the results to Iceberg. The job is packaged as a fat JAR and outputs partitioned Parquet files to MinIO.
 - [Lab 11: Flink SQL Gateway - Serving Real-Time Supplier Stats via REST API](./fh-local-flink-sql-gateway-stats/)
   - Run a Flink SQL streaming pipeline via the Flink SQL Gateway and access real-time query results through its REST API. This lab illustrates how to fetch and display live supplier statistics from a Kafka source using a Python client.
 - [Lab 12: Apache Pinot - Real-Time Analytics of Supplier Stats from Kafka](./fh-local-pinot-stats/)

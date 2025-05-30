@@ -1,6 +1,6 @@
 ## Lab 8: Flink Table API - Loading Order Events from Kafka into Iceberg
 
-Deploy a Kafka-to-Iceberg pipeline using Flink's Table API. This lab demonstrates how to configure the job, compile it as a shadow JAR, and run it in Docker or Flex. Sink table is defined via Spark SQL due to Flink's partitioning limitations.
+Deploy a Kafka-to-Iceberg pipeline using Flink's Table API. This lab demonstrates how to configure the job, compile it as a shadow JAR, and deploy via CLI and Flex. Sink table is defined via Spark SQL due to Flink's partitioning limitations.
 
 ## How to start
 

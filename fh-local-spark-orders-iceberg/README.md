@@ -1,6 +1,6 @@
 ## Lab 10: Spark Structured Streaming - Delivering Kafka Order Records into Iceberg Table
 
-Build a PySpark Structured Streaming job that ingests Kafka order data, deserializes Avro using ABRiS and Schema Registry, and writes the results to Iceberg. The job is packaged as a fat JAR and outputs partitioned Parquet files to MinIO.
+Build a PySpark Structured Streaming job that ingests Kafka order data, deserializes Avro messages using [ABRiS](https://github.com/AbsaOSS/ABRiS), and writes the results to Iceberg. The job is packaged as a fat JAR and outputs partitioned Parquet files to MinIO.
 
 ## How to start
 
