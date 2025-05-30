@@ -81,6 +81,24 @@ docker exec jobmanager /opt/flink/bin/flink run -d -p 3 \
   -c io.factorhouse.demo.MainKt /tmp/fh-local-flink-ds-stats-1.0.jar
 ```
 
+Or we can also submit the JAR using the Flex UI available at `http://localhost:3001`:
+
+1. **Upload the JAR** from the **Jobs** sidebar.
+
+![](./images/upload-jar.png)
+
+2. **Click the submit menu** next to the uploaded JAR.
+
+![](./images/submit-jar-01.png)
+
+3. **Fill out the submission form**, including:
+
+   - Entry Class: `io.factorhouse.demo.MainKt`
+   - Parallelism: e.g. `3`
+   - Optional: Savepoint path, job arguments, etc.
+
+![](./images/submit-jar-02.png)
+
 ### Monitoring the Job
 
 We can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
