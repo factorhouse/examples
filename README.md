@@ -27,6 +27,8 @@ It provides a collection of pre-configured Docker Compose environments that demo
   <img width="600" height="500" src="./images/fh-local-labs.png">
 </p>
 
+The **Factor House Local labs** provide a fast and practical entry point for developers building real-time data pipelines using Kafka, Flink, Spark, Iceberg, and Pinot. They highlight key capabilities such as Avro serialization with Schema Registry, stream processing with Kafka Streams and Flink (via SQL and DataStream APIs), connector deployment with Kpow, modern lakehouse integrations using Iceberg, and real-time analytics with Pinot. Each lab is designed to be modular, hands-on, and production-inspired - making it easy to learn, prototype, and extend.
+
 - [Lab 1: Kafka Clients for Orders with Avro and Schema Registry](./fh-local-kafka-clients-orders/)
   - This lab includes a hands-on example using Python-based Kafka producers and consumers to work with Avro serialization and Confluent Schema Registry. It showcases schema evolution with both generic and specific records.
 - [Lab 2: Kafka Connect for Orders via the Kpow UI and API](./fh-local-kafka-connect-orders/)
@@ -41,8 +43,8 @@ It provides a collection of pre-configured Docker Compose environments that demo
   - This lab ingests Avro-encoded orders from Kafka into a Flink SQL source table and writes them to MinIO as Parquet files using the Filesystem connector.
 - [Lab 7: Flink SQL for Orders Sink in Iceberg](./fh-local-flink-sql-orders-iceberg/)
   - This lab shows how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an Iceberg table stored in object storage (MinIO) using the Iceberg connector. Since Flink SQL does not support defining Iceberg's hidden partitioning, the sink table is created using Spark SQL instead.
-- Lab 8: Flink Table Application for Orders Sink in Iceberg
-  - In progress
+- [Lab 8: Flink Table Application for Orders Sink in Iceberg](./fh-local-flink-table-iceberg/)
+  - This lab demonstrates how to deploy a Kafka–Flink–Iceberg pipeline that ingests fake order data into Kafka and writes it to an Iceberg table. It uses Spark SQL to create the sink table due to Flink's lack of hidden partitioning support. The Flink job is built as a shadow JAR and deployed via Docker or Flex, with output verified in MinIO.
 - [Lab 9: Kafka Connect for Orders Sink in Iceberg](./fh-local-kafka-connect-iceberg/)
   - This lab demonstrates streaming Avro messages from Kafka into an Iceberg table using Kafka Connect. The target table is pre-defined via Spark SQL with custom partitions using Iceberg's hidden partitioning, and data is written to MinIO as partitioned Parquet files once deployed through Kpow.
 - [Lab 10: Spark SQL for Orders Sink in Iceberg](./fh-local-spark-orders-iceberg/)
