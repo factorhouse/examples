@@ -1,6 +1,6 @@
-## Flink Table Application for Orders Sink in Iceberg
+## Lab 8: Flink Table API - Loading Order Events from Kafka into Iceberg
 
-This lab demonstrates how to deploy a Kafka–Flink–Iceberg pipeline that ingests fake order data into Kafka and writes it to an Iceberg table. It uses Spark SQL to create the sink table due to Flink's lack of hidden partitioning support. The Flink job is built as a shadow JAR and deployed via Docker or Flex, with output verified in MinIO.
+Deploy a Kafka-to-Iceberg pipeline using Flink's Table API. This lab demonstrates how to configure the job, compile it as a shadow JAR, and run it in Docker or Flex. Sink table is defined via Spark SQL due to Flink's partitioning limitations.
 
 ## How to start
 

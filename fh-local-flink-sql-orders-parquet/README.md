@@ -1,6 +1,6 @@
-## Flink SQL for Orders Sink with Parquet
+## Lab 6: Flink SQL - Writing Kafka Order Records to MinIO as Parquet Files
 
-This lab ingests Avro-encoded orders from Kafka into a Flink SQL source table and writes them to MinIO as Parquet files using the Filesystem connector.
+Ingest Kafka order records using Flink SQL and write them as Parquet files to MinIO object storage. This lab uses the Filesystem connector in a streaming context to produce batch-style output, demonstrating Flink's integration with streaming-compatible lakehouse sinks.
 
 ## How to start
 

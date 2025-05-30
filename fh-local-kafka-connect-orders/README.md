@@ -1,6 +1,6 @@
-## Kafka Connect for Orders via the Kpow UI and API
+## Lab 2: Kafka Connect - Managing Kafka Source and Sink Connectors via Kpow UI and API
 
-This lab demonstrates how to deploy Kafka connectors via the Kpow UI and API. It walks through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
+Explore how to deploy and manage Kafka Connect source and sink connectors using the Kpow UI and API. This lab walks through practical examples for configuring connectors that move data between Kafka and external systems.
 
 ## How to start
 

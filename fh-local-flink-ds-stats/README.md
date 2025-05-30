@@ -1,6 +1,6 @@
-## Flink DataStream Application for Supplier Statistics
+## Lab 5: Flink DataStream API - Real-Time Analytics from Orders to Supplier Stats
 
-This lab showcases a Flink application that reads Avro-encoded order records from a Kafka topic, performs 5-second tumbling window aggregations by `supplier_id`, and writes the resulting supplier statistics to a new Kafka topic using Confluent Avro serialization. The application uses event time semantics with watermarks and demonstrates how to build a real-time analytics pipeline with Kafka, Avro, and Flink's DataStream API.
+Implement a Flink DataStream job that reads orders from Kafka, performs event-time tumbling window aggregations, and publishes supplier statistics to a Kafka sink. Learn how to work with watermarks, Avro serialization, and event-time semantics in a production-style stream pipeline.
 
 ## How to start
 

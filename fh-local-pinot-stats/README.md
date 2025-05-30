@@ -1,6 +1,6 @@
-## Flink SQL with Kafka Source and Sink for Supplier Statistics
+## Lab 12: Apache Pinot - Real-Time Analytics of Supplier Stats from Kafka
 
-This lab walks through a real-time analytics pipeline where Avro-encoded order records are streamed from a Kafka topic into Apache Pinot. A simulated 5-second tumbling window aggregation computes supplier statistics using Pinot's multi-stage query engine. The results are queried and printed in real time by a Python application.
+Stream Kafka orders into Apache Pinot and run real-time analytics with its multi-stage query engine. This lab includes a simulated tumbling window aggregation and demonstrates querying supplier stats through a Python client.
 
 ## How to start
 

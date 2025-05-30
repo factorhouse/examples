@@ -1,6 +1,6 @@
-## Kafka Streams for Supplier Statistics with the Kpow Streams Agent
+## Lab 3: Kafka Streams - Supplier Stats with Live Topology View via Kpow Streams Agent
 
-This lab introduces a Kafka Streams application that reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
+Build a Kafka Streams application that processes `orders` from Kafka, computes supplier statistics in real time, and writes to a new topic. Use the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) to inspect the live processing topology.
 
 ## How to start
 

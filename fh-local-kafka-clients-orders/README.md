@@ -1,6 +1,6 @@
-## Kafka Clients for Orders with Avro and Schema Registry
+## Lab 1: Kafka Clients - Producing and Consuming Kafka Messages with Schema Registry
 
-This lab includes a hands-on example using Python-based Kafka producers and consumers to work with Avro serialization and Confluent Schema Registry. It showcases schema evolution with both generic and specific records.
+Learn how to produce and consume Avro-encoded Kafka messages using Python clients and the Confluent Schema Registry. This lab covers schema evolution, working with both generic and specific records, and validating end-to-end data flow.
 
 ## How to start
 

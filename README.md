@@ -27,32 +27,32 @@ It provides a collection of pre-configured Docker Compose environments that demo
   <img width="600" height="500" src="./images/fh-local-labs.png">
 </p>
 
-The **Factor House Local labs** provide a fast and practical entry point for developers building real-time data pipelines using Kafka, Flink, Spark, Iceberg, and Pinot. They highlight key capabilities such as Avro serialization with Schema Registry, stream processing with Kafka Streams and Flink (via SQL and DataStream APIs), connector deployment with Kpow, modern lakehouse integrations using Iceberg, and real-time analytics with Pinot. Each lab is designed to be modular, hands-on, and production-inspired - making it easy to learn, prototype, and extend.
+The **Factor House Local labs** provide a fast and practical entry point for developers building real-time data pipelines using **Kafka**, **Flink**, **Spark**, **Iceberg**, and **Pinot**. These hands-on labs highlight key capabilities such as Avro serialization with Schema Registry, stream processing with Kafka Streams and Flink (via SQL and DataStream APIs), connector deployment with Kpow, modern lakehouse integrations using Iceberg, and real-time analytics with Pinot. Each lab is designed to be modular, hands-on, and production-inspired - making it easy to learn, prototype, and extend.
 
-- [Lab 1: Kafka Clients for Orders with Avro and Schema Registry](./fh-local-kafka-clients-orders/)
-  - This lab includes a hands-on example using Python-based Kafka producers and consumers to work with Avro serialization and Confluent Schema Registry. It showcases schema evolution with both generic and specific records.
-- [Lab 2: Kafka Connect for Orders via the Kpow UI and API](./fh-local-kafka-connect-orders/)
-  - This lab demonstrates how to deploy Kafka connectors via the Kpow UI and API. It walks through end-to-end examples for creating, monitoring, and managing source and sink connectors using both interfaces.
-- [Lab 3: Kafka Streams for Supplier Statistics with the Kpow Streams Agent](./fh-local-kafka-streams-stats/)
-  - This lab introduces a Kafka Streams application that reads records from the `orders` topic, calculates supplier statistics, and sends them to a new Kafka topic (`orders-supplier-stats`). It includes integration with the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) for live topology visualization.
-- [Lab 4: Flink SQL for Supplier Statistics](./fh-local-flink-sql-client-stats/)
-  - This lab illustrates a Flink SQL pipeline that reads Avro-encoded order records from a Kafka topic into a source table, performs 5-second tumbling window aggregations to compute supplier statistics, and writes the results to a Kafka sink table with Confluent Avro format.
-- [Lab 5: Flink DataStream Application for Supplier Statistics](./fh-local-flink-ds-stats/)
-  - This lab showcases a Flink application that reads Avro-encoded order records from a Kafka topic, performs 5-second tumbling window aggregations by `supplier_id`, and writes the resulting supplier statistics to a new Kafka topic using Confluent Avro serialization. The application uses event time semantics with watermarks and demonstrates how to build a real-time analytics pipeline with Kafka, Avro, and Flink's DataStream API.
-- [Lab 6: Flink SQL for Orders Sink with Parquet](./fh-local-flink-sql-orders-parquet/)
-  - This lab ingests Avro-encoded orders from Kafka into a Flink SQL source table and writes them to MinIO as Parquet files using the Filesystem connector.
-- [Lab 7: Flink SQL for Orders Sink in Iceberg](./fh-local-flink-sql-orders-iceberg/)
-  - This lab shows how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an Iceberg table stored in object storage (MinIO) using the Iceberg connector. Since Flink SQL does not support defining Iceberg's hidden partitioning, the sink table is created using Spark SQL instead.
-- [Lab 8: Flink Table Application for Orders Sink in Iceberg](./fh-local-flink-table-iceberg/)
-  - This lab demonstrates how to deploy a Kafka–Flink–Iceberg pipeline that ingests fake order data into Kafka and writes it to an Iceberg table. It uses Spark SQL to create the sink table due to Flink's lack of hidden partitioning support. The Flink job is built as a shadow JAR and deployed via Docker or Flex, with output verified in MinIO.
-- [Lab 9: Kafka Connect for Orders Sink in Iceberg](./fh-local-kafka-connect-iceberg/)
-  - This lab demonstrates streaming Avro messages from Kafka into an Iceberg table using Kafka Connect. The target table is pre-defined via Spark SQL with custom partitions using Iceberg's hidden partitioning, and data is written to MinIO as partitioned Parquet files once deployed through Kpow.
-- [Lab 10: Spark SQL for Orders Sink in Iceberg](./fh-local-spark-orders-iceberg/)
-  - This lab shows how to stream Avro-encoded order records from a Kafka topic into a PySpark Structured Streaming job and write them to an Iceberg table in MinIO. The Avro schema is resolved via Schema Registry using ABRiS, and all dependencies are bundled in an Uber JAR.
-- [Lab 11: Flink SQL Gateway for Supplier Statistics](./fh-local-flink-sql-gateway-stats/)
-  - This lab demonstrates a Flink SQL streaming pipeline that consumes Avro-encoded order records from a Kafka topic into a source table, and performs 5-second tumbling window aggregations to compute supplier statistics. The results are fetched in real time via the Flink SQL Gateway REST API and printed directly by the running Python application.
-- [Lab 12: Pinot Analytics for Supplier Statistics](./fh-local-pinot-stats/)
-  - This lab walks through a real-time analytics pipeline where Avro-encoded order records are streamed from a Kafka topic into Apache Pinot. A simulated 5-second tumbling window aggregation computes supplier statistics using Pinot's multi-stage query engine. The results are queried and printed in real time by a Python application.
+- [Lab 1: Kafka Clients - Producing and Consuming Kafka Messages with Schema Registry](./fh-local-kafka-clients-orders/)
+  - Learn how to produce and consume Avro-encoded Kafka messages using Python clients and the Confluent Schema Registry. This lab covers schema evolution, working with both generic and specific records, and validating end-to-end data flow.
+- [Lab 2: Kafka Connect - Managing Kafka Source and Sink Connectors via Kpow UI and API](./fh-local-kafka-connect-orders/)
+  - Explore how to deploy and manage Kafka Connect source and sink connectors using the Kpow UI and API. This lab walks through practical examples for configuring connectors that move data between Kafka and external systems.
+- [Lab 3: Kafka Streams - Supplier Stats with Live Topology View via Kpow Streams Agent](./fh-local-kafka-streams-stats/)
+  - Build a Kafka Streams application that processes `orders` from Kafka, computes supplier statistics in real time, and writes to a new topic. Use the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) to inspect the live processing topology.
+- [Lab 4: Flink SQL - Aggregating Supplier Stats from Kafka Topic](./fh-local-flink-sql-client-stats/)
+  - Use Flink SQL to read Avro-encoded orders from Kafka, perform tumbling window aggregations to compute supplier-level metrics, and write results back to Kafka. This lab demonstrates real-time analytics using declarative SQL and Kafka integration.
+- [Lab 5: Flink DataStream API - Real-Time Analytics from Orders to Supplier Stats](./fh-local-flink-ds-stats/)
+  - Implement a Flink DataStream job that reads orders from Kafka, performs event-time tumbling window aggregations, and publishes supplier statistics to a Kafka sink. Learn how to work with watermarks, Avro serialization, and event-time semantics in a production-style stream pipeline.
+- [Lab 6: Flink SQL - Writing Kafka Order Records to MinIO as Parquet Files](./fh-local-flink-sql-orders-parquet/)
+  - Ingest Kafka order records using Flink SQL and write them as Parquet files to MinIO object storage. This lab uses the Filesystem connector in a streaming context to produce batch-style output, demonstrating Flink's integration with streaming-compatible lakehouse sinks.
+- [Lab 7: Flink SQL - Ingesting Kafka Order Records into Iceberg Table](./fh-local-flink-sql-orders-iceberg/)
+  - Build a streaming pipeline that reads Kafka order records with Flink SQL and writes to an Iceberg table on MinIO. The Iceberg sink table is created via Spark SQL to enable hidden partitioning.
+- [Lab 8: Flink Table API - Loading Order Events from Kafka into Iceberg](./fh-local-flink-table-iceberg/)
+  - Deploy a Kafka-to-Iceberg pipeline using Flink's Table API. This lab demonstrates how to configure the job, compile it as a shadow JAR, and run it in Docker or Flex. Sink table is defined via Spark SQL due to Flink's partitioning limitations.
+- [Lab 9: Kafka Connect - Streaming Order Data from Kafka into Iceberg](./fh-local-kafka-connect-iceberg/)
+  - Use Kafka Connect to stream Avro records from Kafka into an Iceberg table in MinIO. The lab covers connector deployment via Kpow and how to configure hidden partitioning using a Spark-defined table schema.
+- [Lab 10: Spark Structured Streaming - Delivering Kafka Order Records into Iceberg Table](./fh-local-spark-orders-iceberg/)
+  - Build a PySpark Structured Streaming job that ingests Kafka order data, deserializes Avro using ABRiS and Schema Registry, and writes the results to Iceberg. The job is packaged as a fat JAR and outputs partitioned Parquet files to MinIO.
+- [Lab 11: Flink SQL Gateway - Serving Real-Time Supplier Stats via REST API](./fh-local-flink-sql-gateway-stats/)
+  - Run a Flink SQL streaming pipeline via the Flink SQL Gateway and access real-time query results through its REST API. This lab illustrates how to fetch and display live supplier statistics from a Kafka source using a Python client.
+- [Lab 12: Apache Pinot - Real-Time Analytics of Supplier Stats from Kafka](./fh-local-pinot-stats/)
+  - Stream Kafka orders into Apache Pinot and run real-time analytics with its multi-stage query engine. This lab includes a simulated tumbling window aggregation and demonstrates querying supplier stats through a Python client.
 
 ## Support
 

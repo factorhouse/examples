@@ -1,6 +1,6 @@
-## Kafka Connect for Orders Sink in Iceberg
+## Lab 9: Kafka Connect - Streaming Order Data from Kafka into Iceberg
 
-This lab demonstrates streaming Avro messages from Kafka into an Iceberg table using Kafka Connect. The target table is pre-defined via Spark SQL with custom partitions using Iceberg's hidden partitioning, and data is written to MinIO as partitioned Parquet files once deployed through Kpow.
+Use Kafka Connect to stream Avro records from Kafka into an Iceberg table in MinIO. The lab covers connector deployment via Kpow and how to configure hidden partitioning using a Spark-defined table schema.
 
 ## How to start
 

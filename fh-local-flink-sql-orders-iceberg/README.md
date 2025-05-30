@@ -1,6 +1,6 @@
-## Flink SQL for Orders Sink in Parquet
+## Lab 7: Flink SQL - Ingesting Kafka Order Records into Iceberg Table
 
-This lab shows how to ingest Avro-encoded order records from a Kafka topic into a Flink SQL source table, and write them to an Iceberg table stored in object storage (MinIO) using the Iceberg connector. Since Flink SQL does not support defining Iceberg's hidden partitioning, the sink table is created using Spark SQL instead.
+Build a streaming pipeline that reads Kafka order records with Flink SQL and writes to an Iceberg table on MinIO. The Iceberg sink table is created via Spark SQL to enable hidden partitioning.
 
 ## How to start
 

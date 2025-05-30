@@ -1,6 +1,6 @@
-## Flink SQL for Orders Sink in Parquet
+## Lab 10: Spark Structured Streaming - Delivering Kafka Order Records into Iceberg Table
 
-This lab shows how to stream Avro-encoded order records from a Kafka topic into a PySpark Structured Streaming job and write them to an Iceberg table in MinIO. The Avro schema is resolved via Schema Registry using ABRiS, and all dependencies are bundled in an Uber JAR.
+Build a PySpark Structured Streaming job that ingests Kafka order data, deserializes Avro using ABRiS and Schema Registry, and writes the results to Iceberg. The job is packaged as a fat JAR and outputs partitioned Parquet files to MinIO.
 
 ## How to start
 

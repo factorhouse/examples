@@ -1,6 +1,6 @@
-## Flink SQL with Kafka Source and Sink for Supplier Statistics
+## Lab 11: Flink SQL Gateway - Serving Real-Time Supplier Stats via REST API
 
-This lab demonstrates a Flink SQL streaming pipeline that consumes Avro-encoded order records from a Kafka topic into a source table, and performs 5-second tumbling window aggregations to compute supplier statistics. The results are fetched in real time via the Flink SQL Gateway REST API and printed directly by the running Python application.
+Run a Flink SQL streaming pipeline via the Flink SQL Gateway and access real-time query results through its REST API. This lab illustrates how to fetch and display live supplier statistics from a Kafka source using a Python client.
 
 ## How to start
 
