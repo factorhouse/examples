@@ -40,6 +40,8 @@ We can launch the Kafka Streams application in two ways, catering to different s
    After building a "fat" JAR (also known as a shadow JAR) that bundles all dependencies, the application can be executed as a standalone binary. This method is typically used for staging or production deployments.
 
 ```
+cd fh-local-kafka-streams-stats
+
 👉 With Gradle (Dev Mode)
 ./gradlew run
 

@@ -65,7 +65,10 @@ TBLPROPERTIES (
 );
 ```
 
-Once created, the table will appear with metadata only (no data yet):
+After creation, the table will initially contain only metadata (no data). We can view it in the MinIO Console at http://localhost:9001.
+
+- **Username:** `admin`
+- **Password:** `password`
 
 ![](./images/sink-table-01.png)
 
