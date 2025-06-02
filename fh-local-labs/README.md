@@ -1,7 +1,7 @@
 # Factor House Local Labs
 
 <p align="center">
-  <img width="600" height="500" src="../images/fh-local-labs.png">
+  <img src="../images/fh-local-labs.png">
 </p>
 
 The **Factor House Local labs** provide a fast and practical entry point for developers building real-time data pipelines using **Kafka**, **Flink**, **Spark**, **Iceberg**, and **Pinot**. These hands-on labs highlight key capabilities such as Avro serialization with Schema Registry, stream processing with Kafka Streams and Flink (via SQL and DataStream APIs), connector deployment with Kpow, modern lakehouse integrations using Iceberg, and real-time analytics with Pinot. Each lab is designed to be modular, hands-on, and production-inspired - making it easy to learn, prototype, and extend.
