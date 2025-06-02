@@ -29,16 +29,16 @@ python -m venv venv
 source venv/bin/activate
 # windows
 # .\venv\Scripts\activate
-pip install -r offset-management/requirements.txt
+pip install -r features/offset-management/requirements.txt
 ```
 
 Start the producer and consumer.
 
 ```bash
 # producer
-python offset-management/producer.py
+python features/offset-management/producer.py
 # consumer
-python offset-management/consumer.py
+python features/offset-management/consumer.py
 ```
 
 ### Shutdown Environment
