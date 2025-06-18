@@ -16,8 +16,13 @@ cd examples
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex** as well as an analytics environment for Iceberg. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
 ```bash
+## Clone the Factor House Local Repository
 git clone https://github.com/factorhouse/factorhouse-local.git
 
+## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
+./factorhouse-local/resources/setup-env.sh
+
+## Start Docker Services
 docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
   && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml up -d \
   && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d

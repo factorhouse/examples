@@ -43,8 +43,13 @@ This ensures the following JARs are loaded into the Flink JobManager, TaskManage
 **Start services:**
 
 ```bash
+## Clone the Factor House Local Repository
 git clone https://github.com/factorhouse/factorhouse-local.git
 
+## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
+./factorhouse-local/resources/setup-env.sh
+
+## Start Docker Services
 docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
   && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml up -d
 ```

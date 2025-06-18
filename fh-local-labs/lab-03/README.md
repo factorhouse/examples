@@ -16,7 +16,13 @@ cd examples
 We can get our Kafka environment including **Kpow** up and running using [Factor House Local](https://github.com/factorhouse/factorhouse-local). This setup uses the **Kpow Enterprise edition**, as we'll use the [Kpow Streams Agent](https://github.com/factorhouse/kpow-streams-agent) - an enterprise-only feature. **Before you begin, ensure you have a valid Kpow license.** For guidance on requesting and configuring a license, see [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
 ```bash
+## Clone the Factor House Local Repository
 git clone https://github.com/factorhouse/factorhouse-local.git
+
+## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
+./factorhouse-local/resources/setup-env.sh
+
+## Start Docker Services
 docker compose -f ./factorhouse-local/compose-kpow-trial.yml up -d
 ```
 
