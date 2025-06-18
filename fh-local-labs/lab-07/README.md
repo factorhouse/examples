@@ -18,6 +18,8 @@ We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local)
 ```bash
 git clone https://github.com/factorhouse/factorhouse-local.git
 
+./factorhouse-local/resources/setup-env.sh
+
 docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
   && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml up -d \
   && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
