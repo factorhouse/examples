@@ -16,8 +16,13 @@ cd examples
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up a Kafka environment that includes **Kpow** and MinIO. This setup uses the **Kpow Enterprise edition**, as we'll later rely on the Kpow API - an enterprise-only feature. **Before you begin, ensure you have a valid Kpow license.** For guidance on requesting and configuring a license, see [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
 ```bash
+## Clone the Factor House Local Repository
 git clone https://github.com/factorhouse/factorhouse-local.git
 
+## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
+./factorhouse-local/resources/setup-env.sh
+
+## Start Docker Services
 docker compose -p kpow -f ./factorhouse-local/compose-kpow-trial.yml up -d \
   && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
 ```
