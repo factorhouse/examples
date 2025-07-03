@@ -11,7 +11,7 @@ git clone https://github.com/factorhouse/examples.git
 cd examples
 ```
 
-### Start Kafka, Flink and analytics environments
+### Start Kafka and Flink environments
 
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex** as well as an analytics environment for Iceberg. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
@@ -22,10 +22,18 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 ## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
 ./factorhouse-local/resources/setup-env.sh
 
-## Start Docker Services
-docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml up -d \
-  && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
+## Uncomment the sections to enable the edition and license.
+# Edition (choose one):
+# unset KPOW_SUFFIX         # Enterprise
+# unset FLEX_SUFFIX         # Enterprise
+# export KPOW_SUFFIX="-ce"  # Community
+# export FLEX_SUFFIX="-ce"  # Community
+# Licenses:
+# export KPOW_LICENSE=<path-to-license-file>
+# export FLEX_LICENSE=<path-to-license-file>
+
+docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
+  && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d
 ```
 
 ### Deploy source connector
@@ -45,12 +53,21 @@ docker exec -it spark-iceberg /opt/spark/bin/spark-sql
 ```
 
 ```sql
---// demo is the default catalog
-show catalogs;
--- demo
+-- // Only 'spark_catalog' appears although 'demo_hv' and 'demo_ib' exists
+SHOW CATALOGS;
 -- spark_catalog
 
-CREATE TABLE demo.db.orders (
+-- // If 'demo_ib' gets showing if being used.
+USE demo_ib;
+
+SHOW CATALOGS;
+-- demo_ib
+-- spark_catalog
+
+-- // Use the `default` database
+USE `default`;
+
+CREATE TABLE orders (
     order_id STRING,
     item STRING,
     price DECIMAL(10, 2),
@@ -83,7 +100,8 @@ After creation, the table will initially contain only metadata (no data). We can
 This example runs in the Flink SQL client, which can be started as shown below.
 
 ```bash
-docker exec -it jobmanager ./bin/sql-client.sh
+## Create `demo_hv` and `demo_ib` catalogs at startup
+docker exec -it jobmanager ./bin/sql-client.sh --init /opt/flink/conf/init-catalogs.sql
 ```
 
 #### Load dependent JARs
@@ -91,10 +109,20 @@ docker exec -it jobmanager ./bin/sql-client.sh
 We begin by loading the necessary JAR files for the Apache Kafka SQL connector and Confluent Avro format support.
 
 ```sql
+SHOW CATALOGS;
+-- +-----------------+
+-- |    catalog name |
+-- +-----------------+
+-- | default_catalog |
+-- |         demo_hv |
+-- |         demo_ib |
+-- +-----------------+
+-- 3 rows in set
+
 ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';
 ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
 
-show jars;
+SHOW JARS;
 -- +-------------------------------------------------------------+
 -- |                                                        jars |
 -- +-------------------------------------------------------------+
@@ -111,7 +139,8 @@ The source table is defined using the **Kafka SQL connector**, enabling Flink to
 > 💡 The watermark definition can be omitted in this lab because the goal is simply to write Kafka records to an object storage (_MinIO_) without performing time-base transformations. However, including it prepares the pipeline for future event-time logic.
 
 ```sql
-CREATE TABLE orders (
+-- // Create a temporary table for the Kafka source in the default catalog ('default_catalog').
+CREATE TEMPORARY TABLE orders (
   order_id     STRING,
   item         STRING,
   price        STRING,
@@ -130,7 +159,7 @@ CREATE TABLE orders (
   'scan.startup.mode' = 'earliest-offset'
 );
 
--- select * from orders;
+-- SELECT * FROM orders;
 ```
 
 #### Insert into sink table
@@ -143,27 +172,16 @@ The table uses the **Filesystem connector** with the `s3a://` scheme for writing
 SET 'parallelism.default' = '3';
 SET 'execution.checkpointing.interval' = '60000';
 
-CREATE CATALOG demo WITH (
-    'type' = 'iceberg',
-    'catalog-type' = 'rest',
-    'uri' = 'http://rest:8181',
-    'io-impl' = 'org.apache.iceberg.aws.s3.S3FileIO',
-    's3.endpoint' = 'http://minio:9000',
-    's3.path-style-access' = 'true',
-    's3.access-key-id' = 'admin',
-    's3.secret-access-key' = 'password'
-);
+-- // 'orders' table created by Spark SQL
+SHOW TABLES IN demo_ib.`default`;
+-- +------------+
+-- | table name |
+-- +------------+
+-- |     orders |
+-- +------------+
+-- 1 row in set
 
-show catalogs;
--- +-----------------+
--- |    catalog name |
--- +-----------------+
--- | default_catalog |
--- |            demo |
--- +-----------------+
--- 2 rows in set
-
-INSERT INTO demo.db.orders
+INSERT INTO demo_ib.`default`.orders
 SELECT
     order_id,
     item,
@@ -189,7 +207,9 @@ Finally, stop and remove the Docker containers.
 > Then, stop and remove the Docker containers by running:
 
 ```bash
-docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml down \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml down \
-  && docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml down
+# Stops the containers and unsets environment variables
+docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
 ```
