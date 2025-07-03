@@ -28,7 +28,7 @@ docker compose -f ./factorhouse-local/compose-kpow-trial.yml up -d
 
 ### Deploy source connector
 
-We will create a source connector that generates fake order records to a Kafka topic (`orders`). See the [Kafka Connect via Kpow UI and API](../fh-local-kafka-connect-orders/) lab for details about how to create the connector.
+We will create a source connector that generates fake order records to a Kafka topic (`orders`). See the [Kafka Connect via Kpow UI and API](../lab-02/) lab for details about how to create the connector.
 
 Once deployed, we can check the connector and its tasks in Kpow.
 
