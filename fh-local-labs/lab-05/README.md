@@ -62,10 +62,6 @@ cd fh-local-labs/lab-05
 ./gradlew run
 ```
 
-We can see console output like the following:
-
-![](./images/gradle_run.gif)
-
 #### 2. Deploy on a Flink Cluster (Deployment Mode)
 
 For staging or production-like environments, we can package the application into a self-contained "fat" JAR that includes all dependencies.
