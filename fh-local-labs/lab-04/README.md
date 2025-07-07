@@ -150,7 +150,7 @@ FROM TABLE(
 GROUP BY window_start, window_end, supplier;
 ```
 
-We can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (`localhost:8082`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 
