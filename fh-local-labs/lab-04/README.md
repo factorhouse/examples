@@ -49,16 +49,25 @@ We begin by loading the necessary JAR files for the Apache Kafka SQL connector a
 
 ```sql
 ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';
-ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+```
 
+```sql
+ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+```
+
+```sql
 show jars;
--- +-------------------------------------------------------------+
--- |                                                        jars |
--- +-------------------------------------------------------------+
--- |     /tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar |
--- | /tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar |
--- +-------------------------------------------------------------+
--- 2 rows in set
+```
+
+which should output
+```text
++-------------------------------------------------------------+
+|                                                        jars |
++-------------------------------------------------------------+
+|     /tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar |
+| /tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar |
++-------------------------------------------------------------+
+2 rows in set
 ```
 
 #### Create source table
@@ -86,8 +95,12 @@ CREATE TABLE orders (
   'avro-confluent.schema-registry.subject' = 'orders-value',
   'scan.startup.mode' = 'earliest-offset'
 );
+```
 
--- select * from orders;
+You can test the new table by running
+
+```sql
+select * from orders;
 ```
 
 ![](./images/flink-select-orders.gif)
@@ -115,7 +128,9 @@ This setup allows for real-time supplier metrics to be calculated and streamed o
 
 ```sql
 SET 'parallelism.default' = '3';
+```
 
+```sql
 CREATE TABLE supplier_stats (
   window_start STRING,
   window_end   STRING,
@@ -137,7 +152,9 @@ CREATE TABLE supplier_stats (
   'sink.partitioner' = 'fixed',
   'sink.parallelism' = '3'
 );
+```
 
+```sql
 INSERT INTO supplier_stats
 SELECT
   DATE_FORMAT(window_start, 'yyyy-MM-dd''T''HH:mm:ss''Z''') AS window_start,
