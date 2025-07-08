@@ -56,17 +56,25 @@ docker exec -it spark-iceberg /opt/spark/bin/spark-sql
 -- // Only 'spark_catalog' appears although 'demo_hv' and 'demo_ib' exists
 SHOW CATALOGS;
 -- spark_catalog
+```
 
+```sql
 -- // If 'demo_ib' gets showing if being used.
 USE demo_ib;
+```
 
+```sql
 SHOW CATALOGS;
 -- demo_ib
 -- spark_catalog
+```
 
+```sql
 -- // Use the `default` database
 USE `default`;
+```
 
+```sql
 CREATE TABLE orders (
     order_id STRING,
     item STRING,
@@ -118,10 +126,17 @@ SHOW CATALOGS;
 -- |         demo_ib |
 -- +-----------------+
 -- 3 rows in set
+```
 
+```sql
 ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';
-ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+```
 
+```sql
+ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+```
+
+```sql
 SHOW JARS;
 -- +-------------------------------------------------------------+
 -- |                                                        jars |
@@ -158,8 +173,12 @@ CREATE TEMPORARY TABLE orders (
   'avro-confluent.schema-registry.subject' = 'orders-value',
   'scan.startup.mode' = 'earliest-offset'
 );
+```
 
--- SELECT * FROM orders;
+Run the following query to view the _orders_ table:
+
+```sql
+SELECT * FROM orders;
 ```
 
 #### Insert into sink table
@@ -170,8 +189,13 @@ The table uses the **Filesystem connector** with the `s3a://` scheme for writing
 
 ```sql
 SET 'parallelism.default' = '3';
-SET 'execution.checkpointing.interval' = '60000';
+```
 
+```sql
+SET 'execution.checkpointing.interval' = '60000';
+```
+
+```sql
 -- // 'orders' table created by Spark SQL
 SHOW TABLES IN demo_ib.`default`;
 -- +------------+
@@ -180,7 +204,9 @@ SHOW TABLES IN demo_ib.`default`;
 -- |     orders |
 -- +------------+
 -- 1 row in set
+```
 
+```sql
 INSERT INTO demo_ib.`default`.orders
 SELECT
     order_id,
@@ -191,7 +217,7 @@ SELECT
 FROM orders;
 ```
 
-We can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (`http://localhost:8082`) or Flex (`http://localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 

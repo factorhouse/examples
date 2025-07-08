@@ -58,8 +58,13 @@ We begin by loading the necessary JAR files for the Apache Kafka SQL connector a
 
 ```sql
 ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';
-ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+```
 
+```sql
+ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+```
+
+```sql
 show jars;
 -- +-------------------------------------------------------------+
 -- |                                                        jars |
@@ -95,8 +100,12 @@ CREATE TABLE orders (
   'avro-confluent.schema-registry.subject' = 'orders-value',
   'scan.startup.mode' = 'earliest-offset'
 );
+```
 
--- select * from orders;
+Run the following query to view the source table:
+
+```sql
+select * from orders;
 ```
 
 #### Create sink table
@@ -107,27 +116,34 @@ The table uses the **Filesystem connector** with the `s3a://` scheme for writing
 
 ```sql
 SET 'parallelism.default' = '3';
+```
+
+```sql
 SET 'execution.checkpointing.interval' = '60000';
+```
 
+```sql
 CREATE TABLE orders_sink(
-    bid_date     STRING,
-    order_id     STRING,
-    item         STRING,
-    price        DECIMAL(10, 2),
-    supplier     STRING,
-    bid_time     TIMESTAMP(3)
+  bid_date     STRING,
+  order_id     STRING,
+  item         STRING,
+  price        DECIMAL(10, 2),
+  supplier     STRING,
+  bid_time     TIMESTAMP(3)
 ) PARTITIONED BY (bid_date) WITH (
-    'connector' = 'filesystem',
-    'path' = 's3a://fh-dev-bucket/orders/',
-    'format' = 'parquet',
-    'sink.parallelism' = '3',
-    'sink.partition-commit.delay' = '1 min',
-    'sink.partition-commit.policy.kind' = 'success-file',
-    'sink.rolling-policy.file-size' = '128 MB',
-    'sink.rolling-policy.rollover-interval' = '15 min',
-    'sink.rolling-policy.check-interval' = '1 min'
+  'connector' = 'filesystem',
+  'path' = 's3a://fh-dev-bucket/orders/',
+  'format' = 'parquet',
+  'sink.parallelism' = '3',
+  'sink.partition-commit.delay' = '1 min',
+  'sink.partition-commit.policy.kind' = 'success-file',
+  'sink.rolling-policy.file-size' = '128 MB',
+  'sink.rolling-policy.rollover-interval' = '15 min',
+  'sink.rolling-policy.check-interval' = '1 min'
 );
+```
 
+```sql
 INSERT INTO orders_sink
 SELECT
     DATE_FORMAT(bid_time, 'yyyy-MM-dd'),
@@ -148,7 +164,7 @@ fs.s3a.endpoint: http://minio:9000
 fs.s3a.path.style.access: true
 ```
 
-We can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (`http://localhost:8082`) or Flex (`http://localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 

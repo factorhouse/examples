@@ -56,17 +56,25 @@ docker exec -it spark-iceberg /opt/spark/bin/spark-sql
 -- // Only 'spark_catalog' appears although 'demo_hv' and 'demo_ib' exists
 SHOW CATALOGS;
 -- spark_catalog
+```
 
+```sql
 -- // If 'demo_ib' gets showing if being used.
 USE demo_ib;
+```
 
+```sql
 SHOW CATALOGS;
 -- demo_ib
 -- spark_catalog
+```
 
+```sql
 -- // Use the `default` database
 USE `default`;
+```
 
+```sql
 CREATE TABLE orders (
     order_id STRING,
     item STRING,
