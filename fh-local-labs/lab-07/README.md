@@ -36,6 +36,58 @@ docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
   && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d
 ```
 
+### Persistent Catalogs
+
+Two catalogs are pre-configured in both the Flink and Spark clusters:
+
+- `demo_hv`: a Hive catalog backed by the Hive Metastore
+- `demo_ib`: an Iceberg catalog also backed by the Hive Metastore
+
+#### Flink
+
+In Flink, the catalogs can be initialized automatically using an SQL script (`init-catalogs.sql`) on startup:
+
+```sql
+CREATE CATALOG demo_hv WITH (
+  'type' = 'hive',
+  'hive-conf-dir' = '/opt/flink/conf',
+  'default-database' = 'default'
+);
+
+CREATE CATALOG demo_ib WITH (
+  'type' = 'iceberg',
+  'catalog-type' = 'hive',
+  'uri' = 'thrift://hive-metastore:9083'
+);
+```
+
+#### Spark
+
+In Spark, catalog settings are defined in `spark-defaults.conf`:
+
+```conf
+# Enable Iceberg extensions
+spark.sql.extensions                               org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
+
+# Hive catalog (demo_hv)
+spark.sql.catalog.demo_hv                          org.apache.iceberg.spark.SparkCatalog
+spark.sql.catalog.demo_hv.type                     hive
+spark.sql.catalog.demo_hv.hive.metastore.uris      thrift://hive-metastore:9083
+spark.sql.catalog.demo_hv.warehouse                s3a://warehouse/
+
+# Iceberg catalog (demo_ib)
+spark.sql.catalog.demo_ib                          org.apache.iceberg.spark.SparkCatalog
+spark.sql.catalog.demo_ib.type                     hive
+spark.sql.catalog.demo_ib.uri                      thrift://hive-metastore:9083
+spark.sql.catalog.demo_ib.io-impl                  org.apache.iceberg.aws.s3.S3FileIO
+spark.sql.catalog.demo_ib.s3.endpoint              http://minio:9000
+spark.sql.catalog.demo_ib.s3.path-style-access     true
+spark.sql.catalog.demo_ib.warehouse                s3a://warehouse/
+
+# Optional: set default catalog
+spark.sql.defaultCatalog                           spark_catalog
+```
+
 ### Deploy source connector
 
 We will create a source connector that generates fake order records to a Kafka topic (`orders`). See the [Kafka Connect via Kpow UI and API](../lab-02/) lab for details about how to create the connector.
