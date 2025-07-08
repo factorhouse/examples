@@ -153,7 +153,7 @@ curl -s -H "$AUTH_HEADER" http://localhost:4000/connect/v1/apache/$CONNECT_ID/co
 
 1. Check Topic Data
 
-Once the source connector is running, it begins producing messages. The sink connector, when started, consumes messages from the `orders` topic and writes them to the MinIO bucket (`fh-dev-bucket`), viewable at http://localhost:9001/. Records are stored in the path: `topics/orders/partition=<num>` within the bucket.
+Once the source connector is running, it begins producing messages. The sink connector, when started, consumes messages from the `orders` topic and writes them to the MinIO bucket (`fh-dev-bucket`), viewable at `http://localhost:9001/`. Records are stored in the path: `topics/orders/partition=<num>` within the bucket.
 
 ![](./images/connect-api-01.png)
 
