@@ -22,8 +22,14 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 ## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
 ./factorhouse-local/resources/setup-env.sh
 
-## Start Docker Services
-docker compose -f ./factorhouse-local/compose-kpow-trial.yml up -d
+## Uncomment the sections to enable the edition and license.
+# Edition (choose one):
+# unset KPOW_SUFFIX         # Enterprise
+# export KPOW_SUFFIX="-ce"  # Community
+# License:
+# export KPOW_LICENSE=<path-to-license-file>
+
+docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d
 ```
 
 ### Deploy source connector
@@ -101,5 +107,8 @@ Stop and remove the Docker containers.
 > Then, stop and remove the Docker containers by running:
 
 ```bash
-docker compose -f ./factorhouse-local/compose-kpow-trial.yml down
+# Stops the containers and unsets environment variables
+docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+unset KPOW_SUFFIX KPOW_LICENSE
 ```

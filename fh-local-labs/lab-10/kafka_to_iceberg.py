@@ -49,8 +49,8 @@ if __name__ == "__main__":
     SCHEMA_REGISTRY_URL = os.getenv("SCHEMA_REGISTRY_URL", "http://schema:8081")
     SCHEMA_REGISTRY_AUTH_USER_INFO = "admin:admin"
 
-    ICEBERG_CATALOG_NAME = "demo"
-    ICEBERG_DB_NAME = "db"
+    ICEBERG_CATALOG_NAME = "demo_ib"
+    ICEBERG_DB_NAME = "default"
     ICEBERG_TABLE_NAME = "orders"
     ICEBERG_TABLE_FQN = f"{ICEBERG_CATALOG_NAME}.{ICEBERG_DB_NAME}.{ICEBERG_TABLE_NAME}"
     CHECKPOINT_LOCATION_BASE = "/tmp/spark-events"
@@ -63,10 +63,6 @@ if __name__ == "__main__":
     LOGGER.info("Spark Session created for KafkaToIceberg.")
     LOGGER.info(
         f"Using Iceberg catalog: {ICEBERG_CATALOG_NAME} (from spark-defaults.conf)"
-    )
-
-    spark.sql(
-        f"CREATE DATABASE IF NOT EXISTS f{ICEBERG_CATALOG_NAME}.{ICEBERG_DB_NAME}"
     )
     spark.sql(f"""
         CREATE TABLE IF NOT EXISTS {ICEBERG_TABLE_FQN} (

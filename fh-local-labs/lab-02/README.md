@@ -11,7 +11,7 @@ git clone https://github.com/factorhouse/examples.git
 cd examples
 ```
 
-### Start Kafka and analtyics environment
+### Start Kafka and Flink environments
 
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up a Kafka environment that includes **Kpow** and MinIO. This setup uses the **Kpow Enterprise edition**, as we'll later rely on the Kpow API - an enterprise-only feature. **Before you begin, ensure you have a valid Kpow license.** For guidance on requesting and configuring a license, see [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
@@ -22,9 +22,18 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 ## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
 ./factorhouse-local/resources/setup-env.sh
 
-## Start Docker Services
-docker compose -p kpow -f ./factorhouse-local/compose-kpow-trial.yml up -d \
-  && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
+## Uncomment the sections to enable the edition and license.
+# Edition (choose one):
+# unset KPOW_SUFFIX         # Enterprise
+# unset FLEX_SUFFIX         # Enterprise
+# export KPOW_SUFFIX="-ce"  # Community
+# export FLEX_SUFFIX="-ce"  # Community
+# Licenses:
+# export KPOW_LICENSE=<path-to-license-file>
+# export FLEX_LICENSE=<path-to-license-file>
+
+docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
+  && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d
 ```
 
 ### Deploy source connector via UI
@@ -144,7 +153,7 @@ curl -s -H "$AUTH_HEADER" http://localhost:4000/connect/v1/apache/$CONNECT_ID/co
 
 1. Check Topic Data
 
-Once the source connector is running, it begins producing messages. The sink connector, when started, consumes messages from the `orders` topic and writes them to the MinIO bucket (`fh-dev-bucket`), viewable at http://localhost:9001/. Records are stored in the path: `topics/orders/partition=<num>` within the bucket.
+Once the source connector is running, it begins producing messages. The sink connector, when started, consumes messages from the `orders` topic and writes them to the MinIO bucket (`fh-dev-bucket`), viewable at `http://localhost:9001/`. Records are stored in the path: `topics/orders/partition=<num>` within the bucket.
 
 ![](./images/connect-api-01.png)
 
@@ -188,6 +197,9 @@ Finally, stop and remove the Docker containers.
 > Then, stop and remove the Docker containers by running:
 
 ```bash
-docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml down \
-  && docker compose -p kpow -f ./factorhouse-local/compose-kpow-trial.yml down
+# Stops the containers and unsets environment variables
+docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
 ```

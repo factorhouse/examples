@@ -11,7 +11,7 @@ git clone https://github.com/factorhouse/examples.git
 cd examples
 ```
 
-### Start Kafka and analytics environments
+### Start Kafka and Flink environments
 
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up a Kafka environments that includes **Kpow** as well as an analytics environment for Iceberg. We can use either the Community or Enterprise editions of Kpow. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
@@ -22,9 +22,70 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 ## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
 ./factorhouse-local/resources/setup-env.sh
 
-## Start Docker Services
-docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
-  && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
+## Uncomment the sections to enable the edition and license.
+# Edition (choose one):
+# unset KPOW_SUFFIX         # Enterprise
+# unset FLEX_SUFFIX         # Enterprise
+# export KPOW_SUFFIX="-ce"  # Community
+# export FLEX_SUFFIX="-ce"  # Community
+# Licenses:
+# export KPOW_LICENSE=<path-to-license-file>
+# export FLEX_LICENSE=<path-to-license-file>
+
+docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
+  && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d
+```
+
+### Persistent Catalogs
+
+Two catalogs are pre-configured in both the Flink and Spark clusters:
+
+- `demo_hv`: a Hive catalog backed by the Hive Metastore
+- `demo_ib`: an Iceberg catalog also backed by the Hive Metastore
+
+#### Flink
+
+In Flink, the catalogs can be initialized automatically using an SQL script (`init-catalogs.sql`) on startup:
+
+```sql
+CREATE CATALOG demo_hv WITH (
+  'type' = 'hive',
+  'hive-conf-dir' = '/opt/flink/conf',
+  'default-database' = 'default'
+);
+
+CREATE CATALOG demo_ib WITH (
+  'type' = 'iceberg',
+  'catalog-type' = 'hive',
+  'uri' = 'thrift://hive-metastore:9083'
+);
+```
+
+#### Spark
+
+In Spark, catalog settings are defined in `spark-defaults.conf`:
+
+```conf
+# Enable Iceberg extensions
+spark.sql.extensions                               org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
+
+# Hive catalog (demo_hv)
+spark.sql.catalog.demo_hv                          org.apache.iceberg.spark.SparkCatalog
+spark.sql.catalog.demo_hv.type                     hive
+spark.sql.catalog.demo_hv.hive.metastore.uris      thrift://hive-metastore:9083
+spark.sql.catalog.demo_hv.warehouse                s3a://warehouse/
+
+# Iceberg catalog (demo_ib)
+spark.sql.catalog.demo_ib                          org.apache.iceberg.spark.SparkCatalog
+spark.sql.catalog.demo_ib.type                     hive
+spark.sql.catalog.demo_ib.uri                      thrift://hive-metastore:9083
+spark.sql.catalog.demo_ib.io-impl                  org.apache.iceberg.aws.s3.S3FileIO
+spark.sql.catalog.demo_ib.s3.endpoint              http://minio:9000
+spark.sql.catalog.demo_ib.s3.path-style-access     true
+spark.sql.catalog.demo_ib.warehouse                s3a://warehouse/
+
+# Optional: set default catalog
+spark.sql.defaultCatalog                           spark_catalog
 ```
 
 ### Deploy source connector
@@ -44,12 +105,29 @@ docker exec -it spark-iceberg /opt/spark/bin/spark-sql
 ```
 
 ```sql
---// demo is the default catalog
-show catalogs;
--- demo
+-- // Only 'spark_catalog' appears although 'demo_hv' and 'demo_ib' exists
+SHOW CATALOGS;
 -- spark_catalog
+```
 
-CREATE TABLE demo.db.orders (
+```sql
+-- // If 'demo_ib' gets showing if being used.
+USE demo_ib;
+```
+
+```sql
+SHOW CATALOGS;
+-- demo_ib
+-- spark_catalog
+```
+
+```sql
+-- // Use the `default` database
+USE `default`;
+```
+
+```sql
+CREATE TABLE orders (
     order_id STRING,
     item STRING,
     price DECIMAL(10, 2),
@@ -113,6 +191,9 @@ Finally, stop and remove the Docker containers.
 > Then, stop and remove the Docker containers by running:
 
 ```bash
-docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml down \
-  && docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml down
+# Stops the containers and unsets environment variables
+docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
 ```

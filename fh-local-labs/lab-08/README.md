@@ -11,7 +11,7 @@ git clone https://github.com/factorhouse/examples.git
 cd examples
 ```
 
-### Start Kafka, Flink and analytics environments
+### Start Kafka and Flink environments
 
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex** as well as an analytics environment for Iceberg. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
@@ -22,63 +22,91 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 ## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
 ./factorhouse-local/resources/setup-env.sh
 
-## Start Docker Services
-docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml up -d \
-  && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
+## Uncomment the sections to enable the edition and license.
+# Edition (choose one):
+# unset KPOW_SUFFIX         # Enterprise
+# unset FLEX_SUFFIX         # Enterprise
+# export KPOW_SUFFIX="-ce"  # Community
+# export FLEX_SUFFIX="-ce"  # Community
+# Licenses:
+# export KPOW_LICENSE=<path-to-license-file>
+# export FLEX_LICENSE=<path-to-license-file>
+
+docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
+  && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d
+```
+
+### Persistent Catalogs
+
+Two catalogs are pre-configured in both the Flink and Spark clusters:
+
+- `demo_hv`: a Hive catalog backed by the Hive Metastore
+- `demo_ib`: an Iceberg catalog also backed by the Hive Metastore
+
+#### Flink
+
+In Flink, the catalogs can be initialized automatically using an SQL script (`init-catalogs.sql`) on startup:
+
+```sql
+CREATE CATALOG demo_hv WITH (
+  'type' = 'hive',
+  'hive-conf-dir' = '/opt/flink/conf',
+  'default-database' = 'default'
+);
+
+CREATE CATALOG demo_ib WITH (
+  'type' = 'iceberg',
+  'catalog-type' = 'hive',
+  'uri' = 'thrift://hive-metastore:9083'
+);
+```
+
+#### Spark
+
+In Spark, catalog settings are defined in `spark-defaults.conf`:
+
+```conf
+# Enable Iceberg extensions
+spark.sql.extensions                               org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
+
+# Hive catalog (demo_hv)
+spark.sql.catalog.demo_hv                          org.apache.iceberg.spark.SparkCatalog
+spark.sql.catalog.demo_hv.type                     hive
+spark.sql.catalog.demo_hv.hive.metastore.uris      thrift://hive-metastore:9083
+spark.sql.catalog.demo_hv.warehouse                s3a://warehouse/
+
+# Iceberg catalog (demo_ib)
+spark.sql.catalog.demo_ib                          org.apache.iceberg.spark.SparkCatalog
+spark.sql.catalog.demo_ib.type                     hive
+spark.sql.catalog.demo_ib.uri                      thrift://hive-metastore:9083
+spark.sql.catalog.demo_ib.io-impl                  org.apache.iceberg.aws.s3.S3FileIO
+spark.sql.catalog.demo_ib.s3.endpoint              http://minio:9000
+spark.sql.catalog.demo_ib.s3.path-style-access     true
+spark.sql.catalog.demo_ib.warehouse                s3a://warehouse/
+
+# Optional: set default catalog
+spark.sql.defaultCatalog                           spark_catalog
 ```
 
 ### Deploy source connector
 
-We will create a source connector that generates fake order records to a Kafka topic (`orders`). See the [Kafka Connect via Kpow UI and API](../lab-08/) lab for details about how to create the connector.
+We will create a source connector that generates fake order records to a Kafka topic (`orders`). See the [Kafka Connect via Kpow UI and API](../lab-02/) lab for details about how to create the connector.
 
 Once deployed, we can check the connector and its tasks in Kpow.
 
 ![](./images/kafka-connector.png)
 
-### Create sink table
-
-Flink SQL doesn't support [Iceberg's hidden partitioning](https://iceberg.apache.org/docs/nightly/partitioning/#icebergs-hidden-partitioning). Therefore, we will create the sink table using Spark SQL.
-
-```bash
-docker exec -it spark-iceberg /opt/spark/bin/spark-sql
-```
-
-```sql
---// demo is the default catalog
-show catalogs;
--- demo
--- spark_catalog
-
-CREATE TABLE demo.db.orders (
-    order_id STRING,
-    item STRING,
-    price DECIMAL(10, 2),
-    supplier STRING,
-    bid_time TIMESTAMP
-)
-USING iceberg
-PARTITIONED BY (DAY(bid_time))
-TBLPROPERTIES (
-    'format-version' = '2',
-    'write.format.default' = 'parquet',
-    'write.target-file-size-bytes' = '134217728',
-    'write.parquet.compression-codec' = 'snappy',
-    'write.metadata.delete-after-commit.enabled' = 'true',
-    'write.metadata.previous-versions-max' = '3',
-    'write.delete.mode' = 'copy-on-write',
-    'write.update.mode' = 'copy-on-write'
-);
-```
-
-Once created, the table will initially contain only metadata (no data). We can view it in the MinIO Console at http://localhost:9001.
-
-- **Username:** `admin`
-- **Password:** `password`
-
-![](./images/sink-table-01.png)
-
 ### Running Flink application
+
+This Flink streaming application reads Avro-encoded Kafka messages using the Table API and writes them to an Iceberg table registered with a Hive catalog. It does the following:
+
+- Uses the Flink Table API to define a Kafka source table backed by the Confluent Schema Registry (with basic auth support).
+- Configures checkpointing, parallelism, and fault tolerance for streaming execution.
+- Registers an Iceberg catalog backed by Hive Metastore using SQL and sets it as the active catalog.
+- **Creates the Iceberg table programmatically using the Java Iceberg API** to support **[hidden partitioning](https://www.tabular.io/apache-iceberg-cookbook/data-engineering-hidden-partitioning/) by `DAY(bid_time)`**, which is **not currently supported in Flink SQL DDL**.
+- Defines the source schema with watermarking and consumes data from Kafka in Avro format.
+- Casts fields as needed (e.g., `price` to `DECIMAL(10,2)`) and writes the resulting table into Iceberg using `executeInsert()`.
+- Logs key events throughout the lifecycle, including job submission and failure handling.
 
 To build the Flink application, make sure your environment has the following prerequisites:
 
@@ -134,7 +162,7 @@ Or we can also submit the JAR using the Flex UI available at `http://localhost:3
 
 ### Monitoring the Job
 
-We can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (`http://localhost:8082`) or Flex (`http://localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 
@@ -150,7 +178,9 @@ Finally, stop and remove the Docker containers.
 > Then, stop and remove the Docker containers by running:
 
 ```bash
-docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml down \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml down \
-  && docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml down
+# Stops the containers and unsets environment variables
+docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
 ```

@@ -11,7 +11,7 @@ git clone https://github.com/factorhouse/examples.git
 cd examples
 ```
 
-### Start Kafka, Flink and analytics environments
+### Start Kafka and Flink environments
 
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that includes **Kpow** and **Flex** as well as an analytics environment for Iceberg. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
@@ -22,10 +22,18 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 ## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
 ./factorhouse-local/resources/setup-env.sh
 
-## Start Docker Services
-docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml up -d \
-  && docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml up -d
+## Uncomment the sections to enable the edition and license.
+# Edition (choose one):
+# unset KPOW_SUFFIX         # Enterprise
+# unset FLEX_SUFFIX         # Enterprise
+# export KPOW_SUFFIX="-ce"  # Community
+# export FLEX_SUFFIX="-ce"  # Community
+# Licenses:
+# export KPOW_LICENSE=<path-to-license-file>
+# export FLEX_LICENSE=<path-to-license-file>
+
+docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
+  && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d
 ```
 
 ### Deploy source connector
@@ -50,8 +58,13 @@ We begin by loading the necessary JAR files for the Apache Kafka SQL connector a
 
 ```sql
 ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';
-ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+```
 
+```sql
+ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+```
+
+```sql
 show jars;
 -- +-------------------------------------------------------------+
 -- |                                                        jars |
@@ -87,8 +100,12 @@ CREATE TABLE orders (
   'avro-confluent.schema-registry.subject' = 'orders-value',
   'scan.startup.mode' = 'earliest-offset'
 );
+```
 
--- select * from orders;
+Run the following query to view the source table:
+
+```sql
+select * from orders;
 ```
 
 #### Create sink table
@@ -99,27 +116,34 @@ The table uses the **Filesystem connector** with the `s3a://` scheme for writing
 
 ```sql
 SET 'parallelism.default' = '3';
+```
+
+```sql
 SET 'execution.checkpointing.interval' = '60000';
+```
 
+```sql
 CREATE TABLE orders_sink(
-    bid_date     STRING,
-    order_id     STRING,
-    item         STRING,
-    price        DECIMAL(10, 2),
-    supplier     STRING,
-    bid_time     TIMESTAMP(3)
+  bid_date     STRING,
+  order_id     STRING,
+  item         STRING,
+  price        DECIMAL(10, 2),
+  supplier     STRING,
+  bid_time     TIMESTAMP(3)
 ) PARTITIONED BY (bid_date) WITH (
-    'connector' = 'filesystem',
-    'path' = 's3a://fh-dev-bucket/orders/',
-    'format' = 'parquet',
-    'sink.parallelism' = '3',
-    'sink.partition-commit.delay' = '1 min',
-    'sink.partition-commit.policy.kind' = 'success-file',
-    'sink.rolling-policy.file-size' = '128 MB',
-    'sink.rolling-policy.rollover-interval' = '15 min',
-    'sink.rolling-policy.check-interval' = '1 min'
+  'connector' = 'filesystem',
+  'path' = 's3a://fh-dev-bucket/orders/',
+  'format' = 'parquet',
+  'sink.parallelism' = '3',
+  'sink.partition-commit.delay' = '1 min',
+  'sink.partition-commit.policy.kind' = 'success-file',
+  'sink.rolling-policy.file-size' = '128 MB',
+  'sink.rolling-policy.rollover-interval' = '15 min',
+  'sink.rolling-policy.check-interval' = '1 min'
 );
+```
 
+```sql
 INSERT INTO orders_sink
 SELECT
     DATE_FORMAT(bid_time, 'yyyy-MM-dd'),
@@ -140,7 +164,7 @@ fs.s3a.endpoint: http://minio:9000
 fs.s3a.path.style.access: true
 ```
 
-We can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (`http://localhost:8082`) or Flex (`http://localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 
@@ -156,7 +180,9 @@ Finally, stop and remove the Docker containers.
 > Then, stop and remove the Docker containers by running:
 
 ```bash
-docker compose -p analytics -f ./factorhouse-local/compose-analytics.yml down \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml down \
-  && docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml down
+# Stops the containers and unsets environment variables
+docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
 ```

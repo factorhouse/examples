@@ -23,7 +23,7 @@ Flink SQL Gateway does not support dynamic JAR loading, so required JARs (Kafka 
 x-common-environment: &flink_common_env_vars
   AWS_REGION: us-east-1
   HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
-  CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/iceberg;/tmp/parquet"
+  CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
 ```
 
 **After:**
@@ -32,10 +32,10 @@ x-common-environment: &flink_common_env_vars
 x-common-environment: &flink_common_env_vars
   AWS_REGION: us-east-1
   HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
-  CUSTOM_JARS_DIRS: "/tmp/connector" #<-- Updated
+  CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet;/tmp/connector"
 ```
 
-This ensures the following JARs are loaded into the Flink JobManager, TaskManagers, and SQL Gateway:
+This ensures the following JARs are loaded additionally into the Flink JobManager, TaskManagers, and SQL Gateway:
 
 - `/tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar`
 - `/tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar`
@@ -49,9 +49,18 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 ## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
 ./factorhouse-local/resources/setup-env.sh
 
-## Start Docker Services
-docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml up -d
+## Uncomment the sections to enable the edition and license.
+# Edition (choose one):
+# unset KPOW_SUFFIX         # Enterprise
+# unset FLEX_SUFFIX         # Enterprise
+# export KPOW_SUFFIX="-ce"  # Community
+# export FLEX_SUFFIX="-ce"  # Community
+# Licenses:
+# export KPOW_LICENSE=<path-to-license-file>
+# export FLEX_LICENSE=<path-to-license-file>
+
+docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
+  && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d
 ```
 
 ### Deploy source connector
@@ -142,7 +151,7 @@ We'll see streaming results in the terminal:
 
 ![](./images/flink-sql-runner.gif)
 
-Also, we can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (`http://localhost:8082`) or Flex (`http://localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 
@@ -154,6 +163,9 @@ Finally, stop and remove the Docker containers.
 > Then, stop and remove the Docker containers by running:
 
 ```bash
-docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml down \
-  && docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml down
+# Stops the containers and unsets environment variables
+docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
 ```

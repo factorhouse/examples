@@ -22,9 +22,18 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 ## Download Kafka/Flink Connectors and Spark Iceberg Dependencies
 ./factorhouse-local/resources/setup-env.sh
 
-## Start Docker Services
-docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml up -d \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml up -d
+## Uncomment the sections to enable the edition and license.
+# Edition (choose one):
+# unset KPOW_SUFFIX         # Enterprise
+# unset FLEX_SUFFIX         # Enterprise
+# export KPOW_SUFFIX="-ce"  # Community
+# export FLEX_SUFFIX="-ce"  # Community
+# Licenses:
+# export KPOW_LICENSE=<path-to-license-file>
+# export FLEX_LICENSE=<path-to-license-file>
+
+docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
+  && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d
 ```
 
 ### Deploy source connector
@@ -52,10 +61,6 @@ This mode is ideal for local development and quick testing. It enables fast iter
 cd fh-local-labs/lab-05
 ./gradlew run
 ```
-
-We can see console output like the following:
-
-![](./images/gradle_run.gif)
 
 #### 2. Deploy on a Flink Cluster (Deployment Mode)
 
@@ -106,13 +111,13 @@ Or we can also submit the JAR using the Flex UI available at `http://localhost:3
 
 ### Monitoring the Job
 
-We can monitor the Flink job via the Flink UI (`localhost:8081`) or Flex (`localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (`http://localhost:8082`) or Flex (`http://localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 
 ### Verifying the Output in Kafka
 
-We can also verify that the sink connector registers the `supplier-stats-ds-value` schema in Kpow (`localhost:3000`).
+We can also verify that the sink connector registers the `supplier-stats-ds-value` schema in Kpow (`http://localhost:3000`).
 
 ![](./images/schema-01.png)
 
@@ -128,6 +133,9 @@ Finally, stop and remove the Docker containers.
 > Then, stop and remove the Docker containers by running:
 
 ```bash
-docker compose -p flex -f ./factorhouse-local/compose-flex-community.yml down \
-  && docker compose -p kpow -f ./factorhouse-local/compose-kpow-community.yml down
+# Stops the containers and unsets environment variables
+docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
 ```
