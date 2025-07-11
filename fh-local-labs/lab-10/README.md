@@ -144,11 +144,11 @@ docker exec -it spark-iceberg \
     /tmp/kafka_to_iceberg.py
 ```
 
-We can verify the output by inspecting the Parquet files written by the sink. These files are accessible via MinIO at `http://localhost:9001` using `admin` as the username and `password` as the password. As shown in the screenshot below, the records have been successfully written to the appropriate partitions in the `warehouse` bucket.
+We can verify the output by inspecting the Parquet files written by the sink. These files are accessible via MinIO at http://localhost:9001 using `admin` as the username and `password` as the password. As shown in the screenshot below, the records have been successfully written to the appropriate partitions in the `warehouse` bucket.
 
 ![](./images/minio-01.png)
 
-Additionally, you can monitor the job in real time using the Spark Web UI at `http://localhost:4040` while the application is running, or review completed jobs later via the Spark History Server at `http://localhost:18080`.
+Additionally, you can monitor the job in real time using the Spark Web UI at http://localhost:4040 while the application is running, or review completed jobs later via the Spark History Server at http://localhost:18080.
 
 ![](./images/web-ui-01.png)
 

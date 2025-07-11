@@ -91,7 +91,7 @@ docker exec jobmanager /opt/flink/bin/flink run -d -p 3 \
   -c io.factorhouse.demo.MainKt /tmp/fh-local-flink-ds-stats-1.0.jar
 ```
 
-Or we can also submit the JAR using the Flex UI available at `http://localhost:3001`:
+Or we can also submit the JAR using the Flex UI available at http://localhost:3001:
 
 1. **Upload the JAR** from the **Jobs** sidebar.
 
@@ -111,13 +111,13 @@ Or we can also submit the JAR using the Flex UI available at `http://localhost:3
 
 ### Monitoring the Job
 
-We can monitor the Flink job via the Flink UI (`http://localhost:8082`) or Flex (`http://localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (http://localhost:8082) or Flex (http://localhost:3001). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 
 ### Verifying the Output in Kafka
 
-We can also verify that the sink connector registers the `supplier-stats-ds-value` schema in Kpow (`http://localhost:3000`).
+We can also verify that the sink connector registers the `supplier-stats-ds-value` schema in Kpow (http://localhost:3000).
 
 ![](./images/schema-01.png)
 

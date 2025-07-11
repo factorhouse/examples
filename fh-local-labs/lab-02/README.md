@@ -40,7 +40,7 @@ docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
 
 We will use the MSK Data Generator (source) and Confluent S3 (sink) connectors. Let's first create the source connector using the Kpow UI.
 
-1. Open the Kpow UI at `http://localhost:3000` and log in using the credentials `admin` / `admin`. Then, navigate to the **Connect** section.
+1. Open the Kpow UI at http://localhost:3000 and log in using the credentials `admin` / `admin`. Then, navigate to the **Connect** section.
 2. Click _Create connector_ to get started.
 
 ![](./images/connect-ui-01.png)
@@ -153,7 +153,7 @@ curl -s -H "$AUTH_HEADER" http://localhost:4000/connect/v1/apache/$CONNECT_ID/co
 
 1. Check Topic Data
 
-Once the source connector is running, it begins producing messages. The sink connector, when started, consumes messages from the `orders` topic and writes them to the MinIO bucket (`fh-dev-bucket`), viewable at `http://localhost:9001/`. Records are stored in the path: `topics/orders/partition=<num>` within the bucket.
+Once the source connector is running, it begins producing messages. The sink connector, when started, consumes messages from the `orders` topic and writes them to the MinIO bucket (`fh-dev-bucket`), viewable at http://localhost:9001/. Records are stored in the path: `topics/orders/partition=<num>` within the bucket.
 
 ![](./images/connect-api-01.png)
 
