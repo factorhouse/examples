@@ -172,11 +172,11 @@ FROM TABLE(
 GROUP BY window_start, window_end, supplier;
 ```
 
-We can monitor the Flink job via the Flink UI (`http://localhost:8082`) or Flex (`http://localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (http://localhost:8082) or Flex (http://localhost:3001). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 
-We can also verify that the sink connector registers the `supplier-stats-sql-value` schema in Kpow (`http://localhost:3000`).
+We can also verify that the sink connector registers the `supplier-stats-sql-value` schema in Kpow (http://localhost:3000).
 
 ![](./images/schema-01.png)
 

@@ -69,7 +69,7 @@ You should see:
 # Table response: {"unrecognizedProperties":{},"status":"Table orders_REALTIME successfully added"}
 ```
 
-We can now query the `orders` table from the **Pinot Query Console** at `http://localhost:19000`.
+We can now query the `orders` table from the **Pinot Query Console** at http://localhost:19000.
 
 ![](./images/pinot-01.png)
 

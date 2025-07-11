@@ -142,7 +142,7 @@ docker exec jobmanager /opt/flink/bin/flink run -d -p 3 \
   -c io.factorhouse.demo.MainKt /tmp/fh-local-flink-table-iceberg-1.0.jar
 ```
 
-Or we can also submit the JAR using the Flex UI available at `http://localhost:3001`:
+Or we can also submit the JAR using the Flex UI available at http://localhost:3001:
 
 1. **Upload the JAR** from the **Jobs** sidebar.
 
@@ -162,11 +162,11 @@ Or we can also submit the JAR using the Flex UI available at `http://localhost:3
 
 ### Monitoring the Job
 
-We can monitor the Flink job via the Flink UI (`http://localhost:8082`) or Flex (`http://localhost:3001`). The screenshot below shows the job's logical plan as visualized in Flex.
+We can monitor the Flink job via the Flink UI (http://localhost:8082) or Flex (http://localhost:3001). The screenshot below shows the job's logical plan as visualized in Flex.
 
 ![](./images/flex-01.png)
 
-In addition to monitoring the job, we can verify the output by inspecting the Parquet files written by the sink. These files are accessible via MinIO at `http://localhost:9001` using `admin` as the username and `password` as the password. As shown in the screenshot below, the records have been successfully written to the appropriate partitions in the `warehouse` bucket.
+In addition to monitoring the job, we can verify the output by inspecting the Parquet files written by the sink. These files are accessible via MinIO at http://localhost:9001 using `admin` as the username and `password` as the password. As shown in the screenshot below, the records have been successfully written to the appropriate partitions in the `warehouse` bucket.
 
 ![](./images/minio-01.png)
 

@@ -179,7 +179,7 @@ We can also track connector performance by filtering its consumer group (`connec
 
 ![](./images/consumer-group-01.png)
 
-Finally, inspect the Parquet files written by the connector via MinIO at `http://localhost:9001` using `admin` as the username and `password` as the password. As shown below, records are correctly partitioned and stored in the configured MinIO bucket (`warehouse`).
+Finally, inspect the Parquet files written by the connector via MinIO at http://localhost:9001 using `admin` as the username and `password` as the password. As shown below, records are correctly partitioned and stored in the configured MinIO bucket (`warehouse`).
 
 ![](./images/minio-01.png)
 
