@@ -1,0 +1,8 @@
+confluent_kafka
+types-confluent-kafka
+httpx
+attrs
+cachetools
+authlib
+fastavro
+referencing
