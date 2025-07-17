@@ -4,10 +4,16 @@ import csv
 import datetime
 import random
 import typing
+import logging
+from typing import List
 
-import pandas as pd
-from sqlalchemy import create_engine, Connection
 from faker import Faker
+from confluent_kafka.admin import AdminClient, NewTopic
+from confluent_kafka.error import KafkaException, KafkaError
+
+logging.basicConfig(
+    level=logging.INFO, format="[%(asctime)s] %(levelname)s: %(message)s"
+)
 
 fake = Faker()
 
@@ -22,8 +28,10 @@ MIN_AGE = 12
 MAX_AGE = 71
 
 
-# read from local csv and return products
 def generate_products() -> typing.List[dict]:
+    """
+    Read from local csv and return products.
+    """
     product_brand_dict = {}  # products partitioned by brand - unused
     product_category_dict = {}  # product partitioned by cateogry - unused
     gender_category_dict = {}  # products partitioned by gender and category - unused
@@ -216,8 +224,10 @@ def get_address(
     }
 
 
-# generates random date between now and specified date
 def created_at(start_date: datetime.datetime) -> datetime.datetime:
+    """
+    Generates random date between now and specified date.
+    """
     end_date = datetime.datetime.now()
     time_between_dates = end_date - start_date
     days_between_dates = time_between_dates.days
@@ -232,8 +242,10 @@ def created_at(start_date: datetime.datetime) -> datetime.datetime:
     return created_at
 
 
-# generate URI for events table
 def generate_uri(event: str, product: str) -> str:
+    """
+    Generate URI for events table.
+    """
     if event == "product":
         return f"/{event}/{product[0]}"
     elif event == "department":
@@ -242,19 +254,38 @@ def generate_uri(event: str, product: str) -> str:
         return f"/{event}"
 
 
-def create_connection(
-    user: str = "develop",
-    password: str = "password",
-    host: str = "localhost",
-    db_name: str = "develop",
-    echo: bool = False,
-):
-    return create_engine(
-        f"postgresql+psycopg2://{user}:{password}@{host}/{db_name}", echo=echo
-    ).connect()
+def get_topic_names(prefix: str, schema: str, table_map: dict):
+    """
+    Get all unique topic names from the nested dictionary map.
+    """
+    topic_names = set()
+    for category in table_map.values():
+        if "data" in category:
+            topic_names.update(
+                [f"{prefix}.{schema}.{key}" for key in category["data"].keys()]
+            )
+    return list(topic_names)
 
 
-def insert_to_db(
-    df: pd.DataFrame, tbl_name: str, schema_name: str, conn: Connection, if_exists: str = "append"
+def create_topics_if_not_exists(
+    bootstrap_servers: str,
+    topic_names: List[str],
+    num_partitions: int = 3,
+    replication_factor: int = 1,
 ):
-    df.to_sql(name=tbl_name, schema=schema_name, con=conn, index=False, if_exists=if_exists)
+    """Uses an AdminClient to create topics."""
+    admin_client = AdminClient({"bootstrap.servers": bootstrap_servers})
+    topics = [
+        NewTopic(name, num_partitions, replication_factor) for name in topic_names
+    ]
+    result_dict = admin_client.create_topics(topics)
+
+    for topic, future in result_dict.items():
+        try:
+            future.result(timeout=3)
+            logging.info(f"Topic '{topic}' created.")
+        except KafkaException as e:
+            if e.args[0].code() == KafkaError.TOPIC_ALREADY_EXISTS:
+                logging.warning(f"Topic '{topic}' already exists.")
+            else:
+                raise RuntimeError(f"Failed to create topic '{topic}'.") from e

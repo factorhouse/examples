@@ -2,4 +2,5 @@ faker
 pandas
 psycopg2-binary
 SQLAlchemy
-google-cloud-pubsub
+confluent_kafka
+types-confluent-kafka
