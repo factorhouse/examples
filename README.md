@@ -2,18 +2,94 @@
 
 ## Product Feature
 
-- [Manage Kafka Consumer Offsets with Kpow](./features/offset-management/)
-  - Python Kafka producer and consumer clients that are used to showcase consumer group offset management capabilities of Kpow.
-  - [Manage Kafka Consumer Offsets with Kpow](https://factorhouse.io/blog/how-to/manage-kafka-consumer-offsets-with-kpow/) (blog post)
+<details>
+  <summary><a href="./features/offset-management/">Manage Kafka Consumer Offsets with Kpow</a></summary>
+  <p>
+    Python Kafka producer and consumer clients that are used to showcase consumer group offset management capabilities of Kpow.
+  </p>
+  <p>
+    Also see the related <a href="https://factorhouse.io/blog/how-to/manage-kafka-consumer-offsets-with-kpow/">blog post</a>.
+  </p>
+</details>
+
+<details>
+  <summary><a href="https://factorhouse.io/blog/how-to/integrate-confluent-compatible-registries-kpow/">Integrate Confluent-compatible Schema Registries with Kpow</a></summary>
+  <p>
+    In modern data architectures built on Apache Kafka, a Schema Registry is an essential component for enforcing data contracts and supporting strong data governance. While the Confluent Schema Registry set the original standard, the ecosystem has expanded to include powerful Confluent-compatible alternatives such as Red Hat’s Apicurio Registry and Aiven’s Karapace.
+  </p>
+  <p>
+    Whether driven by a gradual migration, the need to support autonomous teams, or simply technology evaluation, many organizations find themselves running multiple schema registries in parallel. This inevitably leads to operational complexity and a fragmented view of their data governance.
+  </p>
+  <p>
+    This guide demonstrates how Kpow directly solves this challenge. We will integrate these popular schema registries into a single Kafka environment and show how to manage them all seamlessly through Kpow's single, unified interface.
+  </p>
+</details>
 
 ## Integration
 
-- [Setting Up Kpow with Confluent Cloud](https://factorhouse.io/blog/how-to/set-up-kpow-with-confluent-cloud/)
-  - A step-by-step guide to configuring Kpow with Confluent Cloud resources including Kafka clusters, Schema Registry, Kafka Connect, and kSQLDB.
-- [Set Up Kpow with Amazon Managed Streaming for Apache Kafka](https://factorhouse.io/blog/how-to/set-up-kpow-with-aws/)
-  - A comprehensive, step by step guide to provisioning AWS MSK infrastructure, configuring authentication with the OAUTHBEARER mechanism using AWS IAM, setting up a client EC2 instance within the same VPC, and deploying Kpow.
-- [Set Up Kpow with Google Cloud Managed Service for Apache Kafka](https://factorhouse.io/blog/how-to/set-up-kpow-with-gcp/)
-  - A practical, step-by-step guide on setting up a Google Cloud Managed Service for Apache Kafka cluster and connecting it from Kpow using the OAUTHBEARER mechanism.
+<details>
+  <summary><a href="https://factorhouse.io/blog/how-to/set-up-kpow-with-confluent-cloud/">Setting Up Kpow with Confluent Cloud</a></summary>
+  <p>
+    A step-by-step guide to configuring Kpow with Confluent Cloud resources including Kafka clusters, Schema Registry, Kafka Connect, and kSQLDB.
+  </p>
+</details>
+
+<details>
+  <summary><a href="https://factorhouse.io/blog/how-to/set-up-kpow-with-aws/">Set Up Kpow with Amazon Managed Streaming for Apache Kafka</a></summary>
+  <p>
+    A comprehensive, step-by-step guide to provisioning AWS MSK infrastructure, configuring authentication with the OAUTHBEARER mechanism using AWS IAM, setting up a client EC2 instance within the same VPC, and deploying Kpow.
+  </p>
+</details>
+
+<details>
+  <summary><a href="https://factorhouse.io/blog/how-to/set-up-kpow-with-gcp/">Set Up Kpow with Google Cloud Managed Service for Apache Kafka</a></summary>
+  <p>
+    A practical, step-by-step guide on setting up a Google Cloud Managed Service for Apache Kafka cluster and connecting it from Kpow using the OAUTHBEARER mechanism.
+  </p>
+</details>
+
+<details>
+  <summary><a href="https://factorhouse.io/blog/how-to/integrate-kpow-with-google-schema-registry/">Integrate Kpow with Google Managed Schema Registry</a></summary>
+  <p>
+    Google Cloud has enhanced its platform with the launch of a managed <a href="https://cloud.google.com/managed-service-for-apache-kafka/docs/schema-registry/schema-registry-overview">Schema Registry for Apache Kafka</a>, a critical service for ensuring data quality and schema evolution in streaming architectures. Kpow 94.3 expands its support for Google Managed Service for Apache Kafka by integrating the managed schema registry. This allows users to manage Kafka clusters, topics, consumer groups, and schemas from a single interface.
+  </p>
+  <p>
+    Building on our <a href="https://factorhouse.io/blog/how-to/set-up-kpow-with-gcp/">earlier setup guide</a>, this post details how to configure the new schema registry integration and demonstrates how to leverage the Kpow UI for working effectively with Avro schemas.
+  </p>
+</details>
+
+<details>
+  <summary><a href="https://factorhouse.io/blog/how-to/integrate-kpow-with-bufstream/">Integrate Kpow with Bufstream</a></summary>
+  <p>
+    Kpow supports a wide range of Apache Kafka and Kafka API–compatible platforms, providing robust tools to manage, monitor, and secure data streaming workloads. In this guide, we'll walkthrough how to integrate Bufstream — a cloud-native, Kafka-compatible streaming solution — with Kpow, enabling seamless use of Bufstream's advanced schema management alongside Kpow's comprehensive Kafka management capabilities for an optimized streaming experience.
+  </p>
+</details>
+
+<details>
+  <summary><a href="https://factorhouse.io/blog/how-to/integrate-kpow-with-redpanda/">Integrate Kpow with the Redpanda Streaming Platform</a></summary>
+  <p>
+    Redpanda offers a simple, powerful, and Kafka®-compatible streaming data platform. Kpow provides a rich, developer-focused UI to manage and monitor it. Together, they form a robust stack for building and operating real-time data pipelines.
+  </p>
+  <p>
+    This guide will walk you through the process of setting up Kpow with a local Redpanda cluster using Docker. We will cover launching the environment, using Kpow to create and manage an Avro schema in Redpanda's built-in registry, producing schema-governed data to a topic, and finally, inspecting that data in a human-readable format.
+  </p>
+</details>
+
+## Data Generator
+
+<details>
+  <summary><a href="./datagen/look-ecomm/">theLook eCommerce Data Generator</a></summary>
+  <p>
+    Generates a continuous stream of synthetic data based on the <strong>theLook eCommerce dataset</strong>, which represents a fictional online fashion retailer. The data simulates a live production database, making it ideal for demonstrating <strong>Change Data Capture (CDC)</strong> with Debezium and for real-time analytics using Apache Flink or Apache Spark.
+  </p>
+</details>
+
+<details>
+  <summary><a href="./datagen/mobile-game/">Mobile Game User Score</a></summary>
+  <p>
+    A Python port of Apache Beam's <a href="https://beam.apache.org/get-started/mobile-gaming-example/"><strong>Mobile Gaming Example</strong></a> data generator. This script simulates game events such as user scores, designed to support real-time analytics pipelines for leaderboards, scoring engines, and fraud detection.
+  </p>
+</details>
 
 ## Factor House Local
 
