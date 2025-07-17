@@ -1,0 +1,6 @@
+faker
+pandas
+psycopg2-binary
+SQLAlchemy
+confluent_kafka
+types-confluent-kafka
