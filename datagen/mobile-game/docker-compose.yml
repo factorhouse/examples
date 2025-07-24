@@ -25,8 +25,10 @@ services:
       - "5"
       - --max-members-per-team
       - "15"
+      - --min-score
+      - "-20"
       - --max-score
-      - "20"
+      - "60"
       - --late-event-rate
       - "0"
     networks:
