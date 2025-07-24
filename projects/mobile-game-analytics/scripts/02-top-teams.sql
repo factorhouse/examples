@@ -2,13 +2,14 @@
 USE CATALOG demo_hv;
 USE game_analytics;
 
--- // Set job-specific configurations
+-- // Set configurations
 SET 'parallelism.default' = '3';
-SET 'table.exec.state.ttl' = '24 h';
+SET 'execution.checkpointing.interval' = '1 min';
+-- Set state TTL to be longer than the max team lifetime (40 mins) to ensure correctness
+SET 'table.exec.state.ttl' = '60 min';
 SET 'table.exec.mini-batch.enabled' = 'true';
 SET 'table.exec.mini-batch.allow-latency' = '3 s';
-SET 'table.exec.mini-batch.size' = '500';
-SET 'execution.checkpointing.interval' = '5s';
+SET 'table.exec.mini-batch.size' = '5000';
 
 -- // Insert top teams results into a Kafka topic
 ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';
@@ -20,7 +21,7 @@ WITH team_ranks AS (
     team_id,
     team_name,
     CAST(total_score AS BIGINT) AS total_score,
-    ROW_NUMBER() OVER (ORDER BY total_score DESC) as rnk
+    ROW_NUMBER() OVER (ORDER BY total_score DESC, team_name ASC) as rnk
   FROM (
     SELECT
       team_id,

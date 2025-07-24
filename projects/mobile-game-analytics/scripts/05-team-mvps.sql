@@ -1,35 +1,57 @@
--- Set parallelism to match the number of Kafka partitions
-SET 'parallelism.default' = '3';
--- Enable checkpointing for fault tolerance
-SET 'execution.checkpointing.interval' = '1min';
--- Enable mini-batching for windowed aggregations
-SET 'table.exec.mini-batch.enabled' = 'true';
-SET 'table.exec.mini-batch.allow-latency' = '1 s'; -- Shorter latency for windows
--- Purge state after 1 minute; windows are 5s, so this is a safe buffer
-SET 'table.exec.state.ttl' = '1 min';
+-- // Switch to the catalog and database
+USE CATALOG demo_hv;
+USE game_analytics;
 
--- The query itself
-WITH PlayerContribution AS (
+-- // Set configurations
+SET 'parallelism.default' = '3';
+SET 'execution.checkpointing.interval' = '1 min';
+-- Set state TTL to be longer than the max team lifetime (40 mins) to ensure correctness
+SET 'table.exec.state.ttl' = '60 min';
+SET 'table.exec.mini-batch.enabled' = 'true';
+SET 'table.exec.mini-batch.allow-latency' = '3 s';
+SET 'table.exec.mini-batch.size' = '1000';
+
+-- // Insert top player results into a Kafka topic
+ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';
+ADD JAR 'file:///tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar';
+
+INSERT INTO team_mvps
+WITH player_agg AS (
   SELECT
-    window_end,
-    team_id,
     user_id,
-    SUM(score) AS player_total_score,
-    -- Calculate team's total score in the same window using an OVER clause
-    SUM(SUM(score)) OVER (PARTITION BY window_start, window_end, team_id) as team_total_score
-  FROM
-    TABLE(TUMBLE(TABLE user_scores, DESCRIPTOR(event_time), INTERVAL '5' SECONDS))
-  GROUP BY
-    window_start, window_end, team_id, user_id
+    team_id,
+    SUM(score) AS player_total
+  FROM user_scores
+  GROUP BY user_id, team_id
+), team_agg AS (
+  SELECT
+    team_id,
+    team_name,
+    SUM(score) AS team_total
+  FROM user_scores
+  GROUP BY team_id, team_name
+), contrib_agg AS (
+  SELECT
+    pt.user_id,
+    tt.team_name,
+    pt.player_total,
+    tt.team_total,
+    pt.player_total * 1.0 / tt.team_total AS contrib_ratio
+  FROM player_agg pt
+  JOIN team_agg tt
+    ON  pt.team_id = tt.team_id
 )
 SELECT
-  window_end,
-  team_id,
+  rnk,
   user_id,
-  player_total_score,
-  team_total_score,
-  -- Calculate the contribution percentage
-  (player_total_score * 100.0 / team_total_score) AS contribution_percentage
-FROM PlayerContribution
--- Use QUALIFY to efficiently select the top player per team in each window
-QUALIFY ROW_NUMBER() OVER (PARTITION BY window_end, team_id ORDER BY player_total_score DESC) = 1;
+  team_name,
+  player_total,
+  team_total,
+  contrib_ratio
+FROM (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (ORDER BY contrib_ratio DESC, team_name ASC) as rnk
+  FROM contrib_agg
+)
+WHERE rnk <= 10;

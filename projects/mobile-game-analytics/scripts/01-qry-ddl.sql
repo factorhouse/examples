@@ -85,3 +85,64 @@ CREATE TABLE top_players (
   
   'sink.parallelism' = '3'
 );
+
+-- // Hot streakers table
+DROP TABLE IF EXISTS hot_streakers;
+CREATE TABLE hot_streakers (
+  rnk             BIGINT,
+  user_id         STRING,
+  short_term_avg  DOUBLE,
+  long_term_avg   DOUBLE,
+  peak_hotness    DOUBLE,
+  PRIMARY KEY (rnk) NOT ENFORCED
+) WITH (
+  'connector' = 'upsert-kafka',
+  'topic' = 'hot-streakers',
+  'properties.bootstrap.servers' = 'kafka-1:19092',
+  'properties.cleanup.policy' = 'compact',
+
+  'key.format' = 'avro-confluent',
+  'key.avro-confluent.schema-registry.url' = 'http://schema:8081',
+  'key.avro-confluent.basic-auth.credentials-source' = 'USER_INFO',
+  'key.avro-confluent.basic-auth.user-info' = 'admin:admin',
+  'key.avro-confluent.schema-registry.subject' = 'hot-streakers-key',
+
+  'value.format' = 'avro-confluent',
+  'value.avro-confluent.schema-registry.url' = 'http://schema:8081',
+  'value.avro-confluent.basic-auth.credentials-source' = 'USER_INFO',
+  'value.avro-confluent.basic-auth.user-info' = 'admin:admin',
+  'value.avro-confluent.schema-registry.subject' = 'hot-streakers-value',
+
+  'sink.parallelism' = '3'
+);
+
+-- // Team MVP table
+DROP TABLE IF EXISTS team_mvps;
+CREATE TABLE team_mvps (
+  rnk             BIGINT,
+  user_id         STRING,
+  team_name       STRING,
+  player_total    BIGINT,
+  team_total      BIGINT,
+  contrib_ratio   DOUBLE,
+  PRIMARY KEY (rnk) NOT ENFORCED
+) WITH (
+  'connector' = 'upsert-kafka',
+  'topic' = 'team-mvps',
+  'properties.bootstrap.servers' = 'kafka-1:19092',
+  'properties.cleanup.policy' = 'compact',
+
+  'key.format' = 'avro-confluent',
+  'key.avro-confluent.schema-registry.url' = 'http://schema:8081',
+  'key.avro-confluent.basic-auth.credentials-source' = 'USER_INFO',
+  'key.avro-confluent.basic-auth.user-info' = 'admin:admin',
+  'key.avro-confluent.schema-registry.subject' = 'team-mvps-key',
+
+  'value.format' = 'avro-confluent',
+  'value.avro-confluent.schema-registry.url' = 'http://schema:8081',
+  'value.avro-confluent.basic-auth.credentials-source' = 'USER_INFO',
+  'value.avro-confluent.basic-auth.user-info' = 'admin:admin',
+  'value.avro-confluent.schema-registry.subject' = 'team-mvps-value',
+
+  'sink.parallelism' = '3'
+);
