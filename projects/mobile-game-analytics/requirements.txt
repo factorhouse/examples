@@ -1,1 +1,2 @@
 -r ../../datagen/mobile-game/requirements.txt
+streamlit
