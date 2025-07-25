@@ -8,7 +8,7 @@ SET 'execution.checkpointing.interval' = '1 min';
 -- Set state TTL to be longer than the max team lifetime (40 mins) to ensure correctness
 SET 'table.exec.state.ttl' = '60 min';
 SET 'table.exec.mini-batch.enabled' = 'true';
-SET 'table.exec.mini-batch.allow-latency' = '3 s';
+SET 'table.exec.mini-batch.allow-latency' = '6 s';
 SET 'table.exec.mini-batch.size' = '1000';
 
 -- // Insert top player results into a Kafka topic
@@ -40,6 +40,21 @@ WITH player_agg AS (
   FROM player_agg pt
   JOIN team_agg tt
     ON  pt.team_id = tt.team_id
+), top_player_per_team AS (
+  SELECT
+    team_rnk,
+    user_id,
+    team_name,
+    player_total,
+    team_total,
+    contrib_ratio
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (PARTITION BY team_name ORDER BY contrib_ratio DESC, user_id ASC) as team_rnk
+    FROM contrib_agg
+  )
+  WHERE team_rnk = 1
 )
 SELECT
   rnk,
@@ -50,8 +65,12 @@ SELECT
   contrib_ratio
 FROM (
   SELECT
-    *,
-    ROW_NUMBER() OVER (ORDER BY contrib_ratio DESC, team_name ASC) as rnk
-  FROM contrib_agg
+    user_id,
+    team_name,
+    player_total,
+    team_total,
+    contrib_ratio,
+    ROW_NUMBER() OVER (ORDER BY contrib_ratio DESC) as rnk
+  FROM top_player_per_team
 )
 WHERE rnk <= 10;

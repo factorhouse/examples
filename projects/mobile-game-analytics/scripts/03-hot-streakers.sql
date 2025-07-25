@@ -52,9 +52,9 @@ WITH short_term_agg AS (
   FROM (
     SELECT
         user_id,
-        (short_term_sum * 1.0 / NULLIF(short_term_count, 0) AS short_term_avg,
-        (long_term_sum * 1.0 / NULLIF(long_term_count, 0) AS long_term_avg,
-        ((short_term_sum * 1.0 / NULLIF(short_term_count, 0)) / NULLIF( (long_term_sum * 1.0 / NULLIF(long_term_count, 0)), 0)) AS hotness_ratio
+        short_term_sum * 1.0 / NULLIF(short_term_count, 0) AS short_term_avg,
+        long_term_sum * 1.0 / NULLIF(long_term_count, 0) AS long_term_avg,
+        ((short_term_sum * 1.0 / NULLIF(short_term_count, 0)) / NULLIF((long_term_sum * 1.0 / NULLIF(long_term_count, 0)), 0)) AS hotness_ratio
     FROM long_term_agg
   ) 
   GROUP BY user_id
@@ -62,10 +62,14 @@ WITH short_term_agg AS (
 SELECT
   rnk,
   user_id,
+  short_term_avg,
+  long_term_avg,
   peak_hotness
 FROM (
   SELECT
     user_id,
+    short_term_avg,
+    long_term_avg,
     peak_hotness,
     ROW_NUMBER() OVER (ORDER BY peak_hotness DESC, user_id ASC) as rnk
   FROM peak_hotness
