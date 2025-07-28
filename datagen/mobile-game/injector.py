@@ -186,8 +186,8 @@ def main():
     parser.add_argument("--num-live-teams", type=int, default=10, help="Number of active teams to maintain.")
     parser.add_argument("--min-members-per-team", type=int, default=5, help="Minimum number of members on a team.")
     parser.add_argument("--max-members-per-team", type=int, default=15, help="Maximum number of members on a team.")
-    parser.add_argument("--min-score", type=int, default=-20, help="Minimum score a user can get in one event.")
-    parser.add_argument("--max-score", type=int, default=60, help="Maximum score a user can get in one event.")
+    parser.add_argument("--min-score", type=int, default=0, help="Minimum score a user can get in one event.")
+    parser.add_argument("--max-score", type=int, default=20, help="Maximum score a user can get in one event.")
     parser.add_argument("--late-event-rate", type=int, default=0, help="Frequency (1 in N) of late data events.")
     # fmt: on
 

@@ -2,7 +2,7 @@ services:
   injector:
     image: fh-mobile-injector
     build:
-      context: .
+      context: ../datagen/mobile-game
     container_name: injector
     command:
       - python
@@ -26,9 +26,9 @@ services:
       - --max-members-per-team
       - "15"
       - --min-score
-      - "-20"
+      - "0"
       - --max-score
-      - "60"
+      - "20"
       - --late-event-rate
       - "0"
     networks:

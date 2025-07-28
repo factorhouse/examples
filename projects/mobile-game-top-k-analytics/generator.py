@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 import datetime
-import time
 from typing import Dict, List, Callable, Awaitable
 
 import streamlit as st
@@ -14,7 +13,6 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
 from confluent_kafka.serialization import SerializationContext, MessageField
 
-# --- Basic Configuration ---
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s: %(message)s",
@@ -25,8 +23,7 @@ logger = logging.getLogger(__name__)
 BOOTSTRAP_SERVERS = os.getenv("BOOTSTRAP_SERVERS", "localhost:9092")
 SCHEMA_REGISTRY_URL = os.getenv("SCHEMA_REGISTRY_URL", "http://localhost:8081")
 TOPIC_NAMES = ["top-teams", "top-players", "hot-streakers", "team-mvps"]
-# CONSUMER_GROUP = f"{int(time.time())}-analytics"
-CONSUMER_GROUP = "analytics"
+CONSUMER_GROUP = "mobile-analytics-top-k"
 
 
 class TopicConsumer:
@@ -40,7 +37,7 @@ class TopicConsumer:
         # Each consumer gets its own group ID to ensure it reads independently.
         client_conf = {
             "bootstrap.servers": bootstrap_servers,
-            "group.id": f"{CONSUMER_GROUP}-{topic}",
+            "group.id": CONSUMER_GROUP,
             "auto.offset.reset": "earliest",
             "enable.auto.commit": False,
         }
@@ -238,7 +235,7 @@ def make_score_bar_chart(df, y_col, value_col="total_score", label="Score"):
         .mark_bar()
         .encode(
             x=alt.X(f"{value_col}:Q", title=label, axis=alt.Axis(format=",.0f")),
-            y=alt.Y(f"{y_col}:N", sort="-x"),
+            y=alt.Y(f"{y_col}:N", title=y_col.replace("_", " ").title(), sort="-x"),
             color=alt.Color(f"{y_col}:N", legend=None),
             tooltip=[
                 alt.Tooltip(f"{y_col}:N", title=y_col),
@@ -259,7 +256,7 @@ def make_percentage_bar_chart(df, y_col, value_col, percentage=True):
         .mark_bar()
         .encode(
             x=alt.X(f"{value_col}:Q", title="%", axis=alt.Axis(format=".1f")),
-            y=alt.Y(f"{y_col}:N", sort="-x"),
+            y=alt.Y(f"{y_col}:N", title=y_col.replace("_", " ").title(), sort="-x"),
             color=alt.Color(f"{y_col}:N", legend=None),
             tooltip=[
                 alt.Tooltip(f"{y_col}:N", title=y_col),
@@ -283,20 +280,27 @@ async def ui_updater(
         st.caption(f"Last updated: {last_updated.strftime('%Y-%m-%d %H:%M:%S')}")
         cols = st.columns(2)
         with cols[0]:
-            st.subheader("Top Teams")
+            st.subheader("🏆 Top Teams")
+            st.caption("A global leaderboard of teams with the highest all-time score.")
             st.altair_chart(
                 make_score_bar_chart(teams_df, "team_name", "total_score"),
                 use_container_width=True,
             )
         with cols[1]:
-            st.subheader("Top Players")
+            st.subheader("🥇 Top Players")
+            st.caption(
+                "A global leaderboard of individual players with the highest all-time score."
+            )
             st.altair_chart(
                 make_score_bar_chart(players_df, "user_id", "total_score"),
                 use_container_width=True,
             )
         cols2 = st.columns(2)
         with cols2[0]:
-            st.subheader("Hot Streakers")
+            st.subheader("🔥 Hot Streakers")
+            st.caption(
+                "Players with the best scoring momentum, calculated by comparing their short-term average score to their long-term baseline."
+            )
             st.altair_chart(
                 make_percentage_bar_chart(
                     streakers_df, "user_id", "peak_hotness", False
@@ -304,7 +308,10 @@ async def ui_updater(
                 use_container_width=True,
             )
         with cols2[1]:
-            st.subheader("Team MVPs")
+            st.subheader("⭐ Team MVPs")
+            st.caption(
+                "Most Valuable Players who contributed the highest percentage to their own team's total score."
+            )
             st.altair_chart(
                 make_percentage_bar_chart(mvps_df, "user_id", "contrib_ratio"),
                 use_container_width=True,
