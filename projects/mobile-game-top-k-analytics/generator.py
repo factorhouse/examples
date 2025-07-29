@@ -19,7 +19,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# --- Kafka and Schema Registry Configuration ---
 BOOTSTRAP_SERVERS = os.getenv("BOOTSTRAP_SERVERS", "localhost:9092")
 SCHEMA_REGISTRY_URL = os.getenv("SCHEMA_REGISTRY_URL", "http://localhost:8081")
 TOPIC_NAMES = ["top-teams", "top-players", "hot-streakers", "team-mvps"]
@@ -93,7 +92,6 @@ class AnalyticsOrchestrator:
     def __init__(
         self, bootstrap_servers: str, schema_registry_url: str, topics: List[str]
     ):
-        # --- State Management ---
         self.teams = pd.DataFrame(
             columns=["rnk", "team_id", "team_name", "total_score"]
         ).set_index("rnk")
@@ -129,7 +127,6 @@ class AnalyticsOrchestrator:
         self.lock = asyncio.Lock()
         self._state_changed_in_batch = False
 
-        # --- Consumer Management ---
         self.consumers = [
             TopicConsumer(bootstrap_servers, schema_registry_url, topic)
             for topic in topics
@@ -145,8 +142,13 @@ class AnalyticsOrchestrator:
             topic, value = msg_data["topic"], msg_data["value"]
             target_df = self.df_map.get(topic)
 
-            if target_df is not None and (
-                rank not in target_df.index or target_df.loc[rank].to_dict() != value
+            if (
+                value is not None
+                and target_df is not None
+                and (
+                    rank not in target_df.index
+                    or target_df.loc[rank].to_dict() != value
+                )
             ):
                 target_df.loc[rank] = value
                 self._state_changed_in_batch = True
@@ -159,7 +161,7 @@ class AnalyticsOrchestrator:
     async def _periodic_ui_updater(self, on_update: Callable[[...], Awaitable[None]]):  # type: ignore
         """The task that checks for state changes and calls the UI callback."""
         while True:
-            await asyncio.sleep(2.0)  # Check for updates every second
+            await asyncio.sleep(2.0)  # Check for updates every two seconds
             if self._state_changed_in_batch:
                 logger.info(
                     "Changes detected since last update. Triggering UI refresh."
@@ -214,6 +216,7 @@ async def listen_to_updates(on_update: Callable[[Dict, Dict], Awaitable[None]]):
 
 
 async def console_updater(teams_df, players_df, streakers_df, mvps_df, last_updated):
+    """A callback function to print the updated leaderboards to the console."""
     print("\033[H\033[J", end="")
     print(f"--- LAST UPDATED AT {last_updated.strftime('%Y-%m-%d %H:%M:%S')}")
     print("--- REAL-TIME LEADERBOARDS (DEDICATED CONSUMERS) ---")
@@ -228,7 +231,8 @@ async def console_updater(teams_df, players_df, streakers_df, mvps_df, last_upda
     print("-" * 42, flush=True)
 
 
-def make_score_bar_chart(df, y_col, value_col="total_score", label="Score"):
+def make_score_bar_chart(df, y_col, value_col, label="Score"):
+    """Creates a horizontal Altair bar chart for displaying absolute scores."""
     chart_df = df.copy()
     return (
         alt.Chart(chart_df)
@@ -248,6 +252,7 @@ def make_score_bar_chart(df, y_col, value_col="total_score", label="Score"):
 
 
 def make_percentage_bar_chart(df, y_col, value_col, percentage=True):
+    """Creates a horizontal Altair bar chart for displaying percentage-based values."""
     chart_df = df.copy()
     if percentage:
         chart_df[value_col] *= 100
@@ -276,21 +281,20 @@ async def ui_updater(
     mvps_df,
     last_updated,
 ):
+    """An async callback function to update the Streamlit UI with the latest data."""
     with placeholder.container():
         st.caption(f"Last updated: {last_updated.strftime('%Y-%m-%d %H:%M:%S')}")
         cols = st.columns(2)
         with cols[0]:
             st.subheader("🏆 Top Teams")
-            st.caption("A global leaderboard of teams with the highest all-time score.")
+            st.caption("Top teams with the highest scores globally.")
             st.altair_chart(
                 make_score_bar_chart(teams_df, "team_name", "total_score"),
                 use_container_width=True,
             )
         with cols[1]:
             st.subheader("🥇 Top Players")
-            st.caption(
-                "A global leaderboard of individual players with the highest all-time score."
-            )
+            st.caption("Top players with the highest scores globally.")
             st.altair_chart(
                 make_score_bar_chart(players_df, "user_id", "total_score"),
                 use_container_width=True,
@@ -299,19 +303,15 @@ async def ui_updater(
         with cols2[0]:
             st.subheader("🔥 Hot Streakers")
             st.caption(
-                "Players with the best scoring momentum, calculated by comparing their short-term average score to their long-term baseline."
+                "Top players with strongest scoring momentum, based on short-term vs. long-term performance."
             )
             st.altair_chart(
-                make_percentage_bar_chart(
-                    streakers_df, "user_id", "peak_hotness", False
-                ),
+                make_percentage_bar_chart(streakers_df, "user_id", "peak_hotness"),
                 use_container_width=True,
             )
         with cols2[1]:
             st.subheader("⭐ Team MVPs")
-            st.caption(
-                "Most Valuable Players who contributed the highest percentage to their own team's total score."
-            )
+            st.caption("Team MVPs who outperform their own teammates.")
             st.altair_chart(
                 make_percentage_bar_chart(mvps_df, "user_id", "contrib_ratio"),
                 use_container_width=True,

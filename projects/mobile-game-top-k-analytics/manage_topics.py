@@ -86,7 +86,6 @@ def main():
     )
     parser.add_argument("--bootstrap-servers", type=str, default="localhost:9092", help="Bootstrap server addresses.")
     parser.add_argument("--schema-registry-url", type=str, default="http://localhost:8081", help="Schema registry URL.")
-    parser.add_argument("--topic-name", type=str, default="user-score", help="Kafka topic name")
     parser.add_argument("--partitions", type=int, default=1)
     parser.add_argument("--replication-factor", type=int, default=1)
     # fmt: on

@@ -13,7 +13,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 st.set_page_config(
-    page_title="Mobile Game Top K Analytics",
+    page_title="Mobile Game Analytics Dashboard",
     page_icon="🎮",
     layout="wide",
 )
