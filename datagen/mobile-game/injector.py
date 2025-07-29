@@ -44,7 +44,10 @@ class TeamInfo:
         self.team_id = self._get_team_id()
         self._robot: Optional[str] = None
 
-        if random.randint(0, args.robot_probability - 1) == 0:
+        if (
+            args.robot_probability > 0
+            and random.randint(0, args.robot_probability - 1) == 0
+        ):
             robot_num = 0
             self._robot = f"RBT-{robot_num:0{len(str(args.max_members_per_team - 1))}}-{self.team_id}"
 
@@ -117,7 +120,7 @@ def generate_event(
         user_id=user,
         team_id=team.team_id,
         team_name=team.team_name,
-        score=random.randint(0, args.max_score),
+        score=random.randint(args.min_score, args.max_score),
         event_time_millis=event_time_millis,
         readable_time=datetime.datetime.fromtimestamp(
             event_time_millis / 1000
@@ -183,6 +186,7 @@ def main():
     parser.add_argument("--num-live-teams", type=int, default=10, help="Number of active teams to maintain.")
     parser.add_argument("--min-members-per-team", type=int, default=5, help="Minimum number of members on a team.")
     parser.add_argument("--max-members-per-team", type=int, default=15, help="Maximum number of members on a team.")
+    parser.add_argument("--min-score", type=int, default=0, help="Minimum score a user can get in one event.")
     parser.add_argument("--max-score", type=int, default=20, help="Maximum score a user can get in one event.")
     parser.add_argument("--late-event-rate", type=int, default=0, help="Frequency (1 in N) of late data events.")
     # fmt: on

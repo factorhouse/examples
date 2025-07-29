@@ -1,6 +1,6 @@
 ![factorhouse](./images/factorhouse.jfif)
 
-## Product Feature
+## Product Features
 
 <details>
   <summary><a href="./features/offset-management/">Manage Kafka Consumer Offsets with Kpow</a></summary>
@@ -29,7 +29,7 @@
   </ul>
 </details>
 
-## Integration
+## Integrations
 
 <details>
   <summary><a href="https://factorhouse.io/blog/how-to/set-up-kpow-with-confluent-cloud/">Setting Up Kpow with Confluent Cloud</a></summary>
@@ -91,7 +91,18 @@
   </ul>
 </details>
 
-## Data Generator
+## Projects
+
+<details>
+  <summary><a href="./projects/mobile-game-top-k-analytics/">Mobile Game Top K Analytics</a></summary>
+  <ul>
+    <li>
+      This project walks through how to build a complete real-time analytics pipeline for a mobile game using a modern data stack. It simulates live gameplay data, processes it in real time to calculate performance metrics, and displays the results on an interactive dashboard.
+    </li>
+  </ul>
+</details>
+
+## Data Generators
 
 <details>
   <summary><a href="./datagen/look-ecomm/">theLook eCommerce Data Generator</a></summary>

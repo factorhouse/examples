@@ -1,0 +1,40 @@
+services:
+  injector:
+    image: fh-mobile-injector
+    build:
+      context: ../datagen/mobile-game
+    container_name: injector
+    command:
+      - python
+      - injector.py
+      - --output
+      - kafka
+      - --bootstrap-servers
+      - kafka-1:19092
+      - --schema-registry-url
+      - http://schema:8081
+      - --topic-name
+      - user-score
+      - --avg-qps
+      - "20.0"
+      - --robot-probability
+      - "0"
+      - --num-live-teams
+      - "10"
+      - --min-members-per-team
+      - "5"
+      - --max-members-per-team
+      - "15"
+      - --min-score
+      - "0"
+      - --max-score
+      - "20"
+      - --late-event-rate
+      - "0"
+    networks:
+      - factorhouse
+
+networks:
+  factorhouse:
+    external: true
+    name: factorhouse
