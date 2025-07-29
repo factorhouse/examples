@@ -8,8 +8,8 @@ SET 'execution.checkpointing.interval' = '1 min';
 -- Set state TTL to be longer than the max team lifetime (40 mins) to ensure correctness
 SET 'table.exec.state.ttl' = '60 min';
 SET 'table.exec.mini-batch.enabled' = 'true';
-SET 'table.exec.mini-batch.allow-latency' = '3 s';
-SET 'table.exec.mini-batch.size' = '5000';
+SET 'table.exec.mini-batch.allow-latency' = '6 s';
+SET 'table.exec.mini-batch.size' = '10000';
 
 -- // Insert top teams results into a Kafka topic
 ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';

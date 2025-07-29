@@ -8,8 +8,8 @@ SET 'execution.checkpointing.interval' = '1 min';
 -- State can be purged quickly because the calculation only looks back 60 seconds.
 SET 'table.exec.state.ttl' = '5 min';
 SET 'table.exec.mini-batch.enabled' = 'true';
-SET 'table.exec.mini-batch.allow-latency' = '1 s';
-SET 'table.exec.mini-batch.size' = '1000';
+SET 'table.exec.mini-batch.allow-latency' = '3 s';
+SET 'table.exec.mini-batch.size' = '5000';
 
 -- // Insert top player results into a Kafka topic
 ADD JAR 'file:///tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar';
