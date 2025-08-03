@@ -1,5 +1,4 @@
 faker
-pandas
 psycopg2-binary
 SQLAlchemy
 confluent_kafka
