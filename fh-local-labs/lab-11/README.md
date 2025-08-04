@@ -15,9 +15,11 @@ cd examples
 
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that include **Kpow** and **Flex**. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
-Flink SQL Gateway does not support dynamic JAR loading, so required JARs (Kafka + Avro) must be preloaded by updating `CUSTOM_JARS_DIRS` in `compose-flex-community.yml`.
+#### Update Flink Custom Jar Loading
 
-**Before:**
+The Flink cluster loads custom dependency JAR files from the directories specified by the `CUSTOM_JARS_DIRS` environment variable in the `compose-flex.yml` file. Since the Flink SQL Gateway does not support dynamic JAR loading, the required JARs (e.g., Kafka and Avro) must be preloaded by setting the appropriate paths in the `CUSTOM_JARS_DIRS` variable.
+
+_Before:_
 
 ```yaml
 x-common-environment: &flink_common_env_vars
@@ -26,7 +28,7 @@ x-common-environment: &flink_common_env_vars
   CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
 ```
 
-**After:**
+_After:_
 
 ```yaml
 x-common-environment: &flink_common_env_vars
@@ -40,7 +42,7 @@ This ensures the following JARs are loaded additionally into the Flink JobManage
 - `/tmp/connector/flink-sql-connector-kafka-3.3.0-1.20.jar`
 - `/tmp/connector/flink-sql-avro-confluent-registry-1.20.1.jar`
 
-**Start services:**
+#### Start services:
 
 ```bash
 ## Clone the Factor House Local Repository
