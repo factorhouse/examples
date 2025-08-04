@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 
-class TheLookSimulator:
+class TheLookECommSimulator:
     """
     Manages the state and execution of the e-commerce data generation simulation.
     """
@@ -322,7 +322,7 @@ class TheLookSimulator:
 
 async def run_simulation(args: argparse.Namespace):
     """Orchestrates the creation, initialization, and execution of the simulator."""
-    simulator = TheLookSimulator(args, Faker())
+    simulator = TheLookECommSimulator(args, Faker())
     try:
         if await simulator.initialize():
             await simulator.run()
