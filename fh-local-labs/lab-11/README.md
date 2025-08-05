@@ -157,7 +157,7 @@ We can monitor the Flink job via the Flink UI (http://localhost:8082) or Flex (h
 
 ![](./images/flex-01.png)
 
-### Shutdown environment
+## Shutdown environment
 
 Finally, stop and remove the Docker containers.
 

@@ -277,7 +277,7 @@ In addition to monitoring the job, we can verify the output by inspecting the Pa
 
 ![](./images/minio-01.png)
 
-### Shutdown environment
+## Shutdown environment
 
 Finally, stop and remove the Docker containers.
 

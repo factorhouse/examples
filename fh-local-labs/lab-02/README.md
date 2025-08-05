@@ -189,7 +189,7 @@ Navigate to the _Connect_ section, and click _Delete connector_ option.
 
 ![](./images/connect-ui-06.png)
 
-### Shutdown environment
+## Shutdown environment
 
 Finally, stop and remove the Docker containers.
 
