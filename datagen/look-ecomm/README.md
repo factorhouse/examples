@@ -1,8 +1,8 @@
 # TheLook E-Commerce Real-Time Data Generator
 
-This project provides a real-time data generator that simulates user activity for an e-commerce platform, "TheLook". It is an evolution of a batch-based generator, now re-engineered to support a continuous, real-time stream of data inserted into a PostgreSQL database. This makes it an ideal source for Change Data Capture (CDC) pipelines using tools like Debezium to stream database changes into Apache Kafka.
+This project provides a real-time data generator that simulates user activity for an e-commerce platform. It is a significant update to the original [TheLook E-Commerce dataset](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce), a popular public dataset from Looker available on the Google Cloud Marketplace.
 
-The simulation generates a variety of interconnected e-commerce events, including user sign-ups, product purchases, order status updates (e.g., Shipped, Delivered, Returned), and anonymous user browsing sessions.
+While the original dataset is static and designed for batch analytics, this generator has been re-engineered to support a continuous, real-time stream of data. It inserts events directly into a PostgreSQL database, making it an ideal source for Change Data Capture (CDC) pipelines using tools like Debezium to stream database changes into Apache Kafka. This allows you to model and test modern, event-driven data architectures using a familiar and comprehensive e-commerce schema.
 
 ![](./images/thelook-datagen.gif)
 
