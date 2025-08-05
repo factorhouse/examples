@@ -341,7 +341,6 @@ def main():
     ## --- General Arguments ---
     parser.add_argument("--avg-qps", type=float, default=5.0, help="Average events per second.")
     parser.add_argument("--max-iter", type=int, default=-1, help="Max number of successful iterations. Default -1 for infinite.")
-    parser.add_argument("--dry-run", action=argparse.BooleanOptionalAction, default=False, help="Enable or disable dry-run.")
     ## --- User Arguments ---
     parser.add_argument("--init-num-users", type=int, default=1000, help="Initial number of users to create.")
     parser.add_argument("--country", default="*", help="User country.")
