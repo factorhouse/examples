@@ -2,7 +2,7 @@ services:
   injector:
     image: fh-mobile-injector
     build:
-      context: ../datagen/mobile-game
+      context: ../../datagen/mobile-game
     container_name: injector
     command:
       - python
