@@ -23,7 +23,7 @@
 
     "topic.prefix": "ecomm",
     "schema.include.list": "demo",
-    "table.exclude.list": "demo.heartbeat",
+    "table.exclude.list": "",
     "plugin.name": "pgoutput",
     "publication.name": "cdc_pub",
     "snapshot.mode": "initial",
