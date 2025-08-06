@@ -7,8 +7,6 @@ import functools
 from typing import List
 
 from sqlalchemy.exc import SQLAlchemyError
-from confluent_kafka.admin import AdminClient, NewTopic
-from confluent_kafka.error import KafkaException, KafkaError
 
 logging.basicConfig(
     level=logging.INFO, format="[%(asctime)s] %(levelname)s: %(message)s"
