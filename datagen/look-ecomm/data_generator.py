@@ -25,12 +25,12 @@ class TheLookECommSimulator:
         self.args = args
         self.fake = fake
         self.writer = DataWriter(
-            args.user,
-            args.password,
-            args.host,
+            args.db_user,
+            args.db_password,
+            args.db_host,
             args.db_name,
-            args.schema,
-            args.batch_size,
+            args.db_schema,
+            args.db_batch_size,
             args.echo,
         )
         self.consecutive_db_errors = 0
@@ -339,7 +339,7 @@ def main():
     # fmt: off
     parser = argparse.ArgumentParser(description="Generate theLook eCommerce data")
     ## --- General Arguments ---
-    parser.add_argument("--avg-qps", type=float, default=5.0, help="Average events per second.")
+    parser.add_argument("--avg-qps", type=float, default=20.0, help="Average events per second.")
     parser.add_argument("--max-iter", type=int, default=-1, help="Max number of successful iterations. Default -1 for infinite.")
     ## --- User Arguments ---
     parser.add_argument("--init-num-users", type=int, default=1000, help="Initial number of users to create.")
@@ -347,23 +347,27 @@ def main():
     parser.add_argument("--state", default="*", help="User state.")
     parser.add_argument("--postal-code", default="*", help="User postal code.")
     parser.add_argument("--user-create-prob", type=float, default=0.05, help="Probability of generating a new user. Default is 0.05. Set to 0 to disable.")
-    parser.add_argument("--user-update-prob", type=float, default=0.5, help="Probability of updating a user address. Default is 0. Set to 0 to disable.")
+    parser.add_argument("--user-update-prob", type=float, default=0.1, help="Probability of updating a user address. Default is 0.1. Set to 0 to disable.")
     ## --- Order Arguments ---
-    parser.add_argument("--order-update-prob", type=float, default=0.5, help="Probability of updating an order status. Default is 0. Set to 0 to disable.")
+    parser.add_argument("--order-update-prob", type=float, default=0.4, help="Probability of updating an order status. Default is 0.4. Set to 0 to disable.")
     ## --- Ghost Event Arguments ---
-    parser.add_argument("--ghost-create-prob", type=float, default=0.5, help="Probability of generating a ghost event. Default is 0.05. Set to 0 to disable.")
+    parser.add_argument("--ghost-create-prob", type=float, default=0.2, help="Probability of generating a ghost event. Default is 0.2. Set to 0 to disable.")
     ## --- Database Arguments ---
-    parser.add_argument("--host", default="localhost", help="Database host.")
-    parser.add_argument("--user", default="db_user", help="Database user.")
-    parser.add_argument("--password", default="db_password", help="Database password.")
+    parser.add_argument("--db-host", default="localhost", help="Database host.")
+    parser.add_argument("--db-user", default="db_user", help="Database user.")
+    parser.add_argument("--db-password", default="db_password", help="Database password.")
     parser.add_argument("--db-name", default="fh_dev", help="Database name.")
-    parser.add_argument("--schema", default="demo", help="Database schema.")
-    parser.add_argument("--batch-size", type=int, default=1000)
-    parser.add_argument("--echo", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("--db-schema", default="demo", help="Database schema.")
+    parser.add_argument("--db-batch-size", type=int, default=1000)
+    parser.add_argument(
+        "--echo", action=argparse.BooleanOptionalAction, default=False, help="Enable or disable echoing of SQL statements. Use --echo or --no-echo."
+    )
     ## --- Kafka Arguments ---
     parser.add_argument("--bootstrap-servers", type=str, default="localhost:9092", help="Bootstrap server addresses.")
     parser.add_argument("--topic-prefix", type=str, default="ecomm", help="Kafka topic prefix.")
-    parser.add_argument("--create-topic", action=argparse.BooleanOptionalAction, default=False, help="Enable or disable automatic topic creation.")
+    parser.add_argument(
+        "--create-topic", action=argparse.BooleanOptionalAction, default=False, help="Enable or disable automatic topic creation. Use --create-topic or --no-create-topic."
+    )
     # fmt: on
 
     args = parser.parse_args()
