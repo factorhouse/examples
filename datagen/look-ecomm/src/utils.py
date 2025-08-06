@@ -173,27 +173,3 @@ def async_retry_on_db_error(max_retries=3, initial_delay=1):
         return wrapper
 
     return decorator
-
-
-def create_topics_if_not_exists(
-    bootstrap_servers: str,
-    topic_names: List[str],
-    num_partitions: int = 3,
-    replication_factor: int = 1,
-):
-    """Uses an AdminClient to create topics."""
-    admin_client = AdminClient({"bootstrap.servers": bootstrap_servers})
-    topics = [
-        NewTopic(name, num_partitions, replication_factor) for name in topic_names
-    ]
-    result_dict = admin_client.create_topics(topics)
-
-    for topic, future in result_dict.items():
-        try:
-            future.result(timeout=3)
-            logging.info(f"Topic '{topic}' created.")
-        except KafkaException as e:
-            if e.args[0].code() == KafkaError.TOPIC_ALREADY_EXISTS:
-                logging.warning(f"Topic '{topic}' already exists.")
-            else:
-                raise RuntimeError(f"Failed to create topic '{topic}'.") from e

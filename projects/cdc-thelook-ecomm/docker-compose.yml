@@ -40,11 +40,9 @@ services:
       - --db-batch-size
       - "1000"
       - --bootstrap-servers
-      - "localhost:9092"
+      - "kafka-1:19092"
       - --topic-prefix
       - "ecomm"
-      - --echo
-      - --create-topic
     networks:
       - factorhouse
 

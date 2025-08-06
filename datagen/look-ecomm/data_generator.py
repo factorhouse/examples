@@ -31,7 +31,6 @@ class TheLookECommSimulator:
             args.db_name,
             args.db_schema,
             args.db_batch_size,
-            args.echo,
         )
         self.consecutive_db_errors = 0
         self.max_consecutive_errors = 3
@@ -77,15 +76,15 @@ class TheLookECommSimulator:
                 conflict_keys=["id"],
             )
 
-            if self.args.create_topic:
-                logging.info("Creating topics...")
-                topic_names = [
-                    f"{self.args.topic_prefix}.{self.args.schema}.{tbl}"
-                    for tbl in self.writer.get_all_tables()
-                ]
-                create_topics_if_not_exists(self.args.bootstrap_servers, topic_names)
-            else:
-                logging.info("Skipping topic creation...")
+            # if self.args.create_topic:
+            #     logging.info("Creating topics...")
+            #     topic_names = [
+            #         f"{self.args.topic_prefix}.{self.args.db_schema}.{tbl}"
+            #         for tbl in self.writer.get_all_tables()
+            #     ]
+            #     create_topics_if_not_exists(self.args.bootstrap_servers, topic_names)
+            # else:
+            #     logging.info("Skipping topic creation...")
 
             logging.info("Initialization successful.")
             return True
@@ -359,15 +358,9 @@ def main():
     parser.add_argument("--db-name", default="fh_dev", help="Database name.")
     parser.add_argument("--db-schema", default="demo", help="Database schema.")
     parser.add_argument("--db-batch-size", type=int, default=1000)
-    parser.add_argument(
-        "--echo", action=argparse.BooleanOptionalAction, default=False, help="Enable or disable echoing of SQL statements. Use --echo or --no-echo."
-    )
     ## --- Kafka Arguments ---
     parser.add_argument("--bootstrap-servers", type=str, default="localhost:9092", help="Bootstrap server addresses.")
     parser.add_argument("--topic-prefix", type=str, default="ecomm", help="Kafka topic prefix.")
-    parser.add_argument(
-        "--create-topic", action=argparse.BooleanOptionalAction, default=False, help="Enable or disable automatic topic creation. Use --create-topic or --no-create-topic."
-    )
     # fmt: on
 
     args = parser.parse_args()

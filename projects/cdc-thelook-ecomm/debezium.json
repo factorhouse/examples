@@ -33,6 +33,11 @@
 
     "compression.type": "lz4",
     "max.queue.size": "16384",
-    "max.batch.size": "4096"
+    "max.batch.size": "4096",
+
+    "topic.creation.enable": "true",
+    "topic.creation.default.cleanup.policy": "compact",
+    "topic.creation.default.partitions": "3",
+    "topic.creation.default.replication.factor": "1"
   }
 }
