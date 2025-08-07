@@ -1,0 +1,3 @@
+faker
+psycopg2-binary
+SQLAlchemy

@@ -149,7 +149,7 @@ To explore the supplier statistics, inspect the messages in the `supplier-stats-
 
 ![](./images/messages-01.png)
 
-### Shutdown environment
+## Shutdown environment
 
 Finally, stop and remove the Docker containers.
 

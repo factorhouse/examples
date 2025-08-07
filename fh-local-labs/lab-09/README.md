@@ -183,7 +183,7 @@ Finally, inspect the Parquet files written by the connector via MinIO at http://
 
 ![](./images/minio-01.png)
 
-### Shutdown environment
+## Shutdown environment
 
 Finally, stop and remove the Docker containers.
 

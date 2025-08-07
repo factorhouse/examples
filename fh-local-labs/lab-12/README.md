@@ -112,7 +112,7 @@ We'll see output like:
 
 ![](./images/query_supplier_stats.gif)
 
-### Shutdown environment
+## Shutdown environment
 
 Finally, stop and remove the Docker containers.
 

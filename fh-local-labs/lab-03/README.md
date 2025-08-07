@@ -99,7 +99,7 @@ Finally, we can inspect the messages in the `supplier-stats-ks` topic. For prope
 
 ![](./images/messages-01.png)
 
-### Shutdown environment
+## Shutdown environment
 
 Stop and remove the Docker containers.
 

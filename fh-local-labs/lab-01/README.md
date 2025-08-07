@@ -140,7 +140,7 @@ MODEL_VERSION=2 python fh-local-labs/lab-01/consumer.py
 # [2025-06-02 10:36:28,065] INFO: Received: OrderV2(order_id='7ab1aaf1-89be-4200-be14-3b4c63553fdd', ..., is_premium=True)
 ```
 
-### Shutdown environment
+## Shutdown environment
 
 Stop and remove the Docker containers.
 

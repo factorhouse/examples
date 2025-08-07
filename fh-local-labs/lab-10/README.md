@@ -152,7 +152,7 @@ Additionally, you can monitor the job in real time using the Spark Web UI at htt
 
 ![](./images/web-ui-01.png)
 
-### Shutdown environment
+## Shutdown environment
 
 Finally, stop and remove the Docker containers.
 
