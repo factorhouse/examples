@@ -1,6 +1,6 @@
 services:
   injector:
-    image: fh-mobile-injector
+    image: fh-mobile-game-injector
     build:
       context: ../../datagen/mobile-game
     container_name: injector
