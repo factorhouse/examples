@@ -105,7 +105,7 @@
 ## Data Generators
 
 <details>
-  <summary><a href="./datagen/look-ecomm/">theLook eCommerce Data Generator</a></summary>
+  <summary><a href="./datagen/thelook-ecomm/">theLook eCommerce Data Generator</a></summary>
   <ul>
     <li>
       Generates a continuous stream of synthetic data based on the <strong>theLook eCommerce dataset</strong>, which represents a fictional online fashion retailer. The data simulates a live production database, making it ideal for demonstrating <strong>Change Data Capture (CDC)</strong> with Debezium and for real-time analytics using Apache Flink or Apache Spark.
