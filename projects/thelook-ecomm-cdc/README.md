@@ -1,6 +1,6 @@
 # CDC with Debezium on Real-Time theLook eCommerce Data
 
-This project unlocks the power of the popular [theLook eCommerce dataset](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) for modern event-driven applications. It includes a re-engineered [real-time data generator](../../datagen/thelook-ecomm/) that transforms the original static dataset into a continuous stream of simulated user activity, writing directly to a PostgreSQL database.
+This project unlocks the power of the popular [theLook eCommerce dataset](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce) for modern event-driven applications. It uses a re-engineered [real-time data generator](../../datagen/thelook-ecomm/) that transforms the original static dataset into a continuous stream of simulated user activity, writing directly to a PostgreSQL database.
 
 This stream becomes an ideal source for building and testing Change Data Capture (CDC) pipelines using Debezium and Kafka—enabling developers and analysts to work with a familiar, realistic schema in a real-time context.
 
