@@ -1,0 +1,53 @@
+services:
+  injector:
+    image: fh-thelook-generator
+    build:
+      context: ../../datagen/thelook-ecomm
+    container_name: generator
+    pull_policy: never
+    command:
+      - python
+      - generator.py
+      - --avg-qps
+      - "20"
+      - --max-iter
+      - "-1"
+      - --init-num-users
+      - "1000"
+      - --country
+      - "Australia"
+      - --state
+      - "*"
+      - --postal-code
+      - "*"
+      - --user-create-prob
+      - "0.05"
+      - --user-update-prob
+      - "0.1"
+      - --order-update-prob
+      - "0.4"
+      - --ghost-create-prob
+      - "0.2"
+      - --db-host
+      - "postgres"
+      - --db-user
+      - "db_user"
+      - --db-password
+      - "db_password"
+      - --db-name
+      - "fh_dev"
+      - --db-schema
+      - "demo"
+      - --db-batch-size
+      - "1000"
+      - --bootstrap-servers
+      - "kafka-1:19092"
+      - --topic-prefix
+      - "ecomm"
+    networks:
+      - factorhouse
+
+networks:
+  factorhouse:
+    external: true
+    name: factorhouse
