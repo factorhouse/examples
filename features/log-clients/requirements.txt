@@ -1,0 +1,10 @@
+confluent_kafka
+types-confluent-kafka
+Faker
+faker-commerce
+httpx
+attrs
+cachetools
+authlib
+fastavro
+referencing

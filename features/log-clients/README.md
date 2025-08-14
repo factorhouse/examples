@@ -1,6 +1,4 @@
-## Kafka apps to showcase consumer offset management
-
-Python Kafka producer and consumer clients in this folder are use to showcase consumer group offset management capabilities of Kpow.
+## Kafka producer and consumer for app log ingestion and processing
 
 ## How to start
 
@@ -41,16 +39,16 @@ python -m venv venv
 source venv/bin/activate
 # windows
 # .\venv\Scripts\activate
-pip install -r features/offset-management/requirements.txt
+pip install -r features/log-clients/requirements.txt
 ```
 
 Start the producer and consumer.
 
 ```bash
 # producer
-python features/offset-management/producer.py
+python features/log-clients/producer.py
 # consumer
-python features/offset-management/consumer.py
+python features/log-clients/consumer.py
 ```
 
 ## Shutdown environment
