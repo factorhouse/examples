@@ -101,23 +101,30 @@
     </li>
   </ul>
 </details>
-
-## Data Generators
-
 <details>
-  <summary><a href="./datagen/thelook-ecomm/">theLook eCommerce Data Generator</a></summary>
+  <summary><a href="./projects/thelook-ecomm-cdc/">CDC with Debezium on Real-Time theLook eCommerce Data</a></summary>
   <ul>
     <li>
-      Generates a continuous stream of synthetic data based on the <strong>theLook eCommerce dataset</strong>, which represents a fictional online fashion retailer. The data simulates a live production database, making it ideal for demonstrating <strong>Change Data Capture (CDC)</strong> with Debezium and for real-time analytics using Apache Flink or Apache Spark.
+      This project unlocks the power of the popular <a href="https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce" target="_blank">theLook eCommerce dataset</a> for modern event-driven applications. It uses a re-engineered <a href="./datagen/thelook-ecomm/">real-time data generator</a> that transforms the original static dataset into a continuous stream of simulated user activity, writing directly to a PostgreSQL database.
     </li>
   </ul>
 </details>
+
+## Data Generators
 
 <details>
   <summary><a href="./datagen/mobile-game/">Mobile Game User Score</a></summary>
   <ul>
     <li>
       A Python port of Apache Beam's <a href="https://beam.apache.org/get-started/mobile-gaming-example/"><strong>Mobile Gaming Example</strong></a> data generator. This script simulates game events such as user scores, designed to support real-time analytics pipelines for leaderboards, scoring engines, and fraud detection.
+    </li>
+  </ul>
+</details>
+<details>
+  <summary><a href="./datagen/thelook-ecomm/">theLook eCommerce Data Generator</a></summary>
+  <ul>
+    <li>
+      Generates a continuous stream of synthetic data based on the <strong>theLook eCommerce dataset</strong>, which represents a fictional online fashion retailer. The data simulates a live production database, making it ideal for demonstrating <strong>Change Data Capture (CDC)</strong> with Debezium and for real-time analytics using Apache Flink or Apache Spark.
     </li>
   </ul>
 </details>
