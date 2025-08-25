@@ -8,6 +8,69 @@ This stream becomes an ideal source for building and testing Change Data Capture
 
 As a practical demonstration, this project includes deployment of a Debezium connector to stream database changes into Kafka topics.
 
+## Introduction to CDC with Debezium
+
+Change Data Capture (CDC) is a set of design patterns used to track changes in a database so that other systems can react to those changes. [Debezium](https://debezium.io/) is an open-source, distributed platform that turns your existing databases into event streams. This allows applications to respond to row-level changes in the database in real-time. Debezium provides a library of connectors for various databases that can monitor and record changes, publishing them to a streaming service like Apache Kafka.
+
+This project utilizes the Debezium PostgreSQL connector to capture changes from a PostgreSQL database. Here’s a breakdown of the key components and configurations:
+
+- **Debezium PostgreSQL Connector**: This connector is configured to monitor the `demo` schema within the PostgreSQL database. It reads the database's write-ahead log (WAL) to capture all `INSERT`, `UPDATE`, and `DELETE` operations committed to the tables within that schema. To enable this, the PostgreSQL server is started with the `wal_level` set to `logical` in the `compose-flex.yml` file, which allows the WAL to contain the information needed for logical decoding.
+
+- **Logical Decoding Plugin (`pgoutput`)**: The Debezium PostgreSQL connector uses PostgreSQL's built-in `pgoutput` logical decoding plugin. This plugin is part of PostgreSQL's core and provides a way to stream a sequence of changes from the WAL.
+
+- **Database Initialization**: Before Debezium can start capturing changes, the database is prepared with a specific schema and publication:
+
+  - A new schema named `demo` is created to house the eCommerce dataset.
+  - A `PUBLICATION` named `cdc_pub` is created for all tables within the `demo` schema. This publication acts as a logical grouping of tables whose changes should be made available to subscribers, in this case, the Debezium connector.
+
+- **Push-Based Model**: Debezium operates on a push-based model. The PostgreSQL database actively sends changes to the Debezium connector as they occur in the transaction log. The connector then processes these changes and pushes them as events to Kafka topics. This approach ensures low-latency data streaming.
+
+### CDC setup in [Factor House Local](https://github.com/factorhouse/factorhouse-local)
+
+**Database Service Configuration**
+
+```yaml
+# factorhouse-local > compose-flex.yml
+services:
+  ...
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    command: ["postgres", "-c", "wal_level=logical"]
+    ports:
+      - 5432:5432
+    networks:
+      - factorhouse
+    volumes:
+      - ./resources/postgres:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: fh_dev
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_password
+      TZ: UTC
+  ...
+```
+
+**Database Initialization Script**
+
+```sql
+--// factorhouse-local > resources/postgres/01-init-databases.sql
+-- Create schema
+CREATE SCHEMA IF NOT EXISTS demo;
+
+-- Grant privileges on schema to the application user
+GRANT ALL ON SCHEMA demo TO db_user;
+
+-- Set search_path at the DB level
+ALTER DATABASE fh_dev SET search_path TO demo, public;
+
+-- Set search_path for current session too
+SET search_path TO demo, public;
+
+-- Create CDC publication for Debezium
+CREATE PUBLICATION cdc_pub FOR TABLES IN SCHEMA demo;
+```
+
 ## Set Up the Environment
 
 ### Clone the Project
