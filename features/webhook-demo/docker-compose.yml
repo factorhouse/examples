@@ -1,0 +1,107 @@
+x-common-config: &kpow_common_config
+  image: factorhouse/kpow:94.5-rc2
+  pull_policy: always
+  restart: always
+  networks:
+    - factorhouse
+  env_file:
+    - $KPOW_LICENSE
+  volumes:
+    - ./resources/jaas:/etc/kpow/jaas
+    - ./resources/rbac:/etc/kpow/rbac
+  depends_on:
+    - kafka-1
+
+x-common-environment: &kpow_common_env_vars
+  BOOTSTRAP: kafka-1:19092
+  JAVA_TOOL_OPTIONS: "-Djava.awt.headless=true -Djava.security.auth.login.config=/etc/kpow/jaas/hash-jaas.conf"
+  AUTH_PROVIDER_TYPE: jetty
+  RBAC_CONFIGURATION_FILE: /etc/kpow/rbac/hash-rbac.yml
+  NUM_PARTITIONS: "1"
+  REPLICATION_FACTOR: "1"
+
+services:
+  kpow-slack:
+    <<: *kpow_common_config
+    container_name: kpow-slack
+    ports:
+      - "3000:3000"
+    environment:
+      ENVIRONMENT_NAME: Webhook Slack Demo
+      WEBHOOK_PROVIDER: slack
+      WEBHOOK_URL: $SLACK_WEBHOOK_URL
+      <<: *kpow_common_env_vars
+
+  kpow-teams:
+    <<: *kpow_common_config
+    container_name: kpow-teams
+    ports:
+      - "4000:3000"
+    environment:
+      ENVIRONMENT_NAME: Webhook Teams Demo
+      WEBHOOK_PROVIDER: teams
+      WEBHOOK_URL: $TEAMS_WEBHOOK_URL
+      <<: *kpow_common_env_vars
+
+  kpow-generic:
+    <<: *kpow_common_config
+    container_name: kpow-generic
+    ports:
+      - "5000:3000"
+    environment:
+      ENVIRONMENT_NAME: Webhook Generic Demo
+      WEBHOOK_PROVIDER: generic
+      WEBHOOK_URL: $GENERIC_WEBHOOK_URL
+      <<: *kpow_common_env_vars
+
+  webhook-server:
+    image: webhook-demo
+    build:
+      context: .
+    container_name: webhook-server
+    pull_policy: never
+    command: ["flask", "run", "--host=0.0.0.0", "--port=9000"]
+    ports:
+      - "9000:9000"
+    networks:
+      - factorhouse
+    environment:
+      FLASK_APP: server.py
+      FLASK_DEBUG: "1"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./server.py:/app/server.py
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.8.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - factorhouse
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka-1:
+    image: confluentinc/cp-kafka:7.8.0
+    container_name: kafka-1
+    ports:
+      - "9092:9092"
+    networks:
+      - factorhouse
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka-1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      KAFKA_LOG4J_ROOT_LOGLEVEL: INFO
+      KAFKA_LOG_CLEANUP_POLICY: "delete"
+    depends_on:
+      - zookeeper
+
+networks:
+  factorhouse:
+    name: factorhouse
