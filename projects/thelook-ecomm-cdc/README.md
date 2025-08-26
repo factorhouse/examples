@@ -174,16 +174,6 @@ Visit [http://localhost:3000](http://localhost:3000) to deploy the Debezium conn
 
 ![](./images/thelook-debezium.gif)
 
-## Conclusion
-
-This project offers a practical, end-to-end environment for working with Change Data Capture using real-time eCommerce data. With a live stream of events feeding into Kafka, you can now:
-
-- 🔍 Build **real-time analytics** with tools like Flink or Apache Pinot
-- 🧊 Ingest data into a **lakehouse** with Spark, Flink, or Kafka Connect
-- ⚙️ Develop **event-driven microservices** that respond to user or order changes
-
-By combining a realistic dataset with open-source tooling, this project makes it easy to experiment, prototype, and build production-ready CDC pipelines.
-
 ## Shut Down
 
 When you're done, shut down all containers and unset any environment variables:
@@ -199,3 +189,13 @@ docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
 # Clear environment variables
 unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
 ```
+
+## Conclusion
+
+This project offers a practical, end-to-end environment for working with Change Data Capture using real-time eCommerce data. With a live stream of events feeding into Kafka, you can now:
+
+- 🔍 Build **real-time analytics** with tools like Flink or Apache Pinot
+- 🧊 Ingest data into a **lakehouse** with Spark, Flink, or Kafka Connect
+- ⚙️ Develop **event-driven microservices** that respond to user or order changes
+
+By combining a realistic dataset with open-source tooling, this project makes it easy to experiment, prototype, and build production-ready CDC pipelines.
