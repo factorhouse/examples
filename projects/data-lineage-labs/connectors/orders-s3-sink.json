@@ -1,0 +1,48 @@
+{
+  "name": "orders-s3-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.s3.S3SinkConnector",
+    "tasks.max": "1",
+    "topics": "orders",
+
+    "storage.class": "io.confluent.connect.s3.storage.S3Storage",
+    "format.class": "io.confluent.connect.s3.format.json.JsonFormat",
+    "partitioner.class": "io.confluent.connect.storage.partitioner.DefaultPartitioner",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "key.converter.schemas.enable": false,
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schemas.enable": true,
+    "value.converter.schema.registry.url": "http://schema:8081",
+    "value.converter.basic.auth.credentials.source": "USER_INFO",
+    "value.converter.basic.auth.user.info": "admin:admin",
+
+    "s3.bucket.name": "fh-dev-bucket",
+    "s3.region": "us-east-1",
+    "store.url": "http://minio:9000",
+    "s3.path.style.access": "true",
+    "s3.part.size": "5242880",
+
+    "aws.access.key.id": "admin",
+    "aws.secret.access.key": "password",
+
+    "transforms": "openlineage",
+    "transforms.openlineage.type": "io.factorhouse.smt.OpenLineageLifecycleSmt",
+    "transforms.openlineage.connector.name": "orders-s3-sink",
+    "transforms.openlineage.connector.class": "io.confluent.connect.s3.S3SinkConnector",
+    "transforms.openlineage.topics": "orders",
+    "transforms.openlineage.s3.bucket.name": "fh-dev-bucket",
+    "transforms.openlineage.key.converter.schema.read": "false",
+    "transforms.openlineage.value.converter.schema.read": "true",
+    "transforms.openlineage.value.converter.schema.registry.url": "http://schema:8081",
+    "transforms.openlineage.value.converter.basic.auth.credentials.source": "USER_INFO",
+    "transforms.openlineage.value.converter.basic.auth.user.info": "admin:admin",
+
+    "flush.size": "100",
+    "rotate.schedule.interval.ms": "60000",
+    "timezone": "UTC",
+
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true"
+  }
+}

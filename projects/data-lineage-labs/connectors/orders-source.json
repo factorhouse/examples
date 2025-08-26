@@ -1,0 +1,48 @@
+{
+  "name": "orders-source",
+  "config": {
+    "connector.class": "com.amazonaws.mskdatagen.GeneratorSourceConnector",
+    "tasks.max": "1",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "key.converter.schemas.enable": false,
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schemas.enable": true,
+    "value.converter.schema.registry.url": "http://schema:8081",
+    "value.converter.basic.auth.credentials.source": "USER_INFO",
+    "value.converter.basic.auth.user.info": "admin:admin",
+
+    "genv.orders.order_id.with": "#{Internet.uuid}",
+    "genv.orders.bid_time.with": "#{date.past '5','SECONDS'}",
+    "genv.orders.price.with": "#{number.random_double '2','1','150'}",
+    "genv.orders.item.with": "#{Commerce.productName}",
+    "genv.orders.supplier.with": "#{regexify '(Alice|Bob|Carol|Alex|Joe|James|Jane|Jack)'}",
+
+    "transforms": "openlineage,unwrapUnion,extractKey,flattenKey,convertBidTime",
+
+    "transforms.openlineage.type": "io.factorhouse.smt.OpenLineageLifecycleSmt",
+    "transforms.openlineage.connector.name": "orders-source",
+    "transforms.openlineage.connector.class": "com.amazonaws.mskdatagen.GeneratorSourceConnector",
+    "transforms.openlineage.topics": "orders",
+    "transforms.openlineage.key.converter.schema.read": "false",
+    "transforms.openlineage.value.converter.schema.read": "true",
+    "transforms.openlineage.value.converter.schema.registry.url": "http://schema:8081",
+    "transforms.openlineage.value.converter.basic.auth.credentials.source": "USER_INFO",
+    "transforms.openlineage.value.converter.basic.auth.user.info": "admin:admin",
+
+    "transforms.unwrapUnion.type": "io.factorhouse.smt.UnwrapUnionTransform",
+
+    "transforms.extractKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
+    "transforms.extractKey.fields": "order_id",
+    "transforms.flattenKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.flattenKey.field": "order_id",
+
+    "transforms.convertBidTime.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+    "transforms.convertBidTime.field": "bid_time",
+    "transforms.convertBidTime.target.type": "Timestamp",
+    "transforms.convertBidTime.format": "EEE MMM dd HH:mm:ss zzz yyyy",
+
+    "global.throttle.ms": "1000",
+    "global.history.records.max": "1000"
+  }
+}
