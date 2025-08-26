@@ -174,6 +174,22 @@ Visit [http://localhost:3000](http://localhost:3000) to deploy the Debezium conn
 
 ![](./images/thelook-debezium.gif)
 
+## Shut Down
+
+When you're done, shut down all containers and unset any environment variables:
+
+```bash
+# Stop the data generator
+docker compose -f projects/thelook-ecomm-cdc/docker-compose.yml down
+
+# Stop Factor House Local containers
+docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+# Clear environment variables
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
+```
+
 ## Conclusion
 
 This project offers a practical, end-to-end environment for working with Change Data Capture using real-time eCommerce data. With a live stream of events feeding into Kafka, you can now:
