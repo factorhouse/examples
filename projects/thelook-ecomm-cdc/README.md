@@ -183,3 +183,19 @@ This project offers a practical, end-to-end environment for working with Change 
 - ⚙️ Develop **event-driven microservices** that respond to user or order changes
 
 By combining a realistic dataset with open-source tooling, this project makes it easy to experiment, prototype, and build production-ready CDC pipelines.
+
+## Shut Down
+
+When you're done, shut down all containers and unset any environment variables:
+
+```bash
+# Stop the data generator
+docker compose -f projects/thelook-ecomm-cdc/docker-compose.yml down
+
+# Stop Factor House Local containers
+docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+# Clear environment variables
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
+```
