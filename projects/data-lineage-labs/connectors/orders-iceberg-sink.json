@@ -1,0 +1,42 @@
+{
+  "name": "orders-iceberg-sink",
+  "config": {
+    "connector.class": "io.tabular.iceberg.connect.IcebergSinkConnector",
+    "tasks.max": "1",
+    "topics": "orders",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schema:8081",
+    "value.converter.basic.auth.credentials.source": "USER_INFO",
+    "value.converter.basic.auth.user.info": "admin:admin",
+
+    "iceberg.catalog": "demo_ib",
+    "iceberg.catalog.type": "hive",
+    "iceberg.catalog.uri": "thrift://hive-metastore:9083",
+    "iceberg.catalog.warehouse": "s3://warehouse",
+    "iceberg.catalog.io-impl": "org.apache.iceberg.aws.s3.S3FileIO",
+    "iceberg.catalog.s3.endpoint": "http://minio:9000",
+    "iceberg.catalog.s3.region": "us-east-1",
+    "iceberg.catalog.s3.access-key-id": "admin",
+    "iceberg.catalog.s3.secret-access-key": "password",
+    "iceberg.catalog.s3.path-style-access": "true",
+    "iceberg.catalog.client.connect-timeout-ms": "10000",
+    "iceberg.catalog.client.read-timeout-ms": "60000",
+
+    "iceberg.tables": "default.orders",
+    "iceberg.control.commit.interval-ms": "10000",
+
+    "transforms": "openlineage",
+    "transforms.openlineage.type": "io.factorhouse.smt.OpenLineageLifecycleSmt",
+    "transforms.openlineage.connector.name": "orders-iceberg-sink",
+    "transforms.openlineage.connector.class": "io.tabular.iceberg.connect.IcebergSinkConnector",
+    "transforms.openlineage.topics": "orders",
+    "transforms.openlineage.iceberg.catalog": "demo_ib",
+    "transforms.openlineage.key.converter.schema.read": "false",
+    "transforms.openlineage.value.converter.schema.read": "true",
+    "transforms.openlineage.value.converter.schema.registry.url": "http://schema:8081",
+    "transforms.openlineage.value.converter.basic.auth.credentials.source": "USER_INFO",
+    "transforms.openlineage.value.converter.basic.auth.user.info": "admin:admin"
+  }
+}
