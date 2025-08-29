@@ -1,0 +1,22 @@
+services:
+  flex:
+    image: factorhouse/flex${FLEX_SUFFIX:-}:latest
+    container_name: flex${FLEX_SUFFIX:-}
+    pull_policy: always
+    restart: always
+    ports:
+      - "3001:3000"
+    networks:
+      - factorhouse
+    env_file:
+      - ./resources/flex/setup.env
+      - ${FLEX_LICENSE:-../../factorhouse-local/resources/flex/config/license.env}
+    mem_limit: 2G
+    volumes:
+      - ../../factorhouse-local/resources/flex/jaas:/etc/flex/jaas
+      - ../../factorhouse-local/resources/flex/rbac:/etc/flex/rbac
+
+networks:
+  factorhouse:
+    external: ${USE_EXT:-true}
+    name: factorhouse

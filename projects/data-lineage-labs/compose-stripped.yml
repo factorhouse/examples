@@ -1,0 +1,132 @@
+services:
+  minio:
+    image: minio/minio
+    container_name: minio
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+      - MINIO_DOMAIN=minio
+    ports:
+      - 9001:9001
+      - 9000:9000
+    networks:
+      - factorhouse
+    command: ["server", "/data", "--console-address", ":9001"]
+
+  mc:
+    image: minio/mc
+    container_name: mc
+    networks:
+      - factorhouse
+    environment:
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+    entrypoint: |
+      /bin/sh -c "
+      until (/usr/bin/mc alias set minio http://minio:9000 admin password) do
+        echo '...waiting for minio...' && sleep 1;
+      done;
+      BUCKETS_TO_CREATE='warehouse fh-dev-bucket flink-checkpoints flink-savepoints'
+      for bucket in $$BUCKETS_TO_CREATE; do
+        echo \"--- Configuring bucket: $$bucket ---\"
+        /usr/bin/mc rm -r --force minio/$$bucket;
+        /usr/bin/mc mb minio/$$bucket;
+        /usr/bin/mc policy set public minio/$$bucket;
+      done;
+      echo '--- Minio setup complete, container will remain active ---'
+      tail -f /dev/null
+      "
+    depends_on:
+      - minio
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    command: ["postgres", "-c", "wal_level=logical"]
+    ports:
+      - 5432:5432
+    networks:
+      - factorhouse
+    volumes:
+      - ../../factorhouse-local/resources/postgres:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: fh_dev
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_password
+      TZ: UTC # change if necessary eg) Australia/Melbourne
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U db_user -d metastore"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+      start_period: 3s
+
+  hive-metastore:
+    image: apache/hive:3.1.3
+    container_name: hive-metastore
+    ports:
+      - "9083:9083"
+    networks:
+      - factorhouse
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SERVICE_NAME: metastore
+      DB_DRIVER: postgres
+      METASTORE_PORT: 9083
+    volumes:
+      - ../../factorhouse-local/resources/hms/hive-site.xml:/opt/hive/conf/hive-site.xml
+      - ../../factorhouse-local/resources/hms/core-site.xml:/opt/hive/conf/core-site.xml
+      - ../../factorhouse-local/resources/deps/hms/postgresql-42.7.3.jar:/opt/hive/lib/postgresql-42.7.3.jar
+      - ../../factorhouse-local/resources/deps/hadoop/hadoop-common-3.3.6.jar:/opt/hive/lib/hadoop-common-3.3.6.jar
+      - ../../factorhouse-local/resources/deps/hadoop/hadoop-auth-3.3.6.jar:/opt/hive/lib/hadoop-auth-3.3.6.jar
+      - ../../factorhouse-local/resources/deps/hadoop/hadoop-aws-3.3.6.jar:/opt/hive/lib/hadoop-aws-3.3.6.jar
+      - ../../factorhouse-local/resources/deps/hadoop/aws-java-sdk-bundle-1.11.1026.jar:/opt/hive/lib/aws-java-sdk-bundle-1.11.1026.jar
+      - ../../factorhouse-local/resources/deps/hadoop/hadoop-shaded-guava-1.1.1.jar:/opt/hive/lib/hadoop-shaded-guava-1.1.1.jar
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/9083"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+      start_period: 3s
+
+  spark:
+    image: apache/spark:3.5.5-java17-python3
+    container_name: spark-iceberg
+    command: >
+      bash -c "
+      mkdir -p /tmp/spark-events &&
+      /opt/spark/bin/spark-class org.apache.spark.deploy.history.HistoryServer \
+        --properties-file /tmp/spark-defaults-history.conf"
+    ports:
+      - "4040:4040" # Spark Web UI
+      - "18080:18080" # Spark History Server
+    networks:
+      - factorhouse
+    depends_on:
+      hive-metastore:
+        condition: service_healthy
+    volumes:
+      - ../../factorhouse-local/resources/spark/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf:ro
+      - ../../factorhouse-local/resources/spark/spark-defaults-history.conf:/tmp/spark-defaults-history.conf:ro
+      - ../../factorhouse-local/resources/spark/log4j2.properties:/opt/spark/conf/log4j2.properties:ro
+      - ../../factorhouse-local/resources/spark/hive-site.xml:/opt/spark/conf/hive-site.xml
+      - ../../factorhouse-local/resources/spark/core-site.xml:/opt/spark/conf/core-site.xml
+      # Iceberg & Hadoop dependencies
+      - ../../factorhouse-local/resources/deps/spark/iceberg/iceberg-spark-runtime-3.5_2.12-1.8.1.jar:/opt/spark/jars/iceberg-spark-runtime-3.5_2.12-1.8.1.jar
+      - ../../factorhouse-local/resources/deps/spark/iceberg/iceberg-aws-bundle-1.8.1.jar:/opt/spark/jars/iceberg-aws-bundle-1.8.1.jar
+      - ../../factorhouse-local/resources/deps/hadoop/hadoop-aws-3.3.6.jar:/opt/spark/jars/hadoop-aws-3.3.6.jar
+      - ../../factorhouse-local/resources/deps/hadoop/aws-java-sdk-bundle-1.11.1026.jar:/opt/spark/jars/aws-java-sdk-bundle-1.11.1026.jar
+      - ../../factorhouse-local/resources/deps/hadoop/hadoop-common-3.3.6.jar:/opt/spark/jars/hadoop-common-3.3.6.jar
+    environment:
+      - SPARK_NO_DAEMONIZE=true
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+
+networks:
+  factorhouse:
+    external: ${USE_EXT:-true}
+    name: factorhouse
