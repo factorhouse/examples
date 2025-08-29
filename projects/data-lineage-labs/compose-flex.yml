@@ -9,7 +9,7 @@ services:
     networks:
       - factorhouse
     env_file:
-      - ./resources/flex/setup.env
+      - ./resources/setup.env
       - ${FLEX_LICENSE:-../../factorhouse-local/resources/flex/config/license.env}
     mem_limit: 2G
     volumes:

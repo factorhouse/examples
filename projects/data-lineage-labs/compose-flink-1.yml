@@ -9,14 +9,14 @@ x-common-environment: &flink_common_env_vars
   AWS_REGION: us-east-1
   HADOOP_CONF_DIR: /opt/flink/conf
   HIVE_CONF_DIR: /opt/flink/conf
-  CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
+  # CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
 
 x-common-flink-volumes: &flink_common_volumes
   - ../../factorhouse-local/resources/flink/bin/config.sh:/opt/flink/bin/config.sh:ro
   - ../../factorhouse-local/resources/flink/bin/flink-console.sh:/opt/flink/bin/flink-console.sh:ro
   - ../../factorhouse-local/resources/flink/bin/flink-daemon.sh:/opt/flink/bin/flink-daemon.sh:ro
   - ../../factorhouse-local/resources/flink/bin/sql-client.sh:/opt/flink/bin/sql-client.sh:ro
-  - ./resources/flink/flink-conf-1.yaml:/opt/flink/conf/flink-conf.yaml:ro
+  - ./resources/flink-conf-1.yaml:/opt/flink/conf/flink-conf.yaml:ro
   - ../../factorhouse-local/resources/flink/hive-site.xml:/opt/flink/conf/hive-site.xml
   - ../../factorhouse-local/resources/flink/core-site.xml:/opt/flink/conf/core-site.xml
   - ../../factorhouse-local/resources/flink/init-catalogs.sql:/opt/flink/conf/init-catalogs.sql
