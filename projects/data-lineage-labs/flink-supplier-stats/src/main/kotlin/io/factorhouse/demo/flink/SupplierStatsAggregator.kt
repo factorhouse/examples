@@ -26,7 +26,7 @@ class SupplierStatsAggregator : AggregateFunction<GenericRecord, SupplierStatsAc
         if (priceField != null) {
             try {
                 priceToAdd = priceField.toString().toDouble()
-            } catch (e: NumberFormatException) {
+            } catch (_: NumberFormatException) {
                 logger.warn { "Could not parse price '$priceField' to Double for record. Skipping this price value." }
             }
         } else {

@@ -22,8 +22,11 @@ dependencies {
     implementation("org.apache.flink:flink-connector-kafka:3.4.0-1.20")
     implementation("org.apache.flink:flink-avro:1.20.1")
     implementation("org.apache.flink:flink-avro-confluent-registry:1.20.1")
+    // Legacy FlinkKafkaProducer for better OpenLineage support
+    implementation("org.apache.flink:flink-connector-kafka_2.12:1.14.6")
     // OpenLineage for Flink data lineage
-    implementation("io.openlineage:openlineage-flink:1.37.0")
+    implementation("io.openlineage:openlineage-flink:1.15.0")
+    implementation("commons-logging:commons-logging:1.2")
     // Logging
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("ch.qos.logback:logback-classic:1.5.13")

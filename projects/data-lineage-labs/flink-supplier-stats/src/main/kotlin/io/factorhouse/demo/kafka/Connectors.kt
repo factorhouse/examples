@@ -10,6 +10,7 @@ import org.apache.flink.connector.kafka.source.KafkaSource
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer
 import org.apache.flink.formats.avro.registry.confluent.ConfluentRegistryAvroDeserializationSchema
 import org.apache.flink.formats.avro.registry.confluent.ConfluentRegistryAvroSerializationSchema
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import java.nio.charset.StandardCharsets
@@ -58,7 +59,7 @@ fun createStatsSink(
                 setProperty(ProducerConfig.BATCH_SIZE_CONFIG, (64 * 1024).toString())
                 setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4")
             },
-        ).setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+        ).setDeliverGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
         .setRecordSerializer(
             KafkaRecordSerializationSchema
                 .builder<SupplierStats>()
@@ -74,3 +75,35 @@ fun createStatsSink(
                     ),
                 ).build(),
         ).build()
+
+// Use the legacy FlinkKafkaProducer for OpenLineage integration
+fun createLegacyStatsSink(
+    topic: String,
+    bootstrapAddress: String,
+    registryUrl: String,
+    registryConfig: Map<String, String>,
+    outputSubject: String,
+): FlinkKafkaProducer<SupplierStats> {
+    val producerConfig =
+        Properties().apply {
+            setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress) // The legacy producer needs this here
+            setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true")
+            setProperty(ProducerConfig.LINGER_MS_CONFIG, "100")
+            setProperty(ProducerConfig.BATCH_SIZE_CONFIG, (64 * 1024).toString())
+            setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4")
+        }
+
+    val valueSerializationSchema =
+        ConfluentRegistryAvroSerializationSchema.forSpecific(
+            SupplierStats::class.java,
+            outputSubject,
+            registryUrl,
+            registryConfig,
+        )
+
+    return FlinkKafkaProducer(
+        topic,
+        valueSerializationSchema,
+        producerConfig,
+    )
+}

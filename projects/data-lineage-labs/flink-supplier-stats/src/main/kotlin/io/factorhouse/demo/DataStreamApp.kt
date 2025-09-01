@@ -1,15 +1,17 @@
 package io.factorhouse.demo
 
+import io.factorhouse.demo.avro.SupplierStats
 import io.factorhouse.demo.flink.SupplierStatsAggregator
 import io.factorhouse.demo.flink.SupplierStatsFunction
+import io.factorhouse.demo.kafka.createLegacyStatsSink
 import io.factorhouse.demo.kafka.createOrdersSource
 import io.factorhouse.demo.kafka.createStatsSink
 import io.factorhouse.demo.kafka.createTopicIfNotExists
 import io.factorhouse.demo.kafka.getLatestSchema
+import io.openlineage.flink.OpenLineageFlinkJobListener
 import mu.KotlinLogging
 import org.apache.avro.generic.GenericRecord
 import org.apache.flink.api.common.eventtime.WatermarkStrategy
-import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import java.time.Duration
@@ -18,9 +20,8 @@ object DataStreamApp {
     private val toSkipPrint = System.getenv("TO_SKIP_PRINT")?.toBoolean() ?: true
     private val bootstrapAddress = System.getenv("BOOTSTRAP") ?: "kafka-1:19092"
     private val inputTopicName = System.getenv("INPUT_TOPIC") ?: "orders"
-    private val outputTopicName = System.getenv("OUTPUT_TOPIC") ?: "supplier-stats-ds"
+    private val outputTopicName = System.getenv("OUTPUT_TOPIC") ?: "supplier-stats"
     private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://schema:8081"
-    private val openLineageUrl = System.getenv("OPENLINEAGE_URL") ?: "http://marquez-api:5000"
     private val openLineageNamespace = System.getenv("OPENLINEAGE_NAMESPACE") ?: "fh-local"
     private val windowSizeSeconds = System.getenv("WINDOW_SIZE_SECONDS")?.toLong() ?: 5L
     private val allowedLatenessSeconds = System.getenv("ALLOWED_LATENESS_SECONDS")?.toLong() ?: 5L
@@ -39,18 +40,19 @@ object DataStreamApp {
         // Create output topic if not existing
         createTopicIfNotExists(outputTopicName, bootstrapAddress, NUM_PARTITIONS, REPLICATION_FACTOR)
 
-        // OpenLineage integration configuration
-        val config = Configuration()
-        config.setString(
-            "job.listener.openlineage.class",
-            "io.openlineage.flink.OpenLineageFlinkJobListener",
-        )
-        config.setString("openlineage.transport.type", "http")
-        config.setString("openlineage.transport.url", openLineageUrl)
-        config.setString("openlineage.namespace", openLineageNamespace)
-
-        val env = StreamExecutionEnvironment.getExecutionEnvironment(config)
+        val jobName = "$outputTopicName-job"
+        val env = StreamExecutionEnvironment.getExecutionEnvironment()
         env.parallelism = 3
+
+        val listener =
+            OpenLineageFlinkJobListener
+                .builder()
+                .executionEnvironment(
+                    env,
+                ).jobNamespace(openLineageNamespace)
+                .jobName(jobName)
+                .build()
+        env.registerJobListener(listener)
 
         val inputAvroSchema = getLatestSchema("$inputTopicName-value", registryUrl, registryConfig)
         val ordersGenericRecordSource =
@@ -62,8 +64,16 @@ object DataStreamApp {
                 registryConfig,
                 inputAvroSchema,
             )
+//        val statsSink =
+//            createStatsSink(
+//                topic = outputTopicName,
+//                bootstrapAddress = bootstrapAddress,
+//                registryUrl = registryUrl,
+//                registryConfig = registryConfig,
+//                outputSubject = "$outputTopicName-value",
+//            )
         val statsSink =
-            createStatsSink(
+            createLegacyStatsSink(
                 topic = outputTopicName,
                 bootstrapAddress = bootstrapAddress,
                 registryUrl = registryUrl,
@@ -98,7 +108,8 @@ object DataStreamApp {
                 .name("SupplierStatsPrint")
         }
 
-        statsStream.sinkTo(statsSink).name("SupplierStatsSink")
-        env.execute("SupplierStats")
+        // statsStream.sinkTo(statsSink).name("SupplierStatsSink")
+        statsStream.addSink(statsSink).name("SupplierStatsSink")
+        env.execute(jobName)
     }
 }
