@@ -1,11 +1,9 @@
 package io.factorhouse.demo
 
-import io.factorhouse.demo.avro.SupplierStats
 import io.factorhouse.demo.flink.SupplierStatsAggregator
 import io.factorhouse.demo.flink.SupplierStatsFunction
 import io.factorhouse.demo.kafka.createLegacyStatsSink
 import io.factorhouse.demo.kafka.createOrdersSource
-import io.factorhouse.demo.kafka.createStatsSink
 import io.factorhouse.demo.kafka.createTopicIfNotExists
 import io.factorhouse.demo.kafka.getLatestSchema
 import io.openlineage.flink.OpenLineageFlinkJobListener
@@ -37,13 +35,23 @@ object DataStreamApp {
     private val logger = KotlinLogging.logger {}
 
     fun run() {
+        logger.info { "Starting SupplierStats Flink job." }
+        logger.info { "Job Parameters:" }
+        logger.info { "  - Input Topic: $inputTopicName" }
+        logger.info { "  - Output Topic: $outputTopicName" }
+        logger.info { "  - Bootstrap Servers: $bootstrapAddress" }
+        logger.info { "  - Schema Registry URL: $registryUrl" }
+        logger.info { "  - OpenLineage Namespace: $openLineageNamespace" }
+
         // Create output topic if not existing
+        logger.info { "Ensuring output topic '$outputTopicName' exists..." }
         createTopicIfNotExists(outputTopicName, bootstrapAddress, NUM_PARTITIONS, REPLICATION_FACTOR)
 
         val jobName = "$outputTopicName-job"
         val env = StreamExecutionEnvironment.getExecutionEnvironment()
         env.parallelism = 3
 
+        logger.info { "Registering OpenLineageFlinkJobListener for job '$jobName' in namespace '$openLineageNamespace'." }
         val listener =
             OpenLineageFlinkJobListener
                 .builder()
@@ -54,6 +62,7 @@ object DataStreamApp {
                 .build()
         env.registerJobListener(listener)
 
+        logger.info { "Creating Kafka source from topic '$inputTopicName'." }
         val inputAvroSchema = getLatestSchema("$inputTopicName-value", registryUrl, registryConfig)
         val ordersGenericRecordSource =
             createOrdersSource(
@@ -64,14 +73,8 @@ object DataStreamApp {
                 registryConfig,
                 inputAvroSchema,
             )
-//        val statsSink =
-//            createStatsSink(
-//                topic = outputTopicName,
-//                bootstrapAddress = bootstrapAddress,
-//                registryUrl = registryUrl,
-//                registryConfig = registryConfig,
-//                outputSubject = "$outputTopicName-value",
-//            )
+
+        logger.info { "Creating legacy Kafka sink to topic '$outputTopicName'." }
         val statsSink =
             createLegacyStatsSink(
                 topic = outputTopicName,
@@ -108,8 +111,9 @@ object DataStreamApp {
                 .name("SupplierStatsPrint")
         }
 
-        // statsStream.sinkTo(statsSink).name("SupplierStatsSink")
         statsStream.addSink(statsSink).name("SupplierStatsSink")
-        env.execute(jobName)
+        logger.info { "Submitting Flink job '$jobName' to the cluster in attached mode..." }
+        env.executeAsync(jobName).jobExecutionResult.get()
+        logger.info { "Flink job '$jobName' finished successfully." }
     }
 }
