@@ -3,6 +3,7 @@ package io.factorhouse.demo
 import io.factorhouse.demo.openlineage.Integration
 import io.openlineage.client.OpenLineage
 import mu.KotlinLogging
+import org.apache.flink.runtime.client.JobCancellationException
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.table.api.DataTypes
 import org.apache.flink.table.api.Expressions.col
@@ -181,11 +182,11 @@ object TableApp {
             jobClient.jobExecutionResult.get()
         } catch (e: Exception) {
             val finalStatus =
-                if (e is CancellationException || e.cause is CancellationException) {
-                    logger.warn(e) { "Flink job was canceled." }
+                if (isCancellationException(e)) {
+                    logger.warn { "Flink job was canceled. Emitting ABORT event." }
                     OpenLineage.RunEvent.EventType.ABORT
                 } else {
-                    logger.error(e) { "Flink job failed with an exception." }
+                    logger.error(e) { "Flink job failed with an exception. Emitting FAIL event." }
                     OpenLineage.RunEvent.EventType.FAIL
                 }
             olIntegration.emitMinimalEvent(finalStatus)
@@ -194,5 +195,16 @@ object TableApp {
             // Close the transport
             olIntegration.close()
         }
+    }
+
+    private fun isCancellationException(throwable: Throwable?): Boolean {
+        var current: Throwable? = throwable
+        while (current != null) {
+            if (current is CancellationException || current is JobCancellationException) {
+                return true
+            }
+            current = current.cause
+        }
+        return false
     }
 }
