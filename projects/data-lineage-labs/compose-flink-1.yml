@@ -10,6 +10,7 @@ x-common-environment: &flink_common_env_vars
   HADOOP_CONF_DIR: /opt/flink/conf
   HIVE_CONF_DIR: /opt/flink/conf
   OPENLINEAGE_NAMESPACE: fh-local
+  OPENLINEAGE_JOBNAME: supplier-stats
   # CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
 
 x-common-flink-volumes: &flink_common_volumes

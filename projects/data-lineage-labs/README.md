@@ -173,37 +173,35 @@ Below are the SMT configuration details for each connector. Kpow provides a user
 
 ##### Create Iceberg Sink Table
 
-1.  Connect to the Spark-Iceberg container:
-    ```bash
-    docker exec -it spark-iceberg /opt/spark/bin/spark-sql
-    ```
-2.  Execute the following SQL commands to create the `orders` table:
+Connect to the Spark-Iceberg container:
 
-    ```sql
-    USE demo_ib;
+```bash
+docker exec -it spark-iceberg /opt/spark/bin/spark-sql
+```
 
-    USE `default`;
+Execute the following SQL commands to create the `orders` table:
 
-    CREATE TABLE orders (
-        order_id STRING,
-        item STRING,
-        price DECIMAL(10, 2),
-        supplier STRING,
-        bid_time TIMESTAMP
-    )
-    USING iceberg
-    PARTITIONED BY (DAY(bid_time))
-    TBLPROPERTIES (
-        'format-version' = '2',
-        'write.format.default' = 'parquet',
-        'write.target-file-size-bytes' = '134217728',
-        'write.parquet.compression-codec' = 'snappy',
-        'write.metadata.delete-after-commit.enabled' = 'true',
-        'write.metadata.previous-versions-max' = '3',
-        'write.delete.mode' = 'copy-on-write',
-        'write.update.mode' = 'copy-on-write'
-    );
-    ```
+```sql
+CREATE TABLE demo_ib.`default`.orders (
+    order_id STRING,
+    item STRING,
+    price DECIMAL(10, 2),
+    supplier STRING,
+    bid_time TIMESTAMP
+)
+USING iceberg
+PARTITIONED BY (DAY(bid_time))
+TBLPROPERTIES (
+    'format-version' = '2',
+    'write.format.default' = 'parquet',
+    'write.target-file-size-bytes' = '134217728',
+    'write.parquet.compression-codec' = 'snappy',
+    'write.metadata.delete-after-commit.enabled' = 'true',
+    'write.metadata.previous-versions-max' = '3',
+    'write.delete.mode' = 'copy-on-write',
+    'write.update.mode' = 'copy-on-write'
+);
+```
 
 ### Viewing Lineage
 

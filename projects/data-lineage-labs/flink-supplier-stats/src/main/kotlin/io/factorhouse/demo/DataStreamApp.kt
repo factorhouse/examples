@@ -21,6 +21,7 @@ object DataStreamApp {
     private val outputTopicName = System.getenv("OUTPUT_TOPIC") ?: "supplier-stats"
     private val registryUrl = System.getenv("REGISTRY_URL") ?: "http://schema:8081"
     private val openLineageNamespace = System.getenv("OPENLINEAGE_NAMESPACE") ?: "fh-local"
+    private val openLineageJobName = System.getenv("OPENLINEAGE_JOBNAME") ?: "supplier-stats"
     private val windowSizeSeconds = System.getenv("WINDOW_SIZE_SECONDS")?.toLong() ?: 5L
     private val allowedLatenessSeconds = System.getenv("ALLOWED_LATENESS_SECONDS")?.toLong() ?: 5L
     private val maxOutOfOrdernessSeconds = System.getenv("MAX_OUT_OF_ORDERNESS_SECONDS")?.toLong() ?: 5L
@@ -35,19 +36,20 @@ object DataStreamApp {
     private val logger = KotlinLogging.logger {}
 
     fun run() {
-        logger.info { "Starting SupplierStats Flink job." }
+        logger.info { "Starting Flink job." }
         logger.info { "Job Parameters:" }
         logger.info { "  - Input Topic: $inputTopicName" }
         logger.info { "  - Output Topic: $outputTopicName" }
         logger.info { "  - Bootstrap Servers: $bootstrapAddress" }
         logger.info { "  - Schema Registry URL: $registryUrl" }
         logger.info { "  - OpenLineage Namespace: $openLineageNamespace" }
+        logger.info { "  - OpenLineage Job name: $openLineageJobName" }
 
         // Create output topic if not existing
         logger.info { "Ensuring output topic '$outputTopicName' exists..." }
         createTopicIfNotExists(outputTopicName, bootstrapAddress, NUM_PARTITIONS, REPLICATION_FACTOR)
 
-        val jobName = "$outputTopicName-job"
+        val jobName = openLineageJobName
         val env = StreamExecutionEnvironment.getExecutionEnvironment()
         env.parallelism = 3
 

@@ -9,6 +9,8 @@ x-common-environment: &flink_common_env_vars
   AWS_REGION: us-east-1
   HADOOP_CONF_DIR: /opt/flink/conf
   HIVE_CONF_DIR: /opt/flink/conf
+  OPENLINEAGE_NAMESPACE: fh-local
+  OPENLINEAGE_JOBNAME: iceberg-ingestion
   CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
 
 x-common-flink-volumes: &flink_common_volumes
@@ -26,14 +28,19 @@ x-common-flink-volumes: &flink_common_volumes
   - ../../factorhouse-local/resources/deps/flink/iceberg:/tmp/iceberg
   - ../../factorhouse-local/resources/deps/flink/parquet:/tmp/parquet
   - ../../factorhouse-local/resources/deps/flink/connector:/tmp/connector
+  ## Add application JAR
+  - ./flink-iceberg-ingestion/build/libs/flink-iceberg-ingestion-1.0.jar:/opt/flink/usrlib/flink-iceberg-ingestion-1.0.jar
 
 services:
   jobmanager-2:
     <<: *flink_image_pull_policy_config
     container_name: jobmanager-2
-    command: jobmanager
+    command: >
+      standalone-job
+      --job-classname io.factorhouse.demo.MainKt
+      --jarfile /opt/flink/usrlib/flink-iceberg-ingestion-1.0.jar
     ports:
-      - "28081:8081"
+      - "18082:8081"
     networks:
       - factorhouse
     environment:

@@ -49,3 +49,7 @@ table.dynamic-table-options.enabled: true
 
 # # Faster task startup
 # execution.runtime-mode: streaming
+
+# This key tells the Flink cluster to run in a mode that honors the
+# client connection, allowing the listener to send its final event.
+execution.attached: true

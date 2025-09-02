@@ -33,6 +33,8 @@
     "transforms.openlineage.connector.class": "io.tabular.iceberg.connect.IcebergSinkConnector",
     "transforms.openlineage.topics": "orders",
     "transforms.openlineage.iceberg.catalog": "demo_ib",
+    "transforms.openlineage.iceberg.catalog.uri": "thrift://hive-metastore:9083",
+    "transforms.openlineage.iceberg.tables": "default.orders",
     "transforms.openlineage.key.converter.schema.read": "false",
     "transforms.openlineage.value.converter.schema.read": "true",
     "transforms.openlineage.value.converter.schema.registry.url": "http://schema:8081",
