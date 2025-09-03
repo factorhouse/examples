@@ -42,7 +42,7 @@ Once deployed, we can check the connector and its tasks in Kpow.
 
 ### Running Kafka Streams application
 
-To build and run the application locally, ensure that **JDK 17** and a recent version of Gradle (e.g., **7.6+** or **8.x**) are installed.
+To build and run the application locally, ensure that **JDK 17** is installed.
 
 We can launch the Kafka Streams application in two ways, catering to different stages of development and deployment:
 
