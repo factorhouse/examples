@@ -108,10 +108,7 @@ This Flink streaming application reads Avro-encoded Kafka messages using the Tab
 - Casts fields as needed (e.g., `price` to `DECIMAL(10,2)`) and writes the resulting table into Iceberg using `executeInsert()`.
 - Logs key events throughout the lifecycle, including job submission and failure handling.
 
-To build the Flink application, make sure your environment has the following prerequisites:
-
-- **JDK 17**
-- **Gradle 7.6+ or 8.x**
+To build and run this Flink application locally, make sure your environment has **JDK 17** installed.
 
 Our project uses the `factorhouse/flink` image, which includes the necessary dependencies for Hadoop and Iceberg. To avoid an excessively large fat JAR, the image is optimized for cluster deployment only.
 

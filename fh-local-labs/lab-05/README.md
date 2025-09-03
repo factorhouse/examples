@@ -70,10 +70,7 @@ Once deployed, we can check the connector and its tasks in Kpow.
 
 ### Running Flink application
 
-To build and run this Flink application locally, make sure your environment has the following prerequisites:
-
-- **JDK 17**
-- **Gradle 7.6+ or 8.x**
+To build and run this Flink application locally, make sure your environment has **JDK 17** installed.
 
 The application supports two primary execution modes, each suited to different stages of development:
 
