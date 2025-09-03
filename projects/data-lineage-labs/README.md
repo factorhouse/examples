@@ -35,7 +35,7 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 
 # Start Kafka and Flink environments
 docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d \
+  && docker compose -p flex -f ./projects/data-lineage-labs/compose-flex.yml up -d \
   && docker compose -p obsv -f ./factorhouse-local/compose-obsv.yml up -d
 ```
 
@@ -173,37 +173,35 @@ Below are the SMT configuration details for each connector. Kpow provides a user
 
 ##### Create Iceberg Sink Table
 
-1.  Connect to the Spark-Iceberg container:
-    ```bash
-    docker exec -it spark-iceberg /opt/spark/bin/spark-sql
-    ```
-2.  Execute the following SQL commands to create the `orders` table:
+Connect to the Spark-Iceberg container:
 
-    ```sql
-    USE demo_ib;
+```bash
+docker exec -it spark-iceberg /opt/spark/bin/spark-sql
+```
 
-    USE `default`;
+Execute the following SQL commands to create the `orders` table:
 
-    CREATE TABLE orders (
-        order_id STRING,
-        item STRING,
-        price DECIMAL(10, 2),
-        supplier STRING,
-        bid_time TIMESTAMP
-    )
-    USING iceberg
-    PARTITIONED BY (DAY(bid_time))
-    TBLPROPERTIES (
-        'format-version' = '2',
-        'write.format.default' = 'parquet',
-        'write.target-file-size-bytes' = '134217728',
-        'write.parquet.compression-codec' = 'snappy',
-        'write.metadata.delete-after-commit.enabled' = 'true',
-        'write.metadata.previous-versions-max' = '3',
-        'write.delete.mode' = 'copy-on-write',
-        'write.update.mode' = 'copy-on-write'
-    );
-    ```
+```sql
+CREATE TABLE demo_ib.`default`.orders (
+    order_id STRING,
+    item STRING,
+    price DECIMAL(10, 2),
+    supplier STRING,
+    bid_time TIMESTAMP
+)
+USING iceberg
+PARTITIONED BY (DAY(bid_time))
+TBLPROPERTIES (
+    'format-version' = '2',
+    'write.format.default' = 'parquet',
+    'write.target-file-size-bytes' = '134217728',
+    'write.parquet.compression-codec' = 'snappy',
+    'write.metadata.delete-after-commit.enabled' = 'true',
+    'write.metadata.previous-versions-max' = '3',
+    'write.delete.mode' = 'copy-on-write',
+    'write.update.mode' = 'copy-on-write'
+);
+```
 
 ### Viewing Lineage
 
@@ -226,7 +224,7 @@ When you're done, shut down all containers and unset any environment variables:
 ```bash
 # Stop Factor House Local containers
 docker compose -p obsv -f ./factorhouse-local/compose-obsv.yml down \
-  && docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
+  && docker compose -p flex -f ./projects/data-lineage-labs/compose-flex.yml down \
   && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
 
 # Clear environment variables
