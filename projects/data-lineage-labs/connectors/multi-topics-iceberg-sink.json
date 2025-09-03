@@ -1,0 +1,44 @@
+{
+  "name": "multi-topics-iceberg-sink",
+  "config": {
+    "connector.class": "io.tabular.iceberg.connect.IcebergSinkConnector",
+    "tasks.max": "1",
+    "topics": "orders,bids",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schema:8081",
+    "value.converter.basic.auth.credentials.source": "USER_INFO",
+    "value.converter.basic.auth.user.info": "admin:admin",
+
+    "iceberg.catalog": "demo_ib",
+    "iceberg.catalog.type": "hive",
+    "iceberg.catalog.uri": "thrift://hive-metastore:9083",
+    "iceberg.catalog.warehouse": "s3://warehouse",
+    "iceberg.catalog.io-impl": "org.apache.iceberg.aws.s3.S3FileIO",
+    "iceberg.catalog.s3.endpoint": "http://minio:9000",
+    "iceberg.catalog.s3.region": "us-east-1",
+    "iceberg.catalog.s3.access-key-id": "admin",
+    "iceberg.catalog.s3.secret-access-key": "password",
+    "iceberg.catalog.s3.path-style-access": "true",
+    "iceberg.catalog.client.connect-timeout-ms": "10000",
+    "iceberg.catalog.client.read-timeout-ms": "60000",
+
+    "iceberg.tables": "default.orders,default.bids",
+    "iceberg.control.commit.interval-ms": "10000",
+
+    "transforms": "openlineage",
+    "transforms.openlineage.type": "io.factorhouse.smt.OpenLineageLifecycleSmt",
+    "transforms.openlineage.connector.name": "multi-topics-iceberg-sink",
+    "transforms.openlineage.connector.class": "io.tabular.iceberg.connect.IcebergSinkConnector",
+    "transforms.openlineage.topics": "orders,bids",
+    "transforms.openlineage.iceberg.catalog": "demo_ib",
+    "transforms.openlineage.iceberg.catalog.uri": "thrift://hive-metastore:9083",
+    "transforms.openlineage.iceberg.tables": "default.orders,default.bids",
+    "transforms.openlineage.key.converter.schema.read": "false",
+    "transforms.openlineage.value.converter.schema.read": "true",
+    "transforms.openlineage.value.converter.schema.registry.url": "http://schema:8081",
+    "transforms.openlineage.value.converter.basic.auth.credentials.source": "USER_INFO",
+    "transforms.openlineage.value.converter.basic.auth.user.info": "admin:admin"
+  }
+}
