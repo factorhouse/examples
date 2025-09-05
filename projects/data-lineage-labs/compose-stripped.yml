@@ -93,7 +93,7 @@ services:
       start_period: 3s
 
   spark:
-    image: apache/spark:3.5.5-java17-python3
+    image: apache/spark:3.5.5-java17-python3 # apache/spark:3.5.6-scala2.12-java11-python3-ubuntu # apache/spark:3.5.5-java17-python3
     container_name: spark-iceberg
     command: >
       bash -c "
@@ -114,12 +114,15 @@ services:
       - ../../factorhouse-local/resources/spark/log4j2.properties:/opt/spark/conf/log4j2.properties:ro
       - ../../factorhouse-local/resources/spark/hive-site.xml:/opt/spark/conf/hive-site.xml
       - ../../factorhouse-local/resources/spark/core-site.xml:/opt/spark/conf/core-site.xml
-      # Iceberg & Hadoop dependencies
-      - ../../factorhouse-local/resources/deps/spark/iceberg/iceberg-spark-runtime-3.5_2.12-1.8.1.jar:/opt/spark/jars/iceberg-spark-runtime-3.5_2.12-1.8.1.jar
-      - ../../factorhouse-local/resources/deps/spark/iceberg/iceberg-aws-bundle-1.8.1.jar:/opt/spark/jars/iceberg-aws-bundle-1.8.1.jar
+      # Hadoop dependencies
       - ../../factorhouse-local/resources/deps/hadoop/hadoop-aws-3.3.6.jar:/opt/spark/jars/hadoop-aws-3.3.6.jar
       - ../../factorhouse-local/resources/deps/hadoop/aws-java-sdk-bundle-1.11.1026.jar:/opt/spark/jars/aws-java-sdk-bundle-1.11.1026.jar
       - ../../factorhouse-local/resources/deps/hadoop/hadoop-common-3.3.6.jar:/opt/spark/jars/hadoop-common-3.3.6.jar
+      # Iceberg dependencies
+      - ../../factorhouse-local/resources/deps/spark/iceberg/iceberg-spark-runtime-3.5_2.12-1.8.1.jar:/opt/spark/jars/iceberg-spark-runtime-3.5_2.12-1.8.1.jar
+      - ../../factorhouse-local/resources/deps/spark/iceberg/iceberg-aws-bundle-1.8.1.jar:/opt/spark/jars/iceberg-aws-bundle-1.8.1.jar
+      # OpenLineage dependency
+      - ../../factorhouse-local/resources/deps/spark/lineage/openlineage-spark_2.12-1.37.0.jar:/opt/spark/jars/openlineage-spark_2.12-1.37.0.jar
     environment:
       - SPARK_NO_DAEMONIZE=true
       - AWS_ACCESS_KEY_ID=admin

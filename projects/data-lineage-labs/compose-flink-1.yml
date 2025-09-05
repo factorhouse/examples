@@ -9,9 +9,14 @@ x-common-environment: &flink_common_env_vars
   AWS_REGION: us-east-1
   HADOOP_CONF_DIR: /opt/flink/conf
   HIVE_CONF_DIR: /opt/flink/conf
+  # CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
+  ## Flink job configurations
+  BOOTSTRAP: kafka-1:19092
+  INPUT_TOPIC: orders
+  OUTPUT_TOPIC: supplier-stats
+  REGISTRY_URL: http://schema:8081
   OPENLINEAGE_NAMESPACE: fh-local
   OPENLINEAGE_JOBNAME: supplier-stats
-  # CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
 
 x-common-flink-volumes: &flink_common_volumes
   - ../../factorhouse-local/resources/flink/bin/config.sh:/opt/flink/bin/config.sh:ro
