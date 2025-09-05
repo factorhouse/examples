@@ -1,5 +1,3 @@
-import os
-
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, to_date, hour, sum, count
 from pyspark.sql.column import Column, _to_java_column
@@ -12,8 +10,12 @@ if __name__ == "__main__":
     ICEBERG_SOURCE_TABLE_NAME = "orders"
     ICEBERG_TARGET_TABLE_NAME = "supplier_stats"
 
-    ICEBERG_SOURCE_TABLE_FQN = f"{ICEBERG_CATALOG_NAME}.{ICEBERG_DB_NAME}.{ICEBERG_SOURCE_TABLE_NAME}"
-    ICEBERG_TARGET_TABLE_FQN = f"{ICEBERG_CATALOG_NAME}.{ICEBERG_DB_NAME}.{ICEBERG_TARGET_TABLE_NAME}"
+    ICEBERG_SOURCE_TABLE_FQN = (
+        f"{ICEBERG_CATALOG_NAME}.{ICEBERG_DB_NAME}.{ICEBERG_SOURCE_TABLE_NAME}"
+    )
+    ICEBERG_TARGET_TABLE_FQN = (
+        f"{ICEBERG_CATALOG_NAME}.{ICEBERG_DB_NAME}.{ICEBERG_TARGET_TABLE_NAME}"
+    )
 
     spark = SparkSession.builder.appName("SupplierStats").getOrCreate()
     sc = spark.sparkContext
@@ -51,6 +53,8 @@ if __name__ == "__main__":
             bid_hour
     """)
 
-    LOGGER.info(f"Successfully overwrote table {ICEBERG_TARGET_TABLE_FQN} with new statistics.")
+    LOGGER.info(
+        f"Successfully overwrote table {ICEBERG_TARGET_TABLE_FQN} with new statistics."
+    )
 
     spark.stop()
