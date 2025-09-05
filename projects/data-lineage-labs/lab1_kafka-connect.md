@@ -78,21 +78,19 @@ The SMT automatically discovers input and output datasets based on the explicit 
 
   - **S3 sink connectors**
 
-    - **Configuration:** Requires the `s3.bucket.name` property.
-    - **Dataset namespace:** The namespace for the output dataset is the S3 bucket URI (e.g., `s3://my-prod-bucket`).
-    - **Dataset name:** The name of the output dataset is the **name of the input Kafka topic**. For example, data from the `orders` topic will be represented as an S3 dataset named `orders` within the bucket's namespace.
+    - **Configuration:** Requires the `dataset.namespace` property.
+    - **Dataset namespace:** The namespace for the output dataset is set by the `dataset.namespace` property (e.g., `s3://fh-dev-bucket`).
+    - **Dataset names:** The names of the output datasets are the **names of the input Kafka topics**. For example, data from the `orders` topic will be represented as an S3 dataset named `orders` within the specified namespace.
 
   - **Iceberg sink connectors**
 
-    - **Configuration:** Requires two properties for correct mapping:
-      1.  `iceberg.tables`: A comma-separated list of full Iceberg table names (e.g., `default.orders,default.bids`).
-      2.  `iceberg.hive.metastore.uri`: The full Thrift URI of the Hive Metastore (e.g., `thrift://hive-metastore:9083`).
-    - **Mapping:** The SMT maps topics to tables based on their order. The first topic in the `topics` list maps to the first table in the `iceberg.tables` list, and so on.
-    - **Dataset namespace:** The namespace for the output dataset is the **Hive Metastore URI**. This ensures consistent identification with Flink jobs that connect to the same metastore.
-    - **Dataset mame:** The name of the output dataset is the **corresponding full table name** from the `iceberg.tables` configuration.
+    - **Configuration:** Requires the `dataset.namespace` and `dataset.names` properties.
+    - **Dataset namespace:** The namespace for the output dataset is set by the `dataset.namespace` property (e.g., `s3://warehouse`).
+      - This namespace can be either the logical name (e.g., `thrift://hive-metastore:9083`) or the physical name (e.g., `s3://warehouse`). Because the OpenLineage Spark integration reports the physical name by default, using the physical name is recommended for downstream compatibility.
+    - **Dataset names:** The names of the output datasets are determined by the `dataset.names` property. Unlike the S3 sink connector, the physical dataset name can be different from the topic name, so the mapping should be specified explicitly.
 
   - **Schema inheritance**
-    For both S3 and Iceberg sinks, the SMT intelligently reuses the Avro schema it fetches from the connector's _input topic_ and attaches it to the sink's _output dataset_. This provides complete, end-to-end column-level lineage from Kafka into the final data store.
+    For both S3 and Iceberg sinks, the SMT intelligently reuses the Avro schema it fetches from the connector's _input topic_ and attaches it to the sink's _output dataset_ event. This provides complete, end-to-end column-level lineage from Kafka into the final data store.
 
 ### Lifecycle & status management
 
@@ -127,12 +125,11 @@ Among the OpenLineage [job statuses](https://openlineage.io/docs/spec/run-cycle/
 
 The SMT applies a consistent, location-based namespacing strategy to uniquely identify datasets and maintain correct linkages with external systems such as Flink. Environment variables are set within the Kafka Connect Docker instance, while S3 and Iceberg dataset details are specified through connector properties.
 
-| Entity              | Namespace Source                                 | Example                        | Purpose                                                                                                                                        |
-| :------------------ | :----------------------------------------------- | :----------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Job**             | `OPENLINEAGE_NAMESPACE` environment variable.    | `fh-local`                     | Provides a logical grouping for related jobs. This should be consistent across your Kafka Connect and Flink deployments.                       |
-| **Kafka Dataset**   | `KAFKA_BOOTSTRAP` environment variable.          | `kafka://kafka-1:19092`        | Creates a canonical, physical identifier for the Kafka cluster, allowing datasets to be shared and linked across different jobs and platforms. |
-| **S3 Dataset**      | `s3.bucket.name` connector property.             | `s3://fh-dev-bucket`           | Uniquely identifies the S3 bucket as the physical storage namespace.                                                                           |
-| **Iceberg Dataset** | `iceberg.hive.metastore.uri` connector property. | `thrift://hive-metastore:9083` | Uniquely identifies the Hive Metastore as the physical catalog namespace, ensuring a perfect match with Flink Table API jobs.                  |
+| Entity                 | Namespace Source                              | Example                                  | Purpose                                                                                                                                        |
+| :--------------------- | :-------------------------------------------- | :--------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Job**                | `OPENLINEAGE_NAMESPACE` environment variable. | `fh-local`                               | Provides a logical grouping for related jobs. This should be consistent across your Kafka Connect and Flink deployments.                       |
+| **Kafka Dataset**      | `KAFKA_BOOTSTRAP` environment variable.       | `kafka://kafka-1:19092`                  | Creates a canonical, physical identifier for the Kafka cluster, allowing datasets to be shared and linked across different jobs and platforms. |
+| **S3/Iceberg Dataset** | `dataset.namespace` connector property.       | `s3://fh-dev-bucket` or `s3://warehouse` | Uniquely identifies the the physical storage. Note Spark reports the physical name.                                                            |
 
 ### Limitations
 
@@ -180,9 +177,11 @@ Individual connectors can be configured to use the SMT by adding the transform d
 - [**S3 Sink Connector**](./connectors/orders-s3-sink.json): Reads records from the `orders` topic and writes them to an object storage bucket (MinIO).
 - [**Iceberg Sink Connector**](./connectors/orders-iceberg-sink.json): Reads records from the `orders` topic and writes them to an Iceberg table.
 
-Below are the SMT configuration details for each connector. Kpow provides a user-friendly UI and API for deploying Kafka connectors. See [this page](../../fh-local-labs/lab-02/README.md) for more information.
+<details>
 
-**MSK source connector**
+<summary><b>Configuration details of the connectors</b></summary>
+
+#### MSK source connector
 
 ```json
 {
@@ -198,7 +197,7 @@ Below are the SMT configuration details for each connector. Kpow provides a user
     "transforms.openlineage.type": "io.factorhouse.smt.OpenLineageLifecycleSmt",
     "transforms.openlineage.connector.name": "orders-source", // Job name for lineage tracking
     "transforms.openlineage.connector.class": "com.amazonaws.mskdatagen.GeneratorSourceConnector", // Identifies the connector as a source
-    "transforms.openlineage.topics": "orders", // Topic for schema discovery
+    "transforms.openlineage.topics": "orders", // Topics for schema discovery, Comma-separated topic names
     "transforms.openlineage.key.converter.schema.read": "false", // Skip key schema
     "transforms.openlineage.value.converter.schema.read": "true", // Read value schema (requires Schema Registry)
     "transforms.openlineage.value.converter.schema.registry.url": "http://schema:8081",
@@ -210,7 +209,7 @@ Below are the SMT configuration details for each connector. Kpow provides a user
 }
 ```
 
-**S3 sink connector**
+#### S3 sink connector
 
 ```json
 {
@@ -225,8 +224,8 @@ Below are the SMT configuration details for each connector. Kpow provides a user
     "transforms.openlineage.type": "io.factorhouse.smt.OpenLineageLifecycleSmt",
     "transforms.openlineage.connector.name": "orders-s3-sink", // Job name for lineage tracking
     "transforms.openlineage.connector.class": "io.confluent.connect.s3.S3SinkConnector", // Identifies the connector as a sink
-    "transforms.openlineage.topics": "orders", // Topic for schema discovery
-    "transforms.openlineage.s3.bucket.name": "fh-dev-bucket", // Sets the dataset namespace
+    "transforms.openlineage.topics": "orders", // Topics for schema discovery, Comma-separated topic names
+    "transforms.openlineage.dataset.namespace": "s3://fh-dev-bucket", // Sets the dataset namespace
     "transforms.openlineage.key.converter.schema.read": "false", // Skip key schema
     "transforms.openlineage.value.converter.schema.read": "true", // Read value schema (requires Schema Registry)
     "transforms.openlineage.value.converter.schema.registry.url": "http://schema:8081",
@@ -238,7 +237,7 @@ Below are the SMT configuration details for each connector. Kpow provides a user
 }
 ```
 
-**Iceberg sink connector**
+#### Iceberg sink connector
 
 > **Note:** The target Iceberg table must be created before deploying the Iceberg sink connector.
 
@@ -255,10 +254,9 @@ Below are the SMT configuration details for each connector. Kpow provides a user
     "transforms.openlineage.type": "io.factorhouse.smt.OpenLineageLifecycleSmt",
     "transforms.openlineage.connector.name": "orders-iceberg-sink", // Job name for lineage tracking
     "transforms.openlineage.connector.class": "io.tabular.iceberg.connect.IcebergSinkConnector", // Identifies the connector as a sink
-    "transforms.openlineage.topics": "orders", // Topic for schema discovery
-    "transforms.openlineage.iceberg.catalog": "demo_ib", // Sets the dataset namespace if iceberg.catalog.uri is missing
-    "transforms.openlineage.iceberg.catalog.uri": "thrift://hive-metastore:9083", // Sets the dataset namespace
-    "transforms.openlineage.iceberg.tables": "default.orders", // Sets the dataset names
+    "transforms.openlineage.topics": "orders", // Topics for schema discovery, Comma-separated topic names
+    "transforms.openlineage.dataset.namespace": "s3://warehouse", // Sets the dataset namespace, Spark reports the physical name
+    "transforms.openlineage.dataset.names": "orders", // Sets the dataset names, Comma-separated dataset names, Spark reports the physical name
     "transforms.openlineage.key.converter.schema.read": "false", // Skip key schema
     "transforms.openlineage.value.converter.schema.read": "true", // Read value schema (requires Schema Registry)
     "transforms.openlineage.value.converter.schema.registry.url": "http://schema:8081",
@@ -268,7 +266,7 @@ Below are the SMT configuration details for each connector. Kpow provides a user
 }
 ```
 
-**Create Iceberg sink table**
+#### Create Iceberg sink table
 
 Connect to the Spark-Iceberg container:
 
@@ -300,15 +298,19 @@ TBLPROPERTIES (
 );
 ```
 
+</details>
+
 <details>
 
 <summary><b>Deploying connectors with multiple topics</b></summary>
 
+<br/>
+
 You can deploy connectors that work with multiple topics. In this example, two topics are used: **orders** and **bids**. The corresponding connector configuration files are available here:
 
-- [Source connector](./connectors/multi-topics-source.json)
-- [S3 sink connector](./connectors/multi-topics-s3-sink.json)
-- [Iceberg sink connector](./connectors/multi-topics-iceberg-sink.json)
+- [Source connector](./connectors/multi-topic-source.json)
+- [S3 sink connector](./connectors/multi-topic-s3-sink.json)
+- [Iceberg sink connector](./connectors/multi-topic-iceberg-sink.json)
 
 **Note:** For the Iceberg sink connector, a new table (`default.bids`) must be created.
 
@@ -334,6 +336,12 @@ TBLPROPERTIES (
 ```
 
 </details>
+
+<br/>
+
+Kpow provides a user-friendly UI for deploying Kafka connectors.
+
+![](./images/create-connector.gif)
 
 ## Viewing lineage on Marquez
 
