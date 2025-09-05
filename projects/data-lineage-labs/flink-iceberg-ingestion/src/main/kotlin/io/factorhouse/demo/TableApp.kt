@@ -30,6 +30,8 @@ object TableApp {
     private val openLineageNamespace = System.getenv("OPENLINEAGE_NAMESPACE") ?: "fh-local"
     private val openLineageJobName = System.getenv("OPENLINEAGE_JOBNAME") ?: "iceberg-ingestion"
     private val openLineageUrl = System.getenv("OPENLINEAGE_URL") ?: "http://marquez-api:5000"
+    private val openLineageDatasetNamespace = System.getenv("OPENLINEAGE_DATASET_NAMESPACE") ?: "s3://warehouse"
+    private val openLineageDatasetName = System.getenv("OPENLINEAGE_DATASET_NAME") ?: "orders"
     private val logger = KotlinLogging.logger {}
 
     fun run() {
@@ -40,6 +42,9 @@ object TableApp {
         logger.info { "  - Schema Registry URL: $registryUrl" }
         logger.info { "  - OpenLineage Namespace: $openLineageNamespace" }
         logger.info { "  - OpenLineage Job name: $openLineageJobName" }
+        logger.info { "  - OpenLineage URL: $openLineageUrl" }
+        logger.info { "  - OpenLineage Dataset namespace: $openLineageDatasetNamespace" }
+        logger.info { "  - OpenLineage Dataset name: $openLineageDatasetName" }
 
         // Initialize OpenLineage integration
         val olIntegration =
@@ -174,7 +179,8 @@ object TableApp {
                 topicName = inputTopicName,
                 icebergCatalog = icebergCatalog,
                 tableIdentifier = tableIdentifier,
-                hmsEndpoint = hmsEndpoint,
+                datasetNamespace = openLineageDatasetNamespace,
+                datasetName = openLineageDatasetName,
                 eventType = OpenLineage.RunEvent.EventType.RUNNING,
             )
 

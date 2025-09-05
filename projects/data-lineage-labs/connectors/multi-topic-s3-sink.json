@@ -31,7 +31,7 @@
     "transforms.openlineage.connector.name": "multi-topics-s3-sink",
     "transforms.openlineage.connector.class": "io.confluent.connect.s3.S3SinkConnector",
     "transforms.openlineage.topics": "orders,bids",
-    "transforms.openlineage.s3.bucket.name": "fh-dev-bucket",
+    "transforms.openlineage.dataset.namespace": "s3://fh-dev-bucket",
     "transforms.openlineage.key.converter.schema.read": "false",
     "transforms.openlineage.value.converter.schema.read": "true",
     "transforms.openlineage.value.converter.schema.registry.url": "http://schema:8081",

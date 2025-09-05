@@ -9,9 +9,19 @@ x-common-environment: &flink_common_env_vars
   AWS_REGION: us-east-1
   HADOOP_CONF_DIR: /opt/flink/conf
   HIVE_CONF_DIR: /opt/flink/conf
+  CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
+  ## Flink job configurations
+  BOOTSTRAP: kafka-1:19092
+  INPUT_TOPIC: orders
+  REGISTRY_URL: http://schema:8081
+  ICEBERG_CATALOG_NAME: demo_ib
+  HMS_ENDPOINT: thrift://hive-metastore:9083
   OPENLINEAGE_NAMESPACE: fh-local
   OPENLINEAGE_JOBNAME: iceberg-ingestion
-  CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
+  OPENLINEAGE_URL: http://marquez-api:5000
+  # OpenLineage Spark integration sees the physical name rather than the logical name
+  OPENLINEAGE_DATASET_NAMESPACE: s3://warehouse
+  OPENLINEAGE_DATASET_NAME: orders
 
 x-common-flink-volumes: &flink_common_volumes
   - ../../factorhouse-local/resources/flink/bin/config.sh:/opt/flink/bin/config.sh:ro

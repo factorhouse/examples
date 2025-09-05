@@ -37,7 +37,8 @@ class Integration(
         schemaType: String = "value",
         icebergCatalog: Catalog,
         tableIdentifier: TableIdentifier,
-        hmsEndpoint: String,
+        datasetNamespace: String,
+        datasetName: String,
         eventType: OpenLineage.RunEvent.EventType,
     ) {
         logger.info { "Emitting rich OpenLineage $eventType event for run ID: $runId" }
@@ -56,7 +57,7 @@ class Integration(
                         .facets(ol.newJobFacetsBuilder().jobType(jobTypeFacet).build())
                         .build(),
                 ).inputs(listOf(buildKafkaInputDataset(topicName, schemaType)))
-                .outputs(listOf(buildIcebergOutputDataset(icebergCatalog, tableIdentifier, hmsEndpoint)))
+                .outputs(listOf(buildIcebergOutputDataset(icebergCatalog, tableIdentifier, datasetNamespace, datasetName)))
                 .build()
         transport.emit(event)
     }
@@ -88,10 +89,9 @@ class Integration(
     fun buildIcebergOutputDataset(
         icebergCatalog: Catalog,
         tableIdentifier: TableIdentifier,
-        hmsEndpoint: String,
+        datasetNamespace: String,
+        datasetName: String,
     ): OpenLineage.OutputDataset {
-        val tableName = "${tableIdentifier.namespace()}.${tableIdentifier.name()}"
-
         val table = icebergCatalog.loadTable(tableIdentifier)
         val schema = table.schema()
 
@@ -107,13 +107,13 @@ class Integration(
 
         return ol
             .newOutputDatasetBuilder()
-            .namespace(hmsEndpoint)
-            .name(tableName)
+            .namespace(datasetNamespace)
+            .name(datasetName)
             .facets(
                 ol
                     .newDatasetFacetsBuilder()
                     .schema(schemaFacet)
-                    .dataSource(ol.newDatasourceDatasetFacet("iceberg", URI.create(hmsEndpoint)))
+                    .dataSource(ol.newDatasourceDatasetFacet("iceberg", URI.create(datasetNamespace)))
                     .build(),
             ).build()
     }

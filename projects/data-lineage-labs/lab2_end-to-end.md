@@ -1,4 +1,8 @@
-# End-to-end data lineage
+# End-to-End Data Lineage from Kafka to Flink and Spark
+
+This guide provides a complete, end-to-end tutorial for capturing real-time and batch data lineage across a modern data stack: **Kafka, Flink, Spark, and Iceberg**. By the end of this lab, you will have a fully functional environment that tracks the flow of data from a Kafka topic, through a real-time Flink ingestion job into an Iceberg table, and finally into a batch Spark job that generates analytical summaries. The entire lineage graph, including column-level details, will be visualized in [Marquez](https://marquezproject.github.io/marquez/).
+
+The core of this solution is the careful configuration of OpenLineage integrations for each component. The lab begins with deploying two Kafka connectors where lineage is captured using the `OpenLineageLifecycleSmt` as discussed in the [previous lab](./lab1_kafka-connect.md). From there, it explores two distinct Flink integration patterns: a simple listener-based approach and a more robust manual orchestration method. Finally, Spark is configured to consume the Flink job's output, completing a practical, end-to-end blueprint for establishing reliable data lineage in a production-style environment.
 
 ## Set up the environment
 
@@ -57,7 +61,9 @@ We will deploy the following two Kafka connectors:
 - [**Source Connector**](./connectors/orders-source.json): Ingests mock order data into the `orders` topic using the _Amazon MSK Data Generator_.
 - [**S3 Sink Connector**](./connectors/orders-s3-sink.json): Reads records from the `orders` topic and writes them to an object storage bucket (MinIO).
 
-Kpow provides a **user-friendly UI and API** for deploying Kafka connectors. For more details, see [this page](../../fh-local-labs/lab-02/README.md).
+Kpow provides a user-friendly UI for deploying Kafka connectors.
+
+![](./images/create-connector.gif)
 
 ## Flink jobs
 
@@ -122,7 +128,11 @@ x-common-flink-config: &flink_image_pull_policy_config
 
 x-common-environment: &flink_common_env_vars
   ...
-  ## OpenLineage configuration
+  ## Flink job configurations
+  BOOTSTRAP: kafka-1:19092
+  INPUT_TOPIC: orders
+  OUTPUT_TOPIC: supplier-stats
+  REGISTRY_URL: http://schema:8081
   OPENLINEAGE_NAMESPACE: fh-local
   OPENLINEAGE_JOBNAME: supplier-stats
 
@@ -192,6 +202,8 @@ cd ../../..
 docker compose -p flink-1 -f ./projects/data-lineage-labs/compose-flink-1.yml up -d
 ```
 
+**TO DO**: Add how to ABORT the job
+
 ### Kafka to Iceberg ingestion (Table API)
 
 This application uses Flink's Table API to ingest data from a Kafka topic into an Apache Iceberg table, providing a robust example of a streaming ETL pipeline. The job defines a source table that connects to the `orders` Kafka topic, reading Avro records via the Schema Registry. It then performs a lightweight transformation—casting the price field to a `DECIMAL` type—before inserting the data directly into an Iceberg table named `default.orders`. The application also demonstrates how to programmatically create and register an Iceberg catalog pointing to a Hive Metastore, making it a foundational pattern for building a modern data lakehouse.
@@ -202,7 +214,7 @@ This job demonstrates a robust, manual integration pattern that provides complet
 
 - **Integration Method:**
 
-  - **Manual rrchestration:** The integration **bypasses the `OpenLineageFlinkJobListener` entirely** and uses the core `openlineage-java` client (`v1.37.0`) directly. The application's main method acts as an orchestrator, controlling _when_ to emit lineage events.
+  - **Manual orchestration:** The integration **bypasses the `OpenLineageFlinkJobListener` entirely** and uses the core `openlineage-java` client (`v1.37.0`) directly. The application's main method acts as an orchestrator, controlling _when_ to emit lineage events.
   - **Separation of concerns:** The detailed logic is delegated to dedicated helper class (`Integration.kt`), which handles the construction and emission of the OpenLineage events as well as is responsible for dynamic metadata discovery.
   - **Explicit event emission:** The application uses a `try...catch...finally` block to guarantee the emission of the correct lifecycle events: a minimal `START` event before submission, a rich `RUNNING` event after submission, and a final `ABORT` or `FAIL` event based on the job's terminal state.
 
@@ -244,11 +256,18 @@ x-common-flink-config: &flink_image_pull_policy_config
 
 x-common-environment: &flink_common_env_vars
   ...
-  ## OpenLineage configuration
+  ## Flink job configurations
+  BOOTSTRAP: kafka-1:19092
+  INPUT_TOPIC: orders
+  REGISTRY_URL: http://schema:8081
+  ICEBERG_CATALOG_NAME: demo_ib
+  HMS_ENDPOINT: thrift://hive-metastore:9083
   OPENLINEAGE_NAMESPACE: fh-local
   OPENLINEAGE_JOBNAME: iceberg-ingestion
-  ## Dependeny JAR
-  CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
+  OPENLINEAGE_URL: http://marquez-api:5000
+  # OpenLineage Spark integration sees the physical name rather than the logical name
+  OPENLINEAGE_DATASET_NAMESPACE: s3://warehouse
+  OPENLINEAGE_DATASET_NAME: orders
 
 x-common-flink-volumes: &flink_common_volumes
   ...
@@ -307,8 +326,63 @@ cd ../../..
 docker compose -p flink-1 -f ./projects/data-lineage-labs/compose-flink-2.yml up -d
 ```
 
-## Spark job
+### Monitor Flink jobs on Flex
+
+**TO DO**: Show how to monitor the Flink jobs on Flex
+
+### Batch supplier stats (Spark)
+
+This PySpark application is a batch processing job that reads the complete `orders` dataset from the Iceberg table where the Flink job writes its output. It performs a batch aggregation to calculate daily and hourly statistics for each supplier, including the total order price and the total count of orders. The script first ensures the target `supplier_stats` Iceberg table exists (using `CREATE TABLE IF NOT EXISTS`) and then performs a complete overwrite of its contents with the newly computed statistics. This represents a classic batch ETL pattern for generating summary tables that can be used for analytics and reporting.
+
+First, copy the PySpark script and the JAR into the running `spark-iceberg` container using the `docker cp` command:
+
+```bash
+# Copy the PySpark script and dependency JAR
+docker cp projects/data-lineage-labs/spark-supplier-stats/supplier_stats.py \
+  spark-iceberg:/tmp/supplier_stats.py
+```
+
+Once copied, submit the application using the following `spark-submit` command:
+
+```bash
+docker exec -it spark-iceberg \
+  /opt/spark/bin/spark-submit \
+    --master local[*] \
+    --conf "spark.driver.extraJavaOptions=--add-opens=java.base/java.security=ALL-UNNAMED" \
+    --conf "spark.sql.iceberg.handle-timestamp-without-timezone=true" \
+    --conf "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener" \
+    --conf "spark.openlineage.transport.type=http" \
+    --conf "spark.openlineage.transport.url=http://marquez-api:5000" \
+    --conf "spark.openlineage.namespace=fh-local" \
+    /tmp/supplier_stats.py
+```
+
+#### OpenLineage integration
+
+- **Integration method:**
+
+  - **Java agent listener:** The integration uses the OpenLineage Java agent JAR, which is attached to the Spark session using the `--conf spark.extraListeners` property during submission.
+  - **Automatic discovery:** The agent automatically inspects Spark's logical and physical query plans to discover input and output datasets from the SQL queries being executed.
+
+- **Key characteristics and configuration:**
+  - **Multiple jobs created:** The Spark agent generates a separate OpenLineage job for each distinct action in the script. Because the script contains a `CREATE TABLE` and an `INSERT OVERWRITE` statement, Marquez will display two distinct child jobs (e.g., `supplier_stats_app.create_table...` and `supplier_stats_app.overwrite_by_expression...`), nested under a parent application job. The `overwrite` job is the one that contains the meaningful data lineage from input to output.
+  - **Physical namespace reporting:** The OpenLineage agent for Iceberg reports datasets using their **physical namespace** (`s3://warehouse`) by default. It also automatically adds the logical Hive Metastore name (`hive://...`) as a secondary `symlink`. For end-to-end lineage to work correctly with Flink, the upstream Flink job **must be configured to report its output dataset using this same physical `s3://warehouse` namespace**. This exact match of dataset identifiers is the key to linking the two jobs in the graph.
 
 ## Viewing lineage on Marquez
 
 ## Shut down
+
+When you're done, shut down all containers and unset any environment variables:
+
+```bash
+# Stop all containers
+docker compose -p flex -f ./projects/data-lineage-labs/compose-flex.yml down \
+  && docker compose -p flink-2 -f ./projects/data-lineage-labs/compose-flink-2.yml down \
+  && docker compose -p flink-1 -f ./projects/data-lineage-labs/compose-flink-1.yml down \
+  && docker compose -p stripped -f ./projects/data-lineage-labs/compose-stripped.yml down \
+  && docker compose -p obsv -f ./factorhouse-local/compose-obsv.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
+
+# Clear environment variables
+unset KPOW_SUFFIX FLEX_SUFFIX KPOW_LICENSE FLEX_LICENSE
+```
