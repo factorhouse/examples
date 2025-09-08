@@ -97,11 +97,9 @@ This project unlocks the power of the popular [theLook eCommerce dataset](https:
 
 ![](./projects/data-lineage-labs/images/connector-lineage.gif)
 
-<br/>
-
 [End-to-End Data Lineage from Kafka to Flink and Spark](./projects/data-lineage-labs/lab2_end-to-end.md)
 
-- An end-to-end tutorial for building a data lineage graph across Kafka, Flink, Spark, and Iceberg. This lab extends the first project by tracking data from a single Kafka topic through parallel pipelines: a Flink job for real-time analytics, another for Iceberg ingestion, and a downstream Spark batch job that consumes from the Iceberg table.
+- An end-to-end tutorial for establishing data lineage across Kafka, Flink, Spark, and Iceberg. This lab begins by tracking data from a single Kafka topic through parallel pipelines: a Kafka S3 sink connector for raw data archival, a Flink job for real-time analytics, another Flink job for Iceberg ingestion, and a downstream Spark batch job that reads from the Iceberg table.
 
 ![](./projects/data-lineage-labs/images/end-to-end-lineage.gif)
 
