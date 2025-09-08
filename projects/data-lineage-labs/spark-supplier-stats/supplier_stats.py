@@ -47,6 +47,7 @@ if __name__ == "__main__":
             SUM(price) AS total_price,
             COUNT(*) AS total_count
         FROM {ICEBERG_SOURCE_TABLE_FQN}
+        WHERE CAST(bid_time AS DATE) = CURRENT_DATE()
         GROUP BY
             supplier,
             bid_date,
