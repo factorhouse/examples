@@ -95,8 +95,6 @@ This project unlocks the power of the popular [theLook eCommerce dataset](https:
 
 - Demonstrates how to capture real-time data lineage from Kafka Connect using the `OpenLineageLifecycleSmt`. This lab builds a complete pipeline that tracks data from a source connector to S3 and Iceberg sinks, with the full lineage graph visualized in Marquez.
 
-<br/>
-
 ![](./projects/data-lineage-labs/images/connector-lineage.gif)
 
 <br/>
