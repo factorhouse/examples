@@ -1,8 +1,8 @@
 # A Practical Guide to Data Lineage on Kafka Connect with OpenLineage
 
-This guide provides a complete, end-to-end solution for capturing real-time data lineage from **Kafka Connect**. By the end of this tutorial, you will have a fully functional environment that tracks data from a source connector, through Kafka, and into data sinks like S3 and Apache Iceberg, with the entire graph visualized in [Marquez](https://marquezproject.github.io/marquez/).
+This guide provides a complete, end-to-end solution for capturing real-time data lineage from **Kafka Connect**. By the end of this tutorial, we will have a fully functional environment that tracks data from a source connector, through Kafka, and into data sinks like S3 and Apache Iceberg, with the entire graph visualized in [Marquez](https://marquezproject.github.io/marquez/).
 
-The core of this solution is the **`OpenLineageLifecycleSmt`**, a custom Single Message Transform (SMT) that enables automated lineage without modifying your data records. We will walk through its setup, configuration, and limitations to provide a comprehensive understanding of how to achieve lineage for your Kafka Connect pipelines.
+The core of this solution is the **`OpenLineageLifecycleSmt`**, a custom Single Message Transform (SMT) that enables automated lineage without modifying our data records. We will walk through its setup, configuration, and limitations to provide a comprehensive understanding of how to achieve lineage for Kafka Connect pipelines.
 
 ## Set up the environment
 
@@ -61,7 +61,7 @@ The SMT is designed to work with multiple Kafka Connect source and sink connecto
 
 ### Datasets creation
 
-The SMT automatically discovers input and output datasets based on the explicit configuration you provide to it.
+The SMT automatically discovers input and output datasets based on the explicit configuration we provide to it.
 
 - **Kafka topic datasets**
 
@@ -70,7 +70,7 @@ The SMT automatically discovers input and output datasets based on the explicit 
   - **Namespace and name:** For lineage purposes, each Kafka topic is treated as a distinct dataset.
     - The dataset **name** is the topic name itself (e.g., `orders`).
     - The dataset **namespace** is the canonical URI of the Kafka cluster, constructed by prepending `kafka://` to the bootstrap server address (e.g., `kafka://kafka-1:19092`). This ensures consistent identification across different systems like Flink.
-  - **Schema:** When `key.converter.schema.read` or `value.converter.schema.read` is set to _true_, the SMT connects to the Schema Registry to fetch the latest schema for keys, values, or both. This enables rich, column-level lineage tracking. You must also provide supporting properties like the Schema Registry URL and authentication info.
+  - **Schema:** When `key.converter.schema.read` or `value.converter.schema.read` is set to _true_, the SMT connects to the Schema Registry to fetch the latest schema for keys, values, or both. This enables rich, column-level lineage tracking. We must also provide supporting properties like the Schema Registry URL and authentication info.
     > **Note:** Currently, the SMT's schema parsing logic is implemented specifically for the **Avro** format. Schemas of other types (e.g., Protobuf, JSON Schema) will not be parsed, and column-level lineage will not be available for those topics.
 
 - **Sink output datasets (S3 & Iceberg)**
@@ -127,13 +127,13 @@ The SMT applies a consistent, location-based namespacing strategy to uniquely id
 
 | Entity                 | Namespace Source                              | Example                                  | Purpose                                                                                                                                        |
 | :--------------------- | :-------------------------------------------- | :--------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Job**                | `OPENLINEAGE_NAMESPACE` environment variable. | `fh-local`                               | Provides a logical grouping for related jobs. This should be consistent across your Kafka Connect and Flink deployments.                       |
+| **Job**                | `OPENLINEAGE_NAMESPACE` environment variable. | `fh-local`                               | Provides a logical grouping for related jobs. This should be consistent across our Kafka Connect and Flink deployments.                        |
 | **Kafka Dataset**      | `KAFKA_BOOTSTRAP` environment variable.       | `kafka://kafka-1:19092`                  | Creates a canonical, physical identifier for the Kafka cluster, allowing datasets to be shared and linked across different jobs and platforms. |
 | **S3/Iceberg Dataset** | `dataset.namespace` connector property.       | `s3://fh-dev-bucket` or `s3://warehouse` | Uniquely identifies the the physical storage. Note Spark reports the physical name.                                                            |
 
 ### Limitations
 
-- **`tasks.max` must Be `1`:** This SMT is designed for single-task connectors. It manages its state internally for each instance. To ensure a clean, one-to-one mapping between a connector and a single OpenLineage run, you **must** set `"tasks.max": "1"` in your connector configuration.
+- **`tasks.max` must Be `1`:** This SMT is designed for single-task connectors. It manages its state internally for each instance. To ensure a clean, one-to-one mapping between a connector and a single OpenLineage run, we **must** set `"tasks.max": "1"` in the connector configuration.
 - **Initial connector failures:** If a connector fails during its own initialization _before_ any records are processed, the SMT will not have a chance to emit a `START` or `FAIL` event.
 - **Schema versioning on redeployment:** The SMT waits for schemas to exist before emitting lineage, avoiding race conditions. However, it does not track schema **version changes**. Updating a topic schema (e.g., adding a field) will not create a new dataset version in Marquez.
 
@@ -306,7 +306,7 @@ TBLPROPERTIES (
 
 <br/>
 
-You can deploy connectors that work with multiple topics. In this example, two topics are used: **orders** and **bids**. The corresponding connector configuration files are available here:
+We can deploy connectors that work with multiple topics. In this example, two topics are used: **orders** and **bids**. The corresponding connector configuration files are available here:
 
 - [Source connector](./connectors/multi-topic-source.json)
 - [S3 sink connector](./connectors/multi-topic-s3-sink.json)
@@ -339,19 +339,19 @@ TBLPROPERTIES (
 
 <br/>
 
-Kpow provides a user-friendly UI for deploying Kafka connectors.
+Kpow provides a user-friendly UI for deploying Kafka connectors, accessible at [http:/localhost:3000](http:/localhost:3000).
 
 ![](./images/create-connector.gif)
 
 ## Viewing lineage on Marquez
 
-After deploying the connectors, you can view the lineage graph in your OpenLineage UI, accessible at [`http://localhost:3003`](http://localhost:3003).
+After deploying the Kafka connectors, we can view the lineage graph in the Marquez UI at [http://localhost:3003](http://localhost:3003). Three jobs are created by the Kafka connectors, and all of them are linked through their input and output datasets.
 
 ![](./images/connector-lineage.gif)
 
 ## Shut down
 
-When you're done, shut down all containers and unset any environment variables:
+Shut down all containers and unset any environment variables:
 
 ```bash
 # Stop Factor House Local containers
