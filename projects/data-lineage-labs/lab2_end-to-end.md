@@ -385,7 +385,6 @@ Once copied, submit the application using the following `spark-submit` command:
 docker exec -it spark-iceberg \
   /opt/spark/bin/spark-submit \
     --master local[*] \
-    --conf "spark.driver.extraJavaOptions=--add-opens=java.base/java.security=ALL-UNNAMED" \
     --conf "spark.sql.iceberg.handle-timestamp-without-timezone=true" \
     --conf "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener" \
     --conf "spark.openlineage.transport.type=http" \
