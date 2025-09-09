@@ -133,7 +133,7 @@ The SMT applies a consistent, location-based namespacing strategy to uniquely id
 
 ### Limitations
 
-- **`tasks.max` must Be `1`:** This SMT is designed for single-task connectors. It manages its state internally for each instance. To ensure a clean, one-to-one mapping between a connector and a single OpenLineage run, we **must** set `"tasks.max": "1"` in the connector configuration.
+- **`tasks.max` must be `1`:** This SMT is designed for single-task connectors. It manages its state internally for each instance. To ensure a clean, one-to-one mapping between a connector and a single OpenLineage run, we **must** set `"tasks.max": "1"` in the connector configuration.
 - **Initial connector failures:** If a connector fails during its own initialization _before_ any records are processed, the SMT will not have a chance to emit a `START` or `FAIL` event.
 - **Schema versioning on redeployment:** The SMT waits for schemas to exist before emitting lineage, avoiding race conditions. However, it does not track schema **version changes**. Updating a topic schema (e.g., adding a field) will not create a new dataset version in Marquez.
 
