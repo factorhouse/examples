@@ -1,0 +1,122 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "ResourceNamePrefixParameter": {
+      "Type": "String",
+      "Default": "factorhouse-instaclustr-custom-connector",
+      "AllowedPattern": "[a-z0-9\\-]+",
+      "Description": "Custom connector AWS storage resources name prefix"
+    }
+  },
+  "Resources": {
+    "InstaclustrKafkaConnectCustomConnectorsBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "ResourceNamePrefixParameter"
+              },
+              "-bucket"
+            ]
+          ]
+        }
+      }
+    },
+    "InstaclustrCustomConnectorPullUser": {
+      "Type": "AWS::IAM::User",
+      "Properties": {
+        "UserName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "ResourceNamePrefixParameter"
+              },
+              "-user"
+            ]
+          ]
+        }
+      },
+      "DependsOn": ["InstaclustrKafkaConnectCustomConnectorsBucket"]
+    },
+    "InstaclustrCustomConnectorUserAccessPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "ResourceNamePrefixParameter"
+              },
+              "-policy"
+            ]
+          ]
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["s3:ListBucket"],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    { "Ref": "ResourceNamePrefixParameter" },
+                    "-bucket"
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["s3:GetObject"],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    { "Ref": "ResourceNamePrefixParameter" },
+                    "-bucket/*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["s3:GetBucketLocation"],
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    { "Ref": "ResourceNamePrefixParameter" },
+                    "-bucket"
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        "Users": [
+          {
+            "Ref": "InstaclustrCustomConnectorPullUser"
+          }
+        ]
+      },
+      "DependsOn": ["InstaclustrCustomConnectorPullUser"]
+    }
+  },
+  "Outputs": {
+    "S3BucketName": {
+      "Value": {
+        "Ref": "InstaclustrKafkaConnectCustomConnectorsBucket"
+      },
+      "Description": "Name of S3 bucket to hold connector content"
+    }
+  }
+}

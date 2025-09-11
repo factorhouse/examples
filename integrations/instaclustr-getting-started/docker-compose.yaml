@@ -1,0 +1,44 @@
+services:
+  # schema:
+  #   image: confluentinc/cp-schema-registry:7.8.0
+  #   container_name: schema_registry
+  #   ports:
+  #     - "8081:8081"
+  #   networks:
+  #     - factorhouse
+  #   depends_on:
+  #     - zookeeper
+  #     - kafka-1
+  #     - kafka-2
+  #     - kafka-3
+  #   environment:
+  #     SCHEMA_REGISTRY_HOST_NAME: "schema"
+  #     SCHEMA_REGISTRY_LISTENERS: http://schema:8081,http://${DOCKER_HOST_IP:-127.0.0.1}:8081
+  #     SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "13.237.106.239:9092,3.104.0.252:9092,52.65.214.215:9092"
+  #     SCHEMA_REGISTRY_AUTHENTICATION_METHOD: BASIC
+  #     SCHEMA_REGISTRY_AUTHENTICATION_REALM: schema
+  #     SCHEMA_REGISTRY_AUTHENTICATION_ROLES: schema-admin
+  #     SCHEMA_REGISTRY_OPTS: -Djava.security.auth.login.config=/etc/schema/schema_jaas.conf
+  #   volumes:
+  #     - ./kpow/schema:/etc/schema
+
+  kpow:
+    image: factorhouse/kpow${KPOW_SUFFIX:-}:latest
+    container_name: kpow${KPOW_SUFFIX:-}
+    pull_policy: always
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - factorhouse
+    env_file:
+      - ./kpow/config/setup.env
+      - ${KPOW_LICENSE:-kpow/config/license.env}
+    mem_limit: 2G
+    volumes:
+      - ./kpow/jaas:/etc/kpow/jaas
+      - ./kpow/rbac:/etc/kpow/rbac
+
+networks:
+  factorhouse:
+    name: factorhouse
