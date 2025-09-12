@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  ResourceNamePrefixParameter:
+    Type: String
+    Default: fh-instaclustr
+    AllowedPattern: "[a-z0-9\\-]+"
+    Description: Custom connector AWS storage resources name prefix
+
+Resources:
+  InstaclustrKafkaConnectCustomConnectorsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${ResourceNamePrefixParameter}-custom-connector"
+
+  InstaclustrKafkaConnectSinkBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${ResourceNamePrefixParameter}-sink"
+
+  InstaclustrCustomConnectorPullUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Sub "${ResourceNamePrefixParameter}-user"
+
+  InstaclustrCustomConnectorUserAccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub "${ResourceNamePrefixParameter}-policy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:ListBucket
+              - s3:GetBucketLocation
+            Resource:
+              - !GetAtt InstaclustrKafkaConnectCustomConnectorsBucket.Arn
+              - !GetAtt InstaclustrKafkaConnectSinkBucket.Arn
+
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+            Resource: !Sub "${InstaclustrKafkaConnectCustomConnectorsBucket.Arn}/*"
+
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:AbortMultipartUpload
+              - s3:DeleteObject
+              - s3:ListMultipartUploadParts
+            Resource: !Sub "${InstaclustrKafkaConnectSinkBucket.Arn}/*"
+      Users:
+        - !Ref InstaclustrCustomConnectorPullUser
+
+Outputs:
+  CustomConnectorS3BucketName:
+    Value: !Ref InstaclustrKafkaConnectCustomConnectorsBucket
+    Description: Name of S3 bucket to hold custom connector JARs
+
+  SinkS3BucketName:
+    Value: !Ref InstaclustrKafkaConnectSinkBucket
+    Description: Name of S3 bucket for the S3 sink connector to write data to

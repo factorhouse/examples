@@ -32,7 +32,7 @@ flag_time_taken() {
 }
 
 ### Determine S3 bucket name from argument or default
-S3_BUCKET_NAME="factorhouse-instaclustr-custom-connector-bucket" # default
+S3_BUCKET_NAME="fh-instaclustr-custom-connector" # default
 
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
   usage
