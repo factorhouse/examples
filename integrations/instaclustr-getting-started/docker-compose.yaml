@@ -1,0 +1,21 @@
+services:
+  kpow:
+    image: factorhouse/kpow${KPOW_SUFFIX:-}:latest
+    container_name: kpow${KPOW_SUFFIX:-}
+    pull_policy: always
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - factorhouse
+    env_file:
+      - ./kpow/config/setup.env
+      - ${KPOW_LICENSE:-kpow/config/license.env}
+    mem_limit: 2G
+    volumes:
+      - ./kpow/jaas:/etc/kpow/jaas
+      - ./kpow/rbac:/etc/kpow/rbac
+
+networks:
+  factorhouse:
+    name: factorhouse
