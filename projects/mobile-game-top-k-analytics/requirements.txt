@@ -1,2 +1,4 @@
 -r ../../datagen/mobile-game/requirements.txt
 streamlit
+psycopg2-binary
+sqlalchemy

@@ -6,3 +6,4 @@ cachetools
 authlib
 fastavro
 referencing
+orjson
