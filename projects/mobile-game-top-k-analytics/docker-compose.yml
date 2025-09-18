@@ -20,7 +20,7 @@ services:
       - --robot-probability
       - "0"
       - --num-live-teams
-      - "10"
+      - "15"
       - --min-members-per-team
       - "5"
       - --max-members-per-team
