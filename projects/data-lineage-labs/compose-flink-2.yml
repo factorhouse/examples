@@ -38,6 +38,7 @@ x-common-flink-volumes: &flink_common_volumes
   - ../../factorhouse-local/resources/deps/flink/iceberg:/tmp/iceberg
   - ../../factorhouse-local/resources/deps/flink/parquet:/tmp/parquet
   - ../../factorhouse-local/resources/deps/flink/connector:/tmp/connector
+  - ../../factorhouse-local/resources/deps/postgres:/tmp/postgres
   ## Add application JAR
   - ./flink-iceberg-ingestion/build/libs/flink-iceberg-ingestion-1.0.jar:/opt/flink/usrlib/flink-iceberg-ingestion-1.0.jar
 

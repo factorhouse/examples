@@ -79,7 +79,7 @@ services:
     volumes:
       - ../../factorhouse-local/resources/hms/hive-site.xml:/opt/hive/conf/hive-site.xml
       - ../../factorhouse-local/resources/hms/core-site.xml:/opt/hive/conf/core-site.xml
-      - ../../factorhouse-local/resources/deps/hms/postgresql-42.7.3.jar:/opt/hive/lib/postgresql-42.7.3.jar
+      - ../../factorhouse-local/resources/deps/postgres/postgresql-42.7.3.jar:/opt/hive/lib/postgresql-42.7.3.jar
       - ../../factorhouse-local/resources/deps/hadoop/hadoop-common-3.3.6.jar:/opt/hive/lib/hadoop-common-3.3.6.jar
       - ../../factorhouse-local/resources/deps/hadoop/hadoop-auth-3.3.6.jar:/opt/hive/lib/hadoop-auth-3.3.6.jar
       - ../../factorhouse-local/resources/deps/hadoop/hadoop-aws-3.3.6.jar:/opt/hive/lib/hadoop-aws-3.3.6.jar

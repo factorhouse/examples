@@ -33,6 +33,7 @@ x-common-flink-volumes: &flink_common_volumes
   - ../../factorhouse-local/resources/deps/flink/iceberg:/tmp/iceberg
   - ../../factorhouse-local/resources/deps/flink/parquet:/tmp/parquet
   - ../../factorhouse-local/resources/deps/flink/connector:/tmp/connector
+  - ../../factorhouse-local/resources/deps/postgres:/tmp/postgres
   ## Add application JAR
   - ./resources/openlineage.yml:/opt/flink/.openlineage/openlineage.yml:ro
   - ./flink-supplier-stats/build/libs/flink-supplier-stats-1.0.jar:/opt/flink/usrlib/flink-supplier-stats-1.0.jar
