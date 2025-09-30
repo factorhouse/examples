@@ -1,0 +1,85 @@
+x-common-environment: &kafka_broker_common_env_vars
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+  KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+  KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+  KAFKA_LOG4J_ROOT_LOGLEVEL: INFO
+  KAFKA_NUM_PARTITIONS: "1"
+  KAFKA_DEFAULT_REPLICATION_FACTOR: "1"
+
+services:
+  kpow:
+    image: factorhouse/kpow${KPOW_SUFFIX:-}:latest
+    container_name: kpow${KPOW_SUFFIX:-}
+    pull_policy: always
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - factorhouse
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - kafka-1
+      - kafka-2
+    environment:
+      WEBHOOK_PROVIDER: slack
+      WEBHOOK_URL: $SLACK_WEBHOOK_URL
+    env_file:
+      - ./kpow/config/setup.env
+      - ${KPOW_LICENSE:-resources/kpow/config/license.env}
+    mem_limit: 2G
+    volumes:
+      - ./kpow/jaas:/etc/kpow/jaas
+      - ./kpow/rbac:/etc/kpow/rbac
+
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:7.8.0
+    container_name: zookeeper-1
+    networks:
+      - factorhouse
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka-1:
+    image: confluentinc/cp-kafka:7.8.0
+    container_name: kafka-1
+    ports:
+      - "9092:9092"
+    networks:
+      - factorhouse
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka-1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      <<: *kafka_broker_common_env_vars
+    depends_on:
+      - zookeeper-1
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:7.8.0
+    container_name: zookeeper-2
+    networks:
+      - factorhouse
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka-2:
+    image: confluentinc/cp-kafka:7.8.0
+    container_name: kafka-2
+    ports:
+      - "9093:9093"
+    networks:
+      - factorhouse
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-2:2181
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka-2:19093,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093
+      <<: *kafka_broker_common_env_vars
+    depends_on:
+      - zookeeper-2
+
+networks:
+  factorhouse:
+    name: factorhouse

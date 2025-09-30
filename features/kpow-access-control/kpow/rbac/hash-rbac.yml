@@ -1,0 +1,75 @@
+tenants:
+  - name: "Global"
+    description: "All configured Kafka resources."
+    resources:
+      - include:
+          - ["*"]
+    roles:
+      - "kafka-admins"
+  - name: "Tenant 1"
+    description: "Tenant 1 Kafka resources."
+    resources:
+      - include:
+          - ["cluster", "cluster-1"]
+    roles:
+      - "kafka-owners"
+      - "kafka-editors"
+      - "kafka-readers"
+
+admin_roles:
+  - "kafka-admins"
+
+authorized_roles:
+  - "kafka-admins"
+  - "kafka-owners"
+  - "kafka-editors"
+  - "kafka-readers"
+
+policies:
+  - actions:
+      - TOPIC_CREATE
+      - TOPIC_PRODUCE
+      - TOPIC_EDIT
+      - TOPIC_DELETE
+      - GROUP_EDIT
+      - ACL_EDIT
+      - BULK_ACTION
+    effect: Allow
+    resource:
+      - cluster
+      - "*"
+    role: "kafka-admins"
+  - actions:
+      - TOPIC_CREATE
+      - TOPIC_EDIT
+      - TOPIC_DELETE
+    effect: Allow
+    resource:
+      - cluster
+      - "*"
+    role: "kafka-owners"
+  - actions:
+      - TOPIC_CREATE
+      - TOPIC_EDIT
+      - TOPIC_DELETE
+    effect: Stage
+    resource:
+      - cluster
+      - "*"
+    role: "kafka-editors"
+  - actions:
+      - TOPIC_PRODUCE
+    effect: Allow
+    resource:
+      - cluster
+      - "*"
+    roles:
+      - "kafka-owners"
+      - "kafka-editors"
+  - actions:
+      - TOPIC_INSPECT
+    effect: Allow
+    resource:
+      - cluster
+      - "*"
+    role: "*"
