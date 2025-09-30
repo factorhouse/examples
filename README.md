@@ -17,6 +17,13 @@
 - This guide demonstrates how Kpow directly solves this challenge. We will integrate these popular schema registries into a single Kafka environment and show how to manage them all seamlessly through Kpow's single, unified interface.
 </details>
 
+<details>
+  <summary><a href="https://www.youtube.com/watch?v=iCTrRg2cJao">Kpow access control demo with multi-tenancy and RBAC</a></summary>
+
+- [demo project](./features/kpow-access-control/)
+
+</details>
+
 ## Integrations
 
 <details>
