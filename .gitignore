@@ -5,6 +5,7 @@
 .ignore
 kpow-local
 factorhouse-local
+awsmp-chart
 
 ####
 #### python
