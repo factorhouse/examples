@@ -1,0 +1,39 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: fh-k8s-cluster
+spec:
+  kafka:
+    version: 3.9.1
+    replicas: 1
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      min.insync.replicas: 1
+      inter.broker.protocol.version: "3.9"
+      auto.create.topics.enable: "true"
+      num.partitions: 1
+      default.replication.factor: 1
+      log.cleanup.policy: "delete"
+      log.retention_bytes: "524288000" # 500 MB
+      log.segment.bytes: "67108864" # 64 MB segments
+      log.retension.ms: "86400000" # 1 day
+    storage:
+      type: ephemeral
+  zookeeper:
+    replicas: 1
+    storage:
+      type: ephemeral
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}

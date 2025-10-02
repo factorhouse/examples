@@ -1,0 +1,42 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: fh-eks-cluster
+  region: us-east-1
+
+vpc:
+  id: "<VPC-ID>"
+  subnets:
+    private:
+      us-east-1a:
+        id: "<PRIVATE-SUBNET-ID-1>"
+      us-east-1b:
+        id: "<PRIVATE-SUBNET-ID-2>"
+    public:
+      us-east-1a:
+        id: "<PUBLIC-SUBNET-ID-1>"
+      us-east-1b:
+        id: "<PUBLIC-SUBNET-ID-2>"
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: kpow-annual
+        namespace: factorhouse
+      attachPolicyARNs:
+        - "arn:aws:iam::aws:policy/service-role/AWSLicenseManagerConsumptionPolicy"
+    - metadata:
+        name: kpow-hourly
+        namespace: factorhouse
+      attachPolicyARNs:
+        - "arn:aws:iam::aws:policy/AWSMarketplaceMeteringRegisterUsage"
+
+nodeGroups:
+  - name: ng-dev
+    instanceType: t3.medium
+    desiredCapacity: 4
+    minSize: 2
+    maxSize: 6
+    privateNetworking: true

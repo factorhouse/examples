@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kpow-config
+  namespace: factorhouse
+data:
+  # Environment Configuration
+  BOOTSTRAP: "fh-k8s-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"
+  REPLICATION_FACTOR: "1"
+  # AuthN + AuthZ
+  JAVA_TOOL_OPTIONS: "-Djava.awt.headless=true -Djava.security.auth.login.config=/etc/kpow/jaas/hash-jaas.conf"
+  AUTH_PROVIDER_TYPE: "jetty"
+  RBAC_CONFIGURATION_FILE: "/etc/kpow/rbac/hash-rbac.yml"

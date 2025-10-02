@@ -1,0 +1,24 @@
+env:
+  ENVIRONMENT_NAME: "Kafka from Kpow Annual"
+envFromConfigMap: "kpow-config"
+volumeMounts:
+  - name: kpow-config-volumes
+    mountPath: /etc/kpow/rbac/hash-rbac.yml
+    subPath: hash-rbac.yml
+  - name: kpow-config-volumes
+    mountPath: /etc/kpow/jaas/hash-jaas.conf
+    subPath: hash-jaas.conf
+  - name: kpow-config-volumes
+    mountPath: /etc/kpow/jaas/hash-realm.properties
+    subPath: hash-realm.properties
+volumes:
+  - name: kpow-config-volumes
+    configMap:
+      name: "kpow-config-files"
+resources:
+  limits:
+    cpu: 1
+    memory: 0.5Gi
+  requests:
+    cpu: 1
+    memory: 0.5Gi
