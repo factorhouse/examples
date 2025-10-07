@@ -1,0 +1,97 @@
+{
+  "generators": [
+    {
+      "runs": 1,
+      "connection": "fh-local",
+      "topic": "parcel_scan_events",
+      "key": "P-PROBABILISTIC-009",
+
+      "stateMachine": {
+        "_gen": "stateMachine",
+        "initial": "DepotArrival",
+        "transitions": {
+          "DepotArrival": "SortedToRoute",
+          "SortedToRoute": "VehicleLoad",
+          "VehicleLoad": "HubArrival",
+          "VehicleReLoad": "HubArrival",
+          "ParcelLost": null,
+          "HubArrival": "OutForDelivery",
+          "OutForDelivery": {
+            "_gen": "weightedOneOf",
+            "choices": [
+              {
+                "weight": 5,
+                "value": "RogueHubArrival"
+              },
+              {
+                "weight": 95,
+                "value": "Delivered"
+              }
+            ]
+          },
+          "RogueHubArrival": {
+            "_gen": "weightedOneOf",
+            "choices": [
+              {
+                "weight": 5,
+                "value": "ParcelLost"
+              },
+              {
+                "weight": 95,
+                "value": "VehicleReLoad"
+              }
+            ]
+          },
+          "Delivered": null
+        },
+        "states": {
+          "DepotArrival": {
+            "value": { "event_type": "DEPOT_ARRIVAL", "location": "DEPOT-A" }
+          },
+          "SortedToRoute": {
+            "value": { "event_type": "SORTED_TO_ROUTE", "location": "DEPOT-A" }
+          },
+          "VehicleLoad": {
+            "value": { "event_type": "VEHICLE_LOAD", "location": "DEPOT-A" }
+          },
+          "VehicleReLoad": {
+            "value": { "event_type": "VEHICLE_LOAD", "location": "DEPOT-C" }
+          },
+          "ParcelLost": {
+            "value": { "event_type": "PARCEL_LOST", "location": "UNKNOWN" }
+          },
+          "HubArrival": {
+            "value": { "event_type": "HUB_ARRIVAL", "location": "HUB-B" }
+          },
+          "OutForDelivery": {
+            "value": { "event_type": "OUT_FOR_DELIVERY", "location": "HUB-B" }
+          },
+          "Delivered": {
+            "value": { "event_type": "DELIVERED", "location": "CUSTOMER" }
+          },
+          "RogueHubArrival": {
+            "value": {
+              "event_type": "HUB_ARRIVAL",
+              "location": "HUB-C"
+            }
+          }
+        },
+        "template": {
+          "parcel_id": "P-PROBABILISTIC-009",
+          "timestamp": { "_gen": "now" }
+        }
+      },
+      "localConfigs": { "throttle": { "ms": 500 } }
+    }
+  ],
+  "connections": {
+    "fh-local": {
+      "kind": "kafka",
+      "producerConfigs": {
+        "bootstrap.servers": "localhost:9092",
+        "key.serializer": "org.apache.kafka.common.serialization.StringSerializer",
+        "value.serializer": "io.shadowtraffic.kafka.serdes.JsonSerializer"
+      }
+    }
+  }
+}
