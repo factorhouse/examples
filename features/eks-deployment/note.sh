@@ -24,31 +24,39 @@ aws ecr get-login-password \
     --username AWS \
     --password-stdin 709825985650.dkr.ecr.us-east-1.amazonaws.com
 
-mkdir awsmp-chart && cd awsmp-chart
-helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/factor-house/kpow-annual-chart --version 1.0.59
+mkdir -p awsmp-chart && cd awsmp-chart
+helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/factor-house/kpow-aws-annual
 tar xf $(pwd)/* && find $(pwd) -maxdepth 1 -type f -delete
 
 cd ..
-helm install kpow-annual ./awsmp-chart/kpow-annual-chart/ \
+helm install kpow-annual ./awsmp-chart/kpow-aws-annual/ \
     -n factorhouse \
     --set serviceAccount.create=false \
     --set serviceAccount.name=kpow-annual \
     --values ./values/eks-annual.yaml
 
-# kubectl -n factorhouse port-forward service/kpow-annual-kpow-annual-chart 3000:3000
+# kubectl -n factorhouse port-forward service/kpow-annual-kpow-aws-annual 3000:3000
 
 ## Kpow hourly
-helm repo add factorhouse https://charts.factorhouse.io \
-  && helm repo update
+export HELM_EXPERIMENTAL_OCI=1
+aws ecr get-login-password \
+    --region us-east-1 | helm registry login \
+    --username AWS \
+    --password-stdin 709825985650.dkr.ecr.us-east-1.amazonaws.com
+
+mkdir -p awsmp-chart && cd awsmp-chart
+helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/factor-house/kpow-aws-hourly
+tar xf $(pwd)/* && find $(pwd) -maxdepth 1 -type f -delete
 
 # Deploy Kpow hourly
-helm install kpow-hourly factorhouse/kpow \
+cd ..
+helm install kpow-hourly ./awsmp-chart/kpow-aws-hourly/ \
   -n factorhouse \
   --set serviceAccount.create=false \
   --set serviceAccount.name=kpow-hourly \
   --values ./values/eks-hourly.yaml
 
-# kubectl -n factorhouse port-forward service/kpow-hourly 3001:3000
+# kubectl -n factorhouse port-forward service/kpow-hourly-kpow-aws-hourly 3001:3000
 
 #### Delete resources
 ## Delete the Kafka cluster and Strimzi operator

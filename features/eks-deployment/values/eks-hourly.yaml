@@ -1,5 +1,3 @@
-image:
-  repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/factor-house/kpow-hourly
 env:
   ENVIRONMENT_NAME: "Kafka from Kpow Hourly"
 envFromConfigMap: "kpow-config"
@@ -20,7 +18,7 @@ volumes:
 resources:
   limits:
     cpu: 1
-    memory: 0.5Gi
+    memory: 1Gi
   requests:
     cpu: 1
     memory: 0.5Gi
