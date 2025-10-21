@@ -38,19 +38,11 @@ helm install kpow-annual ./awsmp-chart/kpow-aws-annual/ \
 # kubectl -n factorhouse port-forward service/kpow-annual-kpow-aws-annual 3000:3000
 
 ## Kpow hourly
-export HELM_EXPERIMENTAL_OCI=1
-aws ecr get-login-password \
-    --region us-east-1 | helm registry login \
-    --username AWS \
-    --password-stdin 709825985650.dkr.ecr.us-east-1.amazonaws.com
-
-mkdir -p awsmp-chart && cd awsmp-chart
-helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/factor-house/kpow-aws-hourly
-tar xf $(pwd)/* && find $(pwd) -maxdepth 1 -type f -delete
+helm repo add factorhouse https://charts.factorhouse.io
+helm repo update
 
 # Deploy Kpow hourly
-cd ..
-helm install kpow-hourly ./awsmp-chart/kpow-aws-hourly/ \
+helm install kpow-hourly factorhouse/kpow-aws-hourly \
   -n factorhouse \
   --set serviceAccount.create=false \
   --set serviceAccount.name=kpow-hourly \
