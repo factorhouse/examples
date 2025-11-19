@@ -105,19 +105,14 @@ services:
         id=0
         echo "Starting to produce messages..."
         while true; do
-          # Note the '$$id' here
           id=$$(($$id+1))
           
-          # This command does not use variables, so it's fine
           random_string=$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
 
-          # Note '$$id' and '$$random_string'
           message=$$(printf '{"id": %d, "message": "%s"}' "$$id" "$$random_string")
           
-          # Note '$$message'
           echo "$$message" | rpk topic produce getting-started -X brokers=redpanda:9092
           
-          # Note '$$message'
           echo "Produced: $$message"
           
           sleep 1
