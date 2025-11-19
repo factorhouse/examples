@@ -27,7 +27,6 @@ services:
 
       # You can replace the following with the boostrap URL of your own Kafka cluster and your own Schema Registry.
       BOOTSTRAP: "redpanda:9092"
-      SCHEMA_REGISTRY_URL: "http://redpanda:8081"
 
       # Your license details. Don't share these!
       LICENSE_ID: "<LICENSE_ID>"
