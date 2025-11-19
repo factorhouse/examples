@@ -1,0 +1,132 @@
+# Kpow Quick Start with Redpanda
+# This docker-compose spins up Kpow connected to a local Redpanda cluster (Kafka-compatible)
+#
+# Get started: docker compose up -d
+# Access Kpow at: http://localhost:3000
+#
+####################################################################################################
+# DO NOT USE IN PRODUCTION
+#
+# This is a getting-started configuration. For production deployments, please see:
+# https://docs.factorhouse.io/kpow/installation/
+####################################################################################################
+
+services:
+  # Kpow Community Edition - Kafka monitoring and management UI
+  # https://docs.factorhouse.io/kpow/
+  kpow:
+    image: factorhouse/kpow-ce:latest
+    container_name: kpow
+    ports:
+      - "3000:3000"
+    networks:
+      - kpow-network
+    environment:
+      # Environment name (displayed in Kpow UI)
+      ENVIRONMENT_NAME: "Welcome to Kpow"
+
+      # You can replace the following with the boostrap URL of your own Kafka cluster and your own Schema Registry.
+      BOOTSTRAP: "redpanda:9092"
+      SCHEMA_REGISTRY_URL: "http://redpanda:8081"
+
+      # Your license details. Don't share these!
+      LICENSE_ID: "<LICENSE_ID>"
+      LICENSE_CODE: "<LICENSE_CODE>"
+      LICENSEE: "<LICENSEE>"
+      LICENSE_EXPIRY: "<LICENSE_EXPIRY>"
+      LICENSE_SIGNATURE: "<LICENSE_SIGNATURE>"
+
+      # Feature flags via Simple Access Control. See the full list of flags at https://docs.factorhouse.io/kpow/authorization/simple-access-control
+      ALLOW_TOPIC_CREATE: "true"
+      ALLOW_TOPIC_DELETE: "true"
+      ALLOW_TOPIC_EDIT: "true"
+      ALLOW_TOPIC_INSPECT: "true"
+      ALLOW_TOPIC_PRODUCE: "true"
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    mem_limit: 2g
+    restart: unless-stopped
+
+  # Redpanda
+  # For demo purposes we'll use Redpanda; a lightweight, zookeeperless, and fully Kafka
+  # API compliant alternative to Kafka https://docs.redpanda.com/
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.3.1
+    container_name: redpanda
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --mode dev-container
+      - --smp 1
+      - --memory 1G
+      - --default-log-level=info
+    ports:
+      - "18081:18081" # Schema Registry
+      - "18082:18082" # Pandaproxy (HTTP)
+      - "19092:19092" # Kafka API (external)
+      - "19644:9644" # Admin API
+    networks:
+      - kpow-network
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  redpanda-producer:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.3.1
+    container_name: producer
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    networks:
+      - kpow-network
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "Creating topic 'getting-started'..."
+        rpk topic create getting-started -X brokers=redpanda:9092
+        echo "Topic created."
+
+        id=0
+        echo "Starting to produce messages..."
+        while true; do
+          # Note the '$$id' here
+          id=$$(($$id+1))
+          
+          # This command does not use variables, so it's fine
+          random_string=$$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
+
+          # Note '$$id' and '$$random_string'
+          message=$$(printf '{"id": %d, "message": "%s"}' "$$id" "$$random_string")
+          
+          # Note '$$message'
+          echo "$$message" | rpk topic produce getting-started -X brokers=redpanda:9092
+          
+          # Note '$$message'
+          echo "Produced: $$message"
+          
+          sleep 1
+        done
+    restart: unless-stopped
+
+networks:
+  kpow-network:
+    driver: bridge
+
+volumes:
+  redpanda-data:
