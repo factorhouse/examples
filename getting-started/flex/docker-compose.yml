@@ -1,0 +1,123 @@
+# Flex Quick Start with Standalone Flink Cluster
+# This docker-compose spins up Flex connected to a local standalone Flink cluster
+#
+# Get started: docker compose up -d
+# Access Flex at: http://localhost:3000
+#
+####################################################################################################
+# DO NOT USE IN PRODUCTION
+#
+# This is a getting-started configuration. For production deployments, please see:
+# https://docs.factorhouse.io/flex/installation/
+####################################################################################################
+
+services:
+  # Flex Community Edition - Flink monitoring and management UI
+  # https://docs.factorhouse.io/flex/
+  flex:
+    image: factorhouse/flex-ce:latest
+    container_name: flex
+    ports:
+      - "3000:3000"
+    networks:
+      - flex-network
+    environment:
+      # Environment name (displayed in Flex UI)
+      FLINK_ENVIRONMENT_NAME: "Welcome to Flex"
+
+      # You can replace the following with the boostrap URL of your own Flink cluster.
+      FLINK_REST_URL: "http://jobmanager:8081"
+
+      # Your license details. Don't share these!
+      LICENSE_ID: "<LICENSE_ID>"
+      LICENSE_CODE: "<LICENSE_CODE>"
+      LICENSEE: "<LICENSEE>"
+      LICENSE_EXPIRY: "<LICENSE_EXPIRY>"
+      LICENSE_SIGNATURE: "<LICENSE_SIGNATURE>"
+
+      # Feature flags via Simple Access Control. See the full list of flags at https://docs.factorhouse.io/flex/authorization/simple-access-control
+      ALLOW_FLINK_SUBMIT: "true"
+      ALLOW_FLINK_JOB_TERMINATE: "true"
+      ALLOW_FLINK_JAR_DELETE: "true"
+      ALLOW_FLINK_JOB_EDIT: "true"
+    depends_on:
+      jobmanager:
+        condition: service_healthy
+    mem_limit: 2g
+    restart: unless-stopped
+
+  jobmanager:
+    image: flink:1.20.1
+    container_name: jobmanager
+    command: jobmanager
+    ports:
+      - "8081:8081"
+    networks:
+      - flex-network
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        state.backend: filesystem
+        state.checkpoints.dir: file:///tmp/flink-checkpoints
+        state.savepoints.dir: file:///tmp/flink-savepoints
+        heartbeat.interval: 1000
+        heartbeat.timeout: 5000
+        rest.flamegraph.enabled: true
+        web.backpressure.refresh-interval: 10000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/config"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  taskmanager:
+    image: flink:1.20.1
+    container_name: taskmanager
+    command: taskmanager
+    networks:
+      - flex-network
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 10
+        state.backend: filesystem
+        state.checkpoints.dir: file:///tmp/flink-checkpoints
+        state.savepoints.dir: file:///tmp/flink-savepoints
+        heartbeat.interval: 1000
+        heartbeat.timeout: 5000
+    depends_on:
+      jobmanager:
+        condition: service_healthy
+  flink-deploy:
+    image: flink:1.20.1
+    container_name: flink-deploy
+    networks:
+      - flex-network
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        JAR_URL="https://github.com/factorhouse/examples/raw/main/getting-started/flex/fh-dev-seller-statistics-1.0.jar"
+        JAR_PATH="/opt/flink/app.jar"
+
+        echo "Waiting a few seconds for JobManager to be fully ready..."
+        sleep 5
+
+        echo "Downloading Flink job JAR from $${JAR_URL}..."
+        wget -q -O "$${JAR_PATH}" "$${JAR_URL}"
+
+        echo "Submitting Flink job to cluster..."
+        # We can use "flink" directly because the default entrypoint sets up the PATH
+        flink run -m jobmanager:8081 "$${JAR_PATH}"
+
+        echo "Job submitted successfully."
+    depends_on:
+      jobmanager:
+        condition: service_healthy
+
+networks:
+  flex-network:
+    driver: bridge
