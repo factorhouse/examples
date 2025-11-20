@@ -25,7 +25,7 @@ services:
       # Environment name (displayed in Kpow UI)
       ENVIRONMENT_NAME: "Welcome to Kpow"
 
-      # You can replace the following with the boostrap URL of your own Kafka cluster and your own Schema Registry.
+      # You can replace the following with the boostrap URL of your own Kafka cluster.
       BOOTSTRAP: "redpanda:9092"
 
       # Your license details. Don't share these!
