@@ -1,5 +1,5 @@
-# Kpow Quick Start with Redpanda
-# This docker-compose spins up Kpow connected to a local Redpanda cluster (Kafka-compatible)
+# Kpow Quick Start with OSS Kafka
+# This docker-compose spins up Kpow connected to a local Kafka cluster
 #
 # Get started: docker compose up -d
 # Access Kpow at: http://localhost:3000
