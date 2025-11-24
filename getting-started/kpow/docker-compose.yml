@@ -82,7 +82,7 @@ services:
 
   # Kafka Producer
   producer:
-    image: apache/kafka:latest
+    image: apache/kafka:4.1.1
     container_name: producer
     depends_on:
       broker:
