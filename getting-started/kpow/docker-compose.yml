@@ -26,7 +26,7 @@ services:
       ENVIRONMENT_NAME: "Welcome to Kpow"
 
       # You can replace the following with the boostrap URL of your own Kafka cluster.
-      BOOTSTRAP: "redpanda:9092"
+      BOOTSTRAP: "broker:29092"
 
       # Your license details. Don't share these!
       LICENSE_ID: "<LICENSE_ID>"
@@ -42,54 +42,50 @@ services:
       ALLOW_TOPIC_INSPECT: "true"
       ALLOW_TOPIC_PRODUCE: "true"
     depends_on:
-      redpanda:
+      broker:
         condition: service_healthy
     mem_limit: 2g
     restart: unless-stopped
 
-  # Redpanda
-  # For demo purposes we'll use Redpanda; a lightweight, zookeeperless, and fully Kafka
-  # API compliant alternative to Kafka https://docs.redpanda.com/
-  redpanda:
-    image: docker.redpanda.com/redpandadata/redpanda:v24.3.1
-    container_name: redpanda
-    command:
-      - redpanda
-      - start
-      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
-      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
-      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
-      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
-      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
-      - --rpc-addr redpanda:33145
-      - --advertise-rpc-addr redpanda:33145
-      - --mode dev-container
-      - --smp 1
-      - --memory 1G
-      - --default-log-level=info
+  # Apache Kafka in KRaft Mode
+  broker:
+    image: apache/kafka:4.1.1
+    container_name: broker
     ports:
-      - "18081:18081" # Schema Registry
-      - "18082:18082" # Pandaproxy (HTTP)
-      - "19092:19092" # Kafka API (external)
-      - "19644:9644" # Admin API
+      - "9092:9092"
     networks:
       - kpow-network
-    volumes:
-      - redpanda-data:/var/lib/redpanda/data
+    environment:
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@broker:9093"
+      KAFKA_LISTENERS: "PLAINTEXT://broker:29092,CONTROLLER://broker:9093,PLAINTEXT_HOST://0.0.0.0:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     healthcheck:
       test:
-        ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
+        [
+          "CMD-SHELL",
+          "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list",
+        ]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 10s
+      retries: 5
+      start_period: 15s
     restart: unless-stopped
 
-  redpanda-producer:
-    image: docker.redpanda.com/redpandadata/redpanda:v24.3.1
+  # Kafka Producer
+  producer:
+    image: apache/kafka:4.1.1
     container_name: producer
     depends_on:
-      redpanda:
+      broker:
         condition: service_healthy
     networks:
       - kpow-network
@@ -97,8 +93,11 @@ services:
     command:
       - |
         set -e
+        # Wait a few seconds for the broker to be fully ready after healthcheck
+        sleep 5
+
         echo "Creating topic 'getting-started'..."
-        rpk topic create getting-started -X brokers=redpanda:9092
+        /opt/kafka/bin/kafka-topics.sh --create --topic getting-started --bootstrap-server broker:29092 --partitions 1 --replication-factor 1
         echo "Topic created."
 
         id=0
@@ -110,17 +109,13 @@ services:
 
           message=$$(printf '{"id": %d, "message": "%s"}' "$$id" "$$random_string")
           
-          echo "$$message" | rpk topic produce getting-started -X brokers=redpanda:9092
+          echo "$$message" | /opt/kafka/bin/kafka-console-producer.sh --topic getting-started --bootstrap-server broker:29092
           
           echo "Produced: $$message"
           
           sleep 1
         done
-    restart: unless-stopped
 
 networks:
   kpow-network:
     driver: bridge
-
-volumes:
-  redpanda-data:
