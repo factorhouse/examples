@@ -1,4 +1,4 @@
-![factorhouse](./images/factorhouse.jfif)
+<img width="1128" height="191" alt="LinkedIn Business (1)" src="https://github.com/user-attachments/assets/83e73899-ef5a-4123-8ed6-b0ab2c7382a2" />
 
 ## Product Features
 
