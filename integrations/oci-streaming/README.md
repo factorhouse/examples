@@ -29,4 +29,4 @@ docker run -d -p 3000:3000 --name kpow \
 
 ## Complete OCI Streaming for Apache Kafka Example
 
-See [docker-compose.yml](./docker-compose.yml)
+See this blog post - [Integrate Kpow with Oracle Compute Infrastructure (OCI) Streaming with Apache Kafka](https://factorhouse.io/how-to/integrate-kpow-with-oci-streaming)

@@ -75,6 +75,13 @@
 
 </details>
 
+<details>
+  <summary><a href="https://factorhouse.io/how-to/integrate-kpow-with-oci-streaming">Integrate Kpow with Oracle Compute Infrastructure (OCI) Streaming with Apache Kafka</a></summary>
+
+- Unlock the full potential of your dedicated OCI Streaming with Apache Kafka cluster. This guide shows you how to integrate Kpow with your OCI brokers and self-hosted Kafka Connect and Schema Registry, unifying them into a single, developer-ready toolkit for complete visibility and control over your entire Kafka ecosystem.
+
+</details>
+
 ## Projects
 
 <details>
