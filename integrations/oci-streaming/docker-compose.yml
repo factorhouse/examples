@@ -1,0 +1,96 @@
+services:
+  kpow:
+    image: factorhouse/kpow-ce:latest
+    container_name: kpow
+    pull_policy: always
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - factorhouse
+    depends_on:
+      connect:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT_NAME: "OCI Kafka Cluster"
+      BOOTSTRAP: "<BOOTSTRAP_SERVER_ADDRESS>"
+      SECURITY_PROTOCOL: "SASL_SSL"
+      SASL_MECHANISM: "SCRAM-SHA-512"
+      SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="<VAULT_USERNAME>" password="<VAULT_PASSWORD>";'
+      CONNECT_NAME: "Local Connect Cluster"
+      CONNECT_REST_URL: "http://connect:8083"
+      SCHEMA_REGISTRY_NAME: "Local Schema Registry"
+      SCHEMA_REGISTRY_URL: "http://schema:8081"
+      SCHEMA_REGISTRY_AUTH: "USER_INFO"
+      SCHEMA_REGISTRY_USER: "admin"
+      SCHEMA_REGISTRY_PASSWORD: "admin"
+    env_file:
+      - license.env
+
+  schema:
+    image: confluentinc/cp-schema-registry:7.8.0
+    container_name: schema_registry
+    ports:
+      - "8081:8081"
+    networks:
+      - factorhouse
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: "schema"
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "<BOOTSTRAP_SERVER_ADDRESS>"
+      ## Authentication
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: "SASL_SSL"
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: "SCRAM-SHA-512"
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="<VAULT_USERNAME>" password="<VAULT_PASSWORD>";'
+      SCHEMA_REGISTRY_AUTHENTICATION_METHOD: BASIC
+      SCHEMA_REGISTRY_AUTHENTICATION_REALM: schema
+      SCHEMA_REGISTRY_AUTHENTICATION_ROLES: schema-admin
+      SCHEMA_REGISTRY_OPTS: -Djava.security.auth.login.config=/etc/schema/schema_jaas.conf
+    volumes:
+      - ./deps/schema:/etc/schema
+
+  connect:
+    image: confluentinc/cp-kafka-connect:7.8.0
+    container_name: connect
+    restart: unless-stopped
+    ports:
+      - 8083:8083
+    networks:
+      - factorhouse
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: "<BOOTSTRAP_SERVER_ADDRESS>"
+      CONNECT_REST_PORT: "8083"
+      CONNECT_GROUP_ID: "oci-demo-connect"
+      CONNECT_CONFIG_STORAGE_TOPIC: "oci-demo-connect-config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "oci-demo-connect-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "oci-demo-connect-status"
+      ## Authentication
+      # Add these lines to configure SASL authentication for OCI
+      CONNECT_SECURITY_PROTOCOL: "SASL_SSL"
+      CONNECT_SASL_MECHANISM: "SCRAM-SHA-512"
+      CONNECT_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="<VAULT_USERNAME>" password="<VAULT_PASSWORD>";'
+      # Propagate auth settings to internal clients
+      CONNECT_PRODUCER_SECURITY_PROTOCOL: "SASL_SSL"
+      CONNECT_PRODUCER_SASL_MECHANISM: "SCRAM-SHA-512"
+      CONNECT_PRODUCER_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="<VAULT_USERNAME>" password="<VAULT_PASSWORD>";'
+      CONNECT_CONSUMER_SECURITY_PROTOCOL: "SASL_SSL"
+      CONNECT_CONSUMER_SASL_MECHANISM: "SCRAM-SHA-512"
+      CONNECT_CONSUMER_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="<VAULT_USERNAME>" password="<VAULT_PASSWORD>";'
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_PLUGIN_PATH: /usr/share/java/,/etc/kafka-connect/jars
+    volumes:
+      - ./deps/connector:/etc/kafka-connect/jars
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8083/ || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+
+networks:
+  factorhouse:
+    name: factorhouse
