@@ -68,4 +68,4 @@ if __name__ == "__main__":
             on_delivery=callback,
         )
         producer.flush()
-        time.sleep(1)
+        time.sleep(0.2)
