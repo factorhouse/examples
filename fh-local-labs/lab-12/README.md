@@ -30,7 +30,7 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 # export KPOW_LICENSE=<path-to-license-file>
 
 docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
-  && docker compose -p pinot -f ./factorhouse-local/compose-pinot.yml up -d
+  && docker compose -p store --profile pinot -f ./factorhouse-local/compose-store.yml up -d
 ```
 
 ### Deploy source connector
@@ -121,7 +121,7 @@ Finally, stop and remove the Docker containers.
 
 ```bash
 # Stops the containers and unsets environment variables
-docker compose -p pinot -f ./factorhouse-local/compose-pinot.yml down \
+docker compose -p store --profile pinot -f ./factorhouse-local/compose-store.yml down \
   && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
 
 unset KPOW_SUFFIX KPOW_LICENSE

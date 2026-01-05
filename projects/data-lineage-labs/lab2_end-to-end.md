@@ -54,7 +54,7 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 
 # Start Kafka and Flink environments
 docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
-  && docker compose -p obsv -f ./factorhouse-local/compose-obsv.yml up -d \
+  && docker compose -p obsv --profile lineage -f ./factorhouse-local/compose-obsv.yml up -d \
   && docker compose -p stripped -f ./projects/data-lineage-labs/compose-stripped.yml up -d
 ```
 
@@ -430,7 +430,7 @@ docker compose -p flex -f ./projects/data-lineage-labs/compose-flex.yml down \
   && docker compose -p flink-2 -f ./projects/data-lineage-labs/compose-flink-2.yml down \
   && docker compose -p flink-1 -f ./projects/data-lineage-labs/compose-flink-1.yml down \
   && docker compose -p stripped -f ./projects/data-lineage-labs/compose-stripped.yml down \
-  && docker compose -p obsv -f ./factorhouse-local/compose-obsv.yml down \
+  && docker compose -p obsv --profile lineage -f ./factorhouse-local/compose-obsv.yml down \
   && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
 
 # Clear environment variables

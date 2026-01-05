@@ -40,7 +40,7 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 # Start Kafka and Flink environments
 docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
   && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d \
-  && docker compose -p obsv -f ./factorhouse-local/compose-obsv.yml up -d
+  && docker compose -p obsv --profile lineage -f ./factorhouse-local/compose-obsv.yml up -d
 ```
 
 ## OpenLineage Kafka Connect SMT
@@ -355,7 +355,7 @@ Shut down all containers and unset any environment variables:
 
 ```bash
 # Stop Factor House Local containers
-docker compose -p obsv -f ./factorhouse-local/compose-obsv.yml down \
+docker compose -p obsv --profile lineage -f ./factorhouse-local/compose-obsv.yml down \
   && docker compose -p flex -f ./factorhouse-local/compose-flex.yml down \
   && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
 
