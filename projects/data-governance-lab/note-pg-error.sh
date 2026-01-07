@@ -1,6 +1,6 @@
-docker clone https://github.com/factorhouse/examples.git
+docker clone -b feature/data-governance https://github.com/factorhouse/examples.git
 cd examples
-docker clone -b feature/data-governance https://github.com/factorhouse/factorhouse-local.git
+docker clone https://github.com/factorhouse/factorhouse-local.git
 ## check sources
 # $ pwd
 # /home/jaehyeon/factorhouse/examples
