@@ -1,0 +1,43 @@
+{
+  "name": "thelook-ecomm",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+
+    "key.converter": "io.confluent.connect.avro.AvroConverter",
+    "key.converter.schemas.enable": true,
+    "key.converter.schema.registry.url": "http://schema:8081",
+    "key.converter.basic.auth.credentials.source": "USER_INFO",
+    "key.converter.basic.auth.user.info": "admin:admin",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schemas.enable": true,
+    "value.converter.schema.registry.url": "http://schema:8081",
+    "value.converter.basic.auth.credentials.source": "USER_INFO",
+    "value.converter.basic.auth.user.info": "admin:admin",
+
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "db_user",
+    "database.password": "db_password",
+    "database.dbname": "fh_dev",
+
+    "topic.prefix": "ecomm",
+    "schema.include.list": "demo",
+    "table.exclude.list": "demo.heartbeat",
+    "plugin.name": "pgoutput",
+    "publication.name": "cdc_pub",
+    "snapshot.mode": "initial",
+
+    "heartbeat.interval.ms": "10000",
+    "heartbeat.action.query": "INSERT INTO demo.heartbeat (id, ts) VALUES (1, NOW()) ON CONFLICT (id) DO UPDATE SET ts = NOW();",
+
+    "compression.type": "lz4",
+    "max.queue.size": "16384",
+    "max.batch.size": "4096",
+
+    "topic.creation.enable": "true",
+    "topic.creation.default.cleanup.policy": "compact,delete",
+    "topic.creation.default.partitions": "3",
+    "topic.creation.default.replication.factor": "1"
+  }
+}

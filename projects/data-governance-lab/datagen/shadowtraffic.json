@@ -1,0 +1,125 @@
+{
+  "generators": [
+    {
+      "name": "users",
+      "table": "users",
+      "vars": {
+        "ts": { "_gen": "now", "serialize": { "type": "postgresTimestamp" } }
+      },
+      "fork": {
+        "key": { "_gen": "uuid" }
+      },
+      "row": {
+        "user_id": { "_gen": "var", "var": "forkKey" }
+      },
+      "stateMachine": {
+        "_gen": "stateMachine",
+        "initial": "insertIt",
+        "transitions": {
+          "insertIt": "updateIt"
+        },
+        "states": {
+          "insertIt": {
+            "row": {
+              "first_name": { "_gen": "string", "expr": "#{Name.firstName}" },
+              "last_name": { "_gen": "string", "expr": "#{Name.lastName}" },
+              "email": { "_gen": "string", "expr": "#{Internet.emailAddress}" },
+              "country": {
+                "_gen": "oneOf",
+                "choices": [
+                  "Australia",
+                  "USA",
+                  "Germany",
+                  "Mexico",
+                  "UK",
+                  "Sweden",
+                  "France",
+                  "Spain",
+                  "Canada",
+                  "Argentina",
+                  "Switzerland",
+                  "Brazil",
+                  "Austria",
+                  "Italy",
+                  "Portugal",
+                  "Venezuela",
+                  "Ireland",
+                  "Belgium",
+                  "Norway",
+                  "Denmark",
+                  "Finland",
+                  "Poland"
+                ]
+              },
+              "postal_code": { "_gen": "string", "expr": "#{Address.zipCode}" },
+              "created_at": { "_gen": "var", "var": "ts" },
+              "updated_at": { "_gen": "var", "var": "ts" }
+            }
+          },
+          "updateIt": {
+            "op": "update",
+            "where": {
+              "user_id": { "_gen": "var", "var": "forkKey" }
+            },
+            "row": {
+              "postal_code": { "_gen": "string", "expr": "#{Address.zipCode}" },
+              "updated_at": { "_gen": "var", "var": "ts" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "orders",
+      "table": "orders",
+      "vars": {
+        "ts": { "_gen": "now", "serialize": { "type": "postgresTimestamp" } }
+      },
+      "row": {
+        "order_id": { "_gen": "uuid" },
+        "user_id": {
+          "_gen": "lookup",
+          "table": "users",
+          "path": ["row", "user_id"]
+        },
+        "product_name": {
+          "_gen": "string",
+          "expr": "#{Commerce.productName}"
+        },
+        "category": {
+          "_gen": "string",
+          "expr": "#{Commerce.department}"
+        },
+        "quantity": {
+          "_gen": "uniformDistribution",
+          "bounds": [1, 10],
+          "decimals": 0
+        },
+        "unit_price": {
+          "_gen": "uniformDistribution",
+          "bounds": [10, 500],
+          "decimals": 2
+        },
+        "created_at": { "_gen": "var", "var": "ts" },
+        "updated_at": { "_gen": "var", "var": "ts" }
+      }
+    }
+  ],
+  "connections": {
+    "pg-db": {
+      "kind": "postgres",
+      "connectionConfigs": {
+        "host": "postgres",
+        "port": 5432,
+        "username": "db_user",
+        "password": "db_password",
+        "db": "fh_dev"
+      },
+      "tablePolicy": "manual",
+      "batchConfigs": {
+        "lingerMs": 500,
+        "batchRows": 5000
+      }
+    }
+  }
+}
