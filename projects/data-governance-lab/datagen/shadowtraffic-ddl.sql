@@ -1,7 +1,6 @@
 DROP TABLE IF EXISTS demo.heartbeat;
 DROP TABLE IF EXISTS demo.users;
 DROP TABLE IF EXISTS demo.orders;
-DROP TABLE IF EXISTS demo.order_items;
 
 CREATE TABLE IF NOT EXISTS demo.heartbeat (
 		id integer PRIMARY KEY,
@@ -30,16 +29,4 @@ CREATE TABLE demo.orders (
 	created_at timestamp NOT NULL,
 	updated_at timestamp NOT NULL,
 	CONSTRAINT orders_pkey PRIMARY KEY (order_id)
-);
-
-CREATE TABLE demo.order_items (
-	item_id uuid NOT NULL,
-	order_id uuid NOT NULL,
-	product_name text NOT NULL,
-	category text NOT NULL,
-	quantity integer NOT NULL,
-	unit_price decimal(5,2) NOT NULL,
-	created_at timestamp NOT NULL,
-	updated_at timestamp NOT NULL,
-	CONSTRAINT order_items_pkey PRIMARY KEY (item_id)
 );

@@ -7,7 +7,10 @@
         "ts": { "_gen": "now", "serialize": { "type": "postgresTimestamp" } }
       },
       "fork": {
-        "key": { "_gen": "uuid" }
+        "key": { "_gen": "uuid" },
+        "stagger": {
+          "ms": 1000
+        }
       },
       "row": {
         "user_id": { "_gen": "var", "var": "forkKey" }
@@ -24,33 +27,7 @@
               "first_name": { "_gen": "string", "expr": "#{Name.firstName}" },
               "last_name": { "_gen": "string", "expr": "#{Name.lastName}" },
               "email": { "_gen": "string", "expr": "#{Internet.emailAddress}" },
-              "country": {
-                "_gen": "oneOf",
-                "choices": [
-                  "Australia",
-                  "USA",
-                  "Germany",
-                  "Mexico",
-                  "UK",
-                  "Sweden",
-                  "France",
-                  "Spain",
-                  "Canada",
-                  "Argentina",
-                  "Switzerland",
-                  "Brazil",
-                  "Austria",
-                  "Italy",
-                  "Portugal",
-                  "Venezuela",
-                  "Ireland",
-                  "Belgium",
-                  "Norway",
-                  "Denmark",
-                  "Finland",
-                  "Poland"
-                ]
-              },
+              "country": { "_gen": "string", "expr": "#{Address.country}" },
               "postal_code": { "_gen": "string", "expr": "#{Address.zipCode}" },
               "created_at": { "_gen": "var", "var": "ts" },
               "updated_at": { "_gen": "var", "var": "ts" }
@@ -62,6 +39,7 @@
               "user_id": { "_gen": "var", "var": "forkKey" }
             },
             "row": {
+              "country": { "_gen": "string", "expr": "#{Address.country}" },
               "postal_code": { "_gen": "string", "expr": "#{Address.zipCode}" },
               "updated_at": { "_gen": "var", "var": "ts" }
             }
@@ -102,6 +80,12 @@
         },
         "created_at": { "_gen": "var", "var": "ts" },
         "updated_at": { "_gen": "var", "var": "ts" }
+      },
+      "localConfigs": {
+        "throttleMs": {
+          "_gen": "constant",
+          "x": 200
+        }
       }
     }
   ],
