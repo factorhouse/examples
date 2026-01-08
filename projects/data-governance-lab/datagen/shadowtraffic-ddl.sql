@@ -15,7 +15,6 @@ CREATE TABLE demo.users (
 	country text NOT NULL,
 	postal_code text NOT NULL,
 	created_at timestamp NOT NULL,
-	updated_at timestamp NOT NULL,
 	CONSTRAINT users_pkey PRIMARY KEY (user_id)
 );
 
@@ -27,6 +26,5 @@ CREATE TABLE demo.orders (
 	quantity integer NOT NULL,
 	unit_price decimal(5,2) NOT NULL,
 	created_at timestamp NOT NULL,
-	updated_at timestamp NOT NULL,
 	CONSTRAINT orders_pkey PRIMARY KEY (order_id)
 );

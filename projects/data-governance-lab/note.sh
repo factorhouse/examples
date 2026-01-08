@@ -11,11 +11,16 @@ docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d \
   && docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d \
   && docker compose -p metadata --profile omt -f ./factorhouse-local/compose-metadata.yml up -d
 
+USE_EXT=false docker compose -p flex -f ./factorhouse-local/compose-flex.yml up -d postgres
+
 docker exec postgres rm -rf /tmp/ddl.sql \
   && docker cp ./projects/data-governance-lab/datagen/shadowtraffic-ddl.sql postgres:/tmp/ddl.sql \
   && docker exec postgres bash -c "PGPASSWORD=db_password psql -U db_user -d fh_dev -f /tmp/ddl.sql"
 
 docker compose -p st -f ./projects/data-governance-lab/datagen/compose-st.yml up -d
+
+docker compose -p st -f ./projects/data-governance-lab/datagen/compose-st.yml down \
+  && USE_EXT=false docker compose -p flex -f ./factorhouse-local/compose-flex.yml down
 
 # docker run --name shadowtraffic -d \
 #   --env-file $ST_LICENSE \

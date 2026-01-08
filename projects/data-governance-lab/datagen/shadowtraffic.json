@@ -3,56 +3,25 @@
     {
       "name": "users",
       "table": "users",
-      "vars": {
-        "ts": { "_gen": "now", "serialize": { "type": "postgresTimestamp" } }
-      },
-      "fork": {
-        "key": { "_gen": "uuid" },
-        "stagger": {
-          "ms": 1000
-        }
-      },
       "row": {
-        "user_id": { "_gen": "var", "var": "forkKey" }
-      },
-      "stateMachine": {
-        "_gen": "stateMachine",
-        "initial": "insertIt",
-        "transitions": {
-          "insertIt": "updateIt"
-        },
-        "states": {
-          "insertIt": {
-            "row": {
-              "first_name": { "_gen": "string", "expr": "#{Name.firstName}" },
-              "last_name": { "_gen": "string", "expr": "#{Name.lastName}" },
-              "email": { "_gen": "string", "expr": "#{Internet.emailAddress}" },
-              "country": { "_gen": "string", "expr": "#{Address.country}" },
-              "postal_code": { "_gen": "string", "expr": "#{Address.zipCode}" },
-              "created_at": { "_gen": "var", "var": "ts" },
-              "updated_at": { "_gen": "var", "var": "ts" }
-            }
-          },
-          "updateIt": {
-            "op": "update",
-            "where": {
-              "user_id": { "_gen": "var", "var": "forkKey" }
-            },
-            "row": {
-              "country": { "_gen": "string", "expr": "#{Address.country}" },
-              "postal_code": { "_gen": "string", "expr": "#{Address.zipCode}" },
-              "updated_at": { "_gen": "var", "var": "ts" }
-            }
-          }
+        "user_id": { "_gen": "uuid" },
+        "first_name": { "_gen": "string", "expr": "#{Name.firstName}" },
+        "last_name": { "_gen": "string", "expr": "#{Name.lastName}" },
+        "email": { "_gen": "string", "expr": "#{Internet.emailAddress}" },
+        "country": { "_gen": "string", "expr": "#{Address.country}" },
+        "postal_code": { "_gen": "string", "expr": "#{Address.zipCode}" },
+        "created_at": {
+          "_gen": "now",
+          "serialize": { "type": "postgresTimestamp" }
         }
+      },
+      "localConfigs": {
+        "throttleMs": 1000
       }
     },
     {
       "name": "orders",
       "table": "orders",
-      "vars": {
-        "ts": { "_gen": "now", "serialize": { "type": "postgresTimestamp" } }
-      },
       "row": {
         "order_id": { "_gen": "uuid" },
         "user_id": {
@@ -78,14 +47,13 @@
           "bounds": [10, 500],
           "decimals": 2
         },
-        "created_at": { "_gen": "var", "var": "ts" },
-        "updated_at": { "_gen": "var", "var": "ts" }
+        "created_at": {
+          "_gen": "now",
+          "serialize": { "type": "postgresTimestamp" }
+        }
       },
       "localConfigs": {
-        "throttleMs": {
-          "_gen": "constant",
-          "x": 200
-        }
+        "throttleMs": 200
       }
     }
   ],
