@@ -65,12 +65,13 @@
       "row": {
         "order_id": {
           "_gen": "uuid",
-          "pgHint": "UUID"
+          "pgHint": "UUID PRIMARY KEY"
         },
         "user_id": {
           "_gen": "lookup",
           "table": "users",
-          "path": ["row", "user_id"]
+          "path": ["row", "user_id"],
+          "pgHint": "UUID"
         },
         "created_at": {
           "_gen": "now",

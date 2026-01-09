@@ -1,5 +1,5 @@
 {
-  "name": "thelook-ecomm",
+  "name": "ecomm-orders",
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
     "tasks.max": "1",
