@@ -1,0 +1,77 @@
+{
+  "generators": [
+    {
+      "name": "users",
+      "table": "users",
+      "row": {
+        "user_id": { "_gen": "uuid" },
+        "first_name": { "_gen": "string", "expr": "#{Name.firstName}" },
+        "last_name": { "_gen": "string", "expr": "#{Name.lastName}" },
+        "email": { "_gen": "string", "expr": "#{Internet.emailAddress}" },
+        "country": { "_gen": "string", "expr": "#{Address.country}" },
+        "postal_code": { "_gen": "string", "expr": "#{Address.zipCode}" },
+        "created_at": {
+          "_gen": "now",
+          "serialize": { "type": "postgresTimestamp" }
+        }
+      },
+      "localConfigs": {
+        "throttleMs": 1000
+      }
+    },
+    {
+      "name": "orders",
+      "table": "orders",
+      "row": {
+        "order_id": { "_gen": "uuid" },
+        "user_id": {
+          "_gen": "lookup",
+          "table": "users",
+          "path": ["row", "user_id"]
+        },
+        "product_name": {
+          "_gen": "string",
+          "expr": "#{Commerce.productName}"
+        },
+        "category": {
+          "_gen": "string",
+          "expr": "#{Commerce.department}"
+        },
+        "quantity": {
+          "_gen": "uniformDistribution",
+          "bounds": [1, 10],
+          "decimals": 0
+        },
+        "unit_price": {
+          "_gen": "uniformDistribution",
+          "bounds": [10, 500],
+          "decimals": 2
+        },
+        "created_at": {
+          "_gen": "now",
+          "serialize": { "type": "postgresTimestamp" }
+        }
+      },
+      "localConfigs": {
+        "throttleMs": 200
+      }
+    }
+  ],
+  "connections": {
+    "pg-db": {
+      "kind": "postgres",
+      "connectionConfigs": {
+        "host": "postgres",
+        "port": 5432,
+        "username": "db_user",
+        "password": "db_password",
+        "db": "fh_dev"
+      },
+      "tablePolicy": "manual",
+      "batchConfigs": {
+        "lingerMs": 500,
+        "batchRows": 5000
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- Pattern: Time [Thread] Level Logger - Message -->
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!-- Reduce noise from Flink internals -->
+        <Logger name="org.apache.flink" level="WARN"/>
+        <Logger name="org.apache.flink.runtime.minicluster" level="INFO"/>
+
+        <!-- Reduce noise from Kafka clients -->
+        <Logger name="org.apache.kafka" level="WARN"/>
+        <Logger name="org.apache.kafka.clients.consumer" level="WARN"/>
+
+        <!-- Reduce noise from Zookeeper/Curator (if used) -->
+        <Logger name="org.apache.zookeeper" level="WARN"/>
+
+        <!-- YOUR APPLICATION LOGS -->
+        <!-- Change this to DEBUG if you want to see detailed logs from your code -->
+        <Logger name="io.factorhouse.demo" level="INFO"/>
+
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,16 @@
+services:
+  shadowtraffic:
+    image: shadowtraffic/shadowtraffic:1.13.2
+    container_name: shadowtraffic
+    command: ["--config", "/home/config.json"]
+    networks:
+      - factorhouse
+    env_file:
+      - $ST_LICENSE
+    volumes:
+      - ./shadowtraffic.json:/home/config.json
+
+networks:
+  factorhouse:
+    external: ${USE_EXT:-true}
+    name: factorhouse
