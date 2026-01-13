@@ -38,6 +38,8 @@
     "topic.creation.enable": "true",
     "topic.creation.default.cleanup.policy": "compact,delete",
     "topic.creation.default.partitions": "3",
-    "topic.creation.default.replication.factor": "1"
+    "topic.creation.default.replication.factor": "1",
+
+    "decimal.handling.mode": "double"
   }
 }
