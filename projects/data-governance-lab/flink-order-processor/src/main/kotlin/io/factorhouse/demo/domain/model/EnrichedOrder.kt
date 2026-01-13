@@ -1,4 +1,4 @@
-package io.factorhouse.demo.model
+package io.factorhouse.demo.domain.model
 
 import java.time.Instant
 
