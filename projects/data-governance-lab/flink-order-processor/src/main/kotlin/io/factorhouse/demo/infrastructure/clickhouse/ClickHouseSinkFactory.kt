@@ -15,9 +15,9 @@ object ClickHouseSinkFactory {
         val clientConfig =
             ClickHouseClientConfig(
                 config.chEndpoint,
-                config.chDatabase,
+                config.chUser,
                 "",
-                "default",
+                config.chDatabase,
                 config.chTable,
             )
 

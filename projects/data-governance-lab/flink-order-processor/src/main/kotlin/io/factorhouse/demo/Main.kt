@@ -18,20 +18,20 @@ fun main() {
     logger.info("Starting OrderEnrichment Application...")
 
     try {
-        // 1. Infrastructure Pre-flight Checks
+        // Infrastructure Checks
         ClickHouseUtils.ensureTableExists(config)
         IcebergUtils.ensureTableExists(config)
         KafkaUtils.ensureTopicExists(config)
 
-        // 2. Setup Flink Environment
+        // Setup Environment
         val env = StreamExecutionEnvironment.getExecutionEnvironment()
         configureEnvironment(env, config)
 
-        // 3. Build Topology
+        // Build Topology
         OrderEnrichmentJob(config).createTopology(env)
 
-        // 4. Execute
-        env.execute("OrderProcessor")
+        logger.info("Executing Flink Job: ${config.jobName}")
+        env.execute(config.jobName)
     } catch (e: Exception) {
         logger.error("Critical error in Flink job execution", e)
         exitProcess(1)

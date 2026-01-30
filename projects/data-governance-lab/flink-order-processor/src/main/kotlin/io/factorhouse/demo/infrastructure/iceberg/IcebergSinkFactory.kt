@@ -14,7 +14,7 @@ object IcebergSinkFactory {
         config: AppConfig,
     ) {
         val loader = IcebergUtils.createCatalogLoader(config)
-        val tableId = TableIdentifier.of("default", config.icebergTableName)
+        val tableId = TableIdentifier.of(config.icebergDatabase, config.icebergTableName)
 
         FlinkSink
             .forRowData(stream)

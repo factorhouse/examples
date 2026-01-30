@@ -4,12 +4,16 @@ import io.factorhouse.demo.config.AppConfig
 import org.apache.hadoop.conf.Configuration
 import org.apache.iceberg.PartitionSpec
 import org.apache.iceberg.Schema
+import org.apache.iceberg.catalog.Namespace
 import org.apache.iceberg.catalog.TableIdentifier
 import org.apache.iceberg.flink.CatalogLoader
 import org.apache.iceberg.hive.HiveCatalog
 import org.apache.iceberg.types.Types
+import org.slf4j.LoggerFactory
 
 object IcebergUtils {
+    private val logger = LoggerFactory.getLogger(IcebergUtils::class.java)
+
     val SCHEMA =
         Schema(
             Types.NestedField.required(1, "order_id", Types.StringType.get()),
@@ -57,8 +61,13 @@ object IcebergUtils {
         catalog.conf = createHadoopConfig(config)
         catalog.initialize(config.icebergCatalogName, props)
 
-        val tableId = TableIdentifier.of("default", config.icebergTableName)
+        val namespace = Namespace.of(config.icebergDatabase)
+        if (!catalog.namespaceExists(namespace)) {
+            catalog.createNamespace(namespace)
+            logger.info("Created Iceberg Namespace (Database): ${config.icebergDatabase}")
+        }
 
+        val tableId = TableIdentifier.of(config.icebergDatabase, config.icebergTableName)
         if (!catalog.tableExists(tableId)) {
             val partitionSpec = PartitionSpec.builderFor(SCHEMA).day("created_at").build()
             catalog.createTable(
