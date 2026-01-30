@@ -20,6 +20,8 @@
         <Logger name="org.apache.zookeeper" level="WARN"/>
 
         <!-- YOUR APPLICATION LOGS -->
+        <Logger name="io.openlineage" level="DEBUG"/>
+
         <!-- Change this to DEBUG if you want to see detailed logs from your code -->
         <Logger name="io.factorhouse.demo" level="INFO"/>
 

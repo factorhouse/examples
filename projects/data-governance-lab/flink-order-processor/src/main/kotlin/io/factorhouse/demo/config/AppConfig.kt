@@ -15,6 +15,7 @@ data class AppConfig(
     val orderTopic: String = "ecomm.demo.orders",
     val missingOrderTopic: String = "missing-orders",
     // Flink / State
+    val jobName: String = "OrderProcessor",
     val checkpointInterval: Long = 10_000,
     val checkPointTimeout: Long = 6_000,
     val minPauseBetweenCheckpoints: Long = 500,
@@ -25,9 +26,11 @@ data class AppConfig(
     val hmsEndpoint: String = System.getenv("HMS_ENDPOINT") ?: "thrift://hive-metastore:9083",
     val icebergCatalogName: String = "demo_ib",
     val icebergWarehouse: String = "s3a://warehouse/",
+    val icebergDatabase: String = "dev",
     val icebergTableName: String = "orders_enriched",
     // ClickHouse
     val chEndpoint: String = System.getenv("CH_ENDPOINT") ?: "http://ch-server:8123",
-    val chDatabase: String = "default",
+    val chDatabase: String = "dev",
     val chTable: String = "orders_enriched",
+    val chUser: String = "default",
 ) : Serializable

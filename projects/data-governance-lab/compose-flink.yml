@@ -1,0 +1,94 @@
+x-common-flink-config: &flink_image_pull_policy_config
+  image: fh-flink-1.20.1
+  build:
+    context: ../../factorhouse-local/resources/flink/
+    dockerfile: Dockerfile
+  pull_policy: never
+
+x-common-environment: &flink_common_env_vars
+  AWS_REGION: us-east-1
+  HADOOP_CONF_DIR: /opt/flink/conf
+  HIVE_CONF_DIR: /opt/flink/conf
+  CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
+  ## Application Environment Variables
+  BOOTSTRAP: kafka-1:19092
+  REGISTRY_URL: http://schema:8081
+  S3_ENDPOINT: http://minio:9000
+  HMS_ENDPOINT: thrift://hive-metastore:9083
+  CH_ENDPOINT: http://ch-server:8123
+  OPENLINEAGE_CONFIG: /opt/flink/.openlineage/openlineage.yml
+
+x-common-flink-volumes: &flink_common_volumes
+  - ../../factorhouse-local/resources/flink/bin/config.sh:/opt/flink/bin/config.sh:ro
+  - ../../factorhouse-local/resources/flink/bin/flink-console.sh:/opt/flink/bin/flink-console.sh:ro
+  - ../../factorhouse-local/resources/flink/bin/flink-daemon.sh:/opt/flink/bin/flink-daemon.sh:ro
+  - ../../factorhouse-local/resources/flink/bin/sql-client.sh:/opt/flink/bin/sql-client.sh:ro
+  - ../../factorhouse-local/resources/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml:ro
+  - ../../factorhouse-local/resources/flink/hive-site.xml:/opt/flink/conf/hive-site.xml
+  - ../../factorhouse-local/resources/flink/core-site.xml:/opt/flink/conf/core-site.xml
+  - ../../factorhouse-local/resources/flink/init-catalogs.sql:/opt/flink/conf/init-catalogs.sql
+  - ../../factorhouse-local/resources/deps/hadoop:/tmp/hadoop
+  - ../../factorhouse-local/resources/deps/flink/hive/flink-sql-connector-hive-3.1.3_2.12-1.20.1.jar:/tmp/hive/flink-sql-connector-hive-3.1.3_2.12-1.20.1.jar
+  - ../../factorhouse-local/resources/deps/flink/hive/antlr-runtime-3.5.2.jar:/tmp/hive/antlr-runtime-3.5.2.jar
+  - ../../factorhouse-local/resources/deps/flink/iceberg:/tmp/iceberg
+  - ../../factorhouse-local/resources/deps/flink/parquet:/tmp/parquet
+  - ../../factorhouse-local/resources/deps/flink/connector:/tmp/connector
+  - ../../factorhouse-local/resources/deps/postgres:/tmp/postgres
+  ## Application JAR
+  - ./flink-order-processor/build/libs/flink-order-processor-1.0.jar:/opt/flink/usrlib/flink-order-processor-1.0.jar
+
+services:
+  flex:
+    image: factorhouse/flex${FLEX_SUFFIX:-}:latest
+    container_name: flex${FLEX_SUFFIX:-}
+    pull_policy: always
+    restart: always
+    ports:
+      - "3001:3000"
+    networks:
+      - factorhouse
+    env_file:
+      - ../../factorhouse-local/resources/flex/config/setup.env
+      - ${FLEX_LICENSE:-../../factorhouse-local/resources/flex/config/license.env}
+    mem_limit: 2G
+    volumes:
+      - ../../factorhouse-local/resources/flex/jaas:/etc/flex/jaas
+      - ../../factorhouse-local/resources/flex/rbac:/etc/flex/rbac
+
+  jobmanager:
+    <<: *flink_image_pull_policy_config
+    container_name: jobmanager
+    command: >
+      standalone-job
+      --job-classname io.factorhouse.demo.MainKt
+      --jarfile /opt/flink/usrlib/flink-order-processor-1.0.jar
+    ports:
+      - "8082:8081"
+    networks:
+      - factorhouse
+    environment:
+      <<: *flink_common_env_vars
+    volumes: *flink_common_volumes
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/config"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  taskmanager:
+    <<: *flink_image_pull_policy_config
+    container_name: taskmanager
+    command: taskmanager
+    networks:
+      - factorhouse
+    environment:
+      <<: *flink_common_env_vars
+    volumes: *flink_common_volumes
+    depends_on:
+      jobmanager:
+        condition: service_healthy
+
+networks:
+  factorhouse:
+    external: ${USE_EXT:-true}
+    name: factorhouse
