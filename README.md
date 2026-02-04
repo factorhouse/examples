@@ -135,6 +135,14 @@ This project unlocks the power of the popular [theLook eCommerce dataset](https:
 ![](./projects/data-lineage-labs/images/end-to-end-lineage.gif)
 
 </details>
+<details>
+  <summary><a href="./projects/data-governance-lab/">(WIP) Governing Enterprise Data: A Unifying Framework with OpenMetadata</a></summary>
+
+- Work in progress
+
+<br/>
+
+</details>
 
 ## Data Generators
 
