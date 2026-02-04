@@ -1,0 +1,17 @@
+services:
+  producer:
+    image: rapid-kafka-diagnostics:producer
+    build: .
+    command: python producer.py
+    networks:
+      - factorhouse
+    environment:
+      BOOTSTRAP_SERVERS: "kafka-1:19092"
+      TOPIC: "orders"
+      POISON_COUNT: 50
+      PYTHONUNBUFFERED: 1
+
+networks:
+  factorhouse:
+    external: ${USE_EXT:-true}
+    name: factorhouse

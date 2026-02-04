@@ -1,0 +1,20 @@
+services:
+  # consumer - scale to 3 instances
+  consumer:
+    image: rapid-kafka-diagnostics:consumer
+    build: .
+    command: python consumer.py
+    networks:
+      - factorhouse
+    deploy:
+      replicas: 3
+    environment:
+      BOOTSTRAP_SERVERS: "kafka-1:19092"
+      TOPIC: "orders"
+      GROUP_ID: "orders-fulfillment"
+      PYTHONUNBUFFERED: 1
+
+networks:
+  factorhouse:
+    external: ${USE_EXT:-true}
+    name: factorhouse

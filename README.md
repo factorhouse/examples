@@ -20,7 +20,16 @@
 <details>
   <summary><a href="https://www.youtube.com/watch?v=iCTrRg2cJao">Kpow access control demo with multi-tenancy and RBAC</a></summary>
 
-- [demo project](./features/kpow-access-control/)
+- Kpow access control demo with [multi-tenancy](https://docs.factorhouse.io/kpow/multi-tenancy) and [role based access control](https://docs.factorhouse.io/kpow/authorization/role-based-access-control).
+- See the [demo project](./features/kpow-access-control/).
+
+</details>
+
+<details>
+  <summary><a href="./features/rapid-kafka-diagnostics/">Rapid Kafka Diagnostics Demo</a></summary>
+
+- This demo simulates a **"Silent Stall"** production incident. In this scenario, a Kafka producer injects a "poison pill" (malformed) message into a specific topic partition.
+- The environment runs three consumer instances. When one of the instances consumes the malicious message, it enters a "Zombie" state—it continuously crashes and retries the same message logic while successfully sending heartbeats to the Kafka cluster. This mimics a difficult-to-diagnose issue where infrastructure looks healthy, but data processing has halted on a specific partition.
 
 </details>
 
