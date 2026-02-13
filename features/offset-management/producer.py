@@ -57,7 +57,8 @@ if __name__ == "__main__":
 
     ## producer messages
     producer = Producer(conf)
-    for _ in range(10):
+    run = 0
+    while True:
         dt = datetime.datetime.now()
         epoch = int(dt.timestamp() * 1000)
         ts = dt.isoformat(timespec="seconds")
@@ -67,5 +68,7 @@ if __name__ == "__main__":
             key=str(epoch),
             on_delivery=callback,
         )
-        producer.flush()
+        run += 1
+        if run % 5 == 0:
+            producer.flush()
         time.sleep(0.2)

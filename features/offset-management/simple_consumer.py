@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # determine the available partitions first.
     partitions_to_assign = [TopicPartition(TOPIC_NAME, 0)]
     consumer.assign(partitions_to_assign)
-    assignment_callback(consumer, partitions_to_assign)  # Manually call our logger
+    assignment_callback(consumer, partitions_to_assign)
 
     try:
         while True:
@@ -51,7 +51,6 @@ if __name__ == "__main__":
                 logging.info(
                     f"Received {value} from partition {message.partition()}, offset {message.offset()}."
                 )
-                # Committing the message works the same way
                 consumer.commit(message)
     except KeyboardInterrupt:
         logging.warning("Cancelled by user")

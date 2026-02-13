@@ -8,7 +8,7 @@ services:
     environment:
       BOOTSTRAP_SERVERS: "kafka-1:19092"
       TOPIC: "orders"
-      POISON_COUNT: 50
+      POISON_COUNT: 2000
       PYTHONUNBUFFERED: 1
 
 networks:

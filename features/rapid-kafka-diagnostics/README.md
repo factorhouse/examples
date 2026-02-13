@@ -40,7 +40,7 @@ We will launch a producer to generate traffic and a consumer group scaled to 3 i
 The producer will send valid orders, followed by a single "poison pill" message to **Partition 2**.
 
 ```bash
-docker compose -f ./features/rapid-kafka-diagnostics/compose-producer.yml up -d --build
+docker compose -p producer -f ./features/rapid-kafka-diagnostics/compose-producer.yml up -d
 ```
 
 #### Start the Consumers
@@ -48,7 +48,7 @@ docker compose -f ./features/rapid-kafka-diagnostics/compose-producer.yml up -d 
 Scale the consumer application to 3 instances to ensure all partitions are covered.
 
 ```bash
-docker compose -f ./features/rapid-kafka-diagnostics/compose-consumer.yml up -d --scale consumer=3
+docker compose -p consumer -f ./features/rapid-kafka-diagnostics/compose-consumer.yml up -d --scale consumer=6
 ```
 
 ### Diagnose the Issue
@@ -64,9 +64,9 @@ To clean up, stop and remove all Docker containers and unset the environment var
 
 ```bash
 # Stop Consumers, Producers, and Infrastructure
-docker compose -f ./features/rapid-kafka-diagnostics/compose-consumer.yml down \
-  && docker compose -f ./features/rapid-kafka-diagnostics/compose-producer.yml down \
-  && docker compose -f ./factorhouse-local/compose-kpow.yml down
+docker compose -p consumer -f ./features/rapid-kafka-diagnostics/compose-consumer.yml down \
+  && docker compose -p producer -f ./features/rapid-kafka-diagnostics/compose-producer.yml down \
+  && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
 
 # Clean up variables
 unset KPOW_SUFFIX KPOW_LICENSE_FILE
