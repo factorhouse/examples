@@ -9,13 +9,13 @@ pip install -r features/offset-management/requirements.txt
 ## Start Kafka + Kpow
 # Community Edition
 export KPOW_SUFFIX="-ce"
-export KPOW_LICENSE=/home/jaehyeon/.license/kpow/community-license.env
+export KPOW_LICENSE=<path-to-licence-file>
 
 docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d
 
 # Enterprise Edition
 unset KPOW_SUFFIX
-export KPOW_LICENSE=/home/jaehyeon/.license/kpow/trial-license.env
+export KPOW_LICENSE=<path-to-licence-file>
 
 docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d
 
