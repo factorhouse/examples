@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from decimal import Decimal, InvalidOperation
 from confluent_kafka import Consumer, TopicPartition
 
 BOOTSTRAP_SERVERS = os.getenv("BOOTSTRAP_SERVERS", "localhost:9092")
@@ -37,11 +38,14 @@ try:
             data = json.loads(payload)
 
             # --- THE TRAP: SCHEMA VALIDATION ---
-            # We expect 'amount' to be a float.
+            # We expect 'amount' to be a numeric value.
             # If it's a string, we simulate a strict logic failure.
-            if not isinstance(data["amount"], (int, float)):
+            amount = data.get("amount")
+            try:
+                amount_value = Decimal(amount)
+            except (InvalidOperation, TypeError):
                 raise ValueError(
-                    f"Schema Mismatch! Amount must be number, got {type(data['amount'])}"
+                    f"Schema Mismatch! Amount must be numeric or decimal string, got {type(amount)}"
                 )
 
             # If successful:
