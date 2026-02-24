@@ -7,10 +7,12 @@ import org.apache.flink.connector.kafka.source.KafkaSource
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer
 import org.apache.flink.formats.avro.registry.confluent.ConfluentRegistryAvroDeserializationSchema
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.consumer.OffsetResetStrategy
 import org.slf4j.LoggerFactory
 import java.util.Properties
 
+/**
+ * Low-level utility to interact with Schema Registry and build the Kafka Source.
+ */
 object Connector {
     private val logger = LoggerFactory.getLogger(Connector::class.java)
 
