@@ -1,0 +1,30 @@
+admin_roles:
+  - "kafka-admins"
+
+authorized_roles:
+  - "kafka-admins"
+  - "kafka-users"
+
+policies:
+  - actions:
+      - TOPIC_CREATE
+      - TOPIC_PRODUCE
+      - TOPIC_EDIT
+      - TOPIC_DELETE
+      # TOPIC_INSPECT encapsulates both TOPIC_DATA_QUERY and TOPIC_DATA_DOWNLOAD
+      - TOPIC_INSPECT
+      - GROUP_EDIT
+      - ACL_EDIT
+      - BULK_ACTION
+    effect: Allow
+    resource:
+      - cluster
+      - "*"
+    role: "kafka-admins"
+  - actions:
+      - BROKER_EDIT
+    effect: Allow
+    resource:
+      - cluster
+      - "*"
+    role: "kafka-admins"
