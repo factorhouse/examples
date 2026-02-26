@@ -12,15 +12,17 @@
 ####################################################################################################
 
 services:
-  # Kpow Community Edition - Kafka monitoring and management UI
+  # Kpow Enterprise Edition - Kafka monitoring and management UI
   # https://docs.factorhouse.io/kpow/
   kpow:
-    image: factorhouse/kpow-ce:latest
+    image: factorhouse/kpow:latest
     container_name: kpow
     ports:
       - "3000:3000"
     networks:
       - kpow-network
+    profiles:
+      - trial
     environment:
       # Environment name (displayed in Kpow UI)
       ENVIRONMENT_NAME: "Welcome to Kpow"
@@ -35,12 +37,57 @@ services:
       LICENSE_EXPIRY: "<LICENSE_EXPIRY>"
       LICENSE_SIGNATURE: "<LICENSE_SIGNATURE>"
 
+      # General configurations
+      INFER_TOPIC_SERDES: "true"
+      REPLICATION_FACTOR: "1"
+      NUM_PARTITIONS: "1"
+
       # Feature flags via Simple Access Control. See the full list of flags at https://docs.factorhouse.io/kpow/authorization/simple-access-control
-      ALLOW_TOPIC_CREATE: "true"
-      ALLOW_TOPIC_DELETE: "true"
-      ALLOW_TOPIC_EDIT: "true"
-      ALLOW_TOPIC_INSPECT: "true"
-      ALLOW_TOPIC_PRODUCE: "true"
+      ALLOW_KPOW_ADMIN: "true" # Allow users to admin panels and controls
+      ALLOW_TOPIC_INSPECT: "true" # Allow users to read topic key and value data
+      ALLOW_TOPIC_PRODUCE: "true" # Allow users to write new messages to topics
+      ALLOW_TOPIC_CREATE: "true" # Allow users to create new topics
+      ALLOW_TOPIC_EDIT: "true" # Allow users to edit topic configuration
+      ALLOW_TOPIC_DELETE: "true" # Allow users to delete topics
+      ALLOW_TOPIC_TRUNCATE: "true" # Allow users to truncate topics
+      ALLOW_TOPIC_ELECT_LEADER: "true" # Allow users to elect the leader replica of a topic partition
+      ALLOW_TOPIC_ALTER_REASSIGNMENTS: "true" # Allow users to edit the reassignments of a topic partition
+      ALLOW_GROUP_EDIT: "true" # Allow users to change consumer group offsets
+      ALLOW_GROUP_DELETE: "true" # Allow users to delete consumer groups entirely
+      ALLOW_BROKER_EDIT: "true" # Allow users to edit broker configuration
+      ALLOW_ACL_EDIT: "true" # Allow users to create and delete Kafka ACLs
+      ALLOW_QUOTA_EDIT: "true" # Allow users to create, edit and delete Kafka Quotas
+      ALLOW_BULK_ACTION: "true" # Allow users to invoke bulk actions
+
+    depends_on:
+      broker:
+        condition: service_healthy
+    mem_limit: 2g
+    restart: unless-stopped
+  # Kpow Community Edition - Kafka monitoring and management UI
+  # https://docs.factorhouse.io/kpow/
+  kpow-ce:
+    image: factorhouse/kpow-ce:latest
+    container_name: kpow-ce
+    ports:
+      - "3000:3000"
+    networks:
+      - kpow-network
+    profiles:
+      - community
+    environment:
+      # Environment name (displayed in Kpow UI)
+      ENVIRONMENT_NAME: "Welcome to Kpow"
+
+      # You can replace the following with the boostrap URL of your own Kafka cluster.
+      BOOTSTRAP: "broker:29092"
+
+      # Your license details. Don't share these!
+      LICENSE_ID: "<LICENSE_ID>"
+      LICENSE_CODE: "<LICENSE_CODE>"
+      LICENSEE: "<LICENSEE>"
+      LICENSE_EXPIRY: "<LICENSE_EXPIRY>"
+      LICENSE_SIGNATURE: "<LICENSE_SIGNATURE>"
     depends_on:
       broker:
         condition: service_healthy
@@ -55,6 +102,9 @@ services:
       - "9092:9092"
     networks:
       - kpow-network
+    profiles:
+      - trial
+      - community
     environment:
       KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_NODE_ID: 1
@@ -89,6 +139,9 @@ services:
         condition: service_healthy
     networks:
       - kpow-network
+    profiles:
+      - trial
+      - community
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -118,4 +171,5 @@ services:
 
 networks:
   kpow-network:
+    name: kpow-network
     driver: bridge
