@@ -16,12 +16,6 @@ policies:
       - GROUP_EDIT
       - ACL_EDIT
       - BULK_ACTION
-    effect: Allow
-    resource:
-      - cluster
-      - "*"
-    role: "kafka-admins"
-  - actions:
       - BROKER_EDIT
     effect: Allow
     resource:
