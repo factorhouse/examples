@@ -82,6 +82,11 @@ services:
 
         # Keep container alive
         tail -f /dev/null
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/config"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   factorhouse:
