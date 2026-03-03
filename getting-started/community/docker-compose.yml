@@ -143,7 +143,7 @@ services:
       # Environment name (displayed in Flex UI)
       FLINK_ENVIRONMENT_NAME: "Welcome to Flex"
 
-      # You can replace the following with the boostrap URL of your own Kafka cluster.
+      # You can replace the following with the boostrap URL of your own Flink cluster.
       FLINK_REST_URL: "http://flink:8081"
 
       # Your license details. Don't share these!
