@@ -1,26 +1,40 @@
-# Kpow Quick Start with OSS Kafka
-# This docker-compose spins up Kpow connected to a local Kafka cluster
+# Factor House Community Quick Start with OSS Kafka and Flink
+# This docker-compose spins up Kpow / Flex connected to a local Kafka / Flink cluster
 #
-# Get started: docker compose up -d
+# Get started:
+# Kpow:
+# docker compose --profile kpow up -d
 # Access Kpow at: http://localhost:3000
 #
+# Flex:
+# docker compose --profile flex up -d
+# Access Flex at: http://localhost:3001
+#
+# Kpow + Flex:
+# docker compose --profile kpow --profile flex up -d
+# Access Kpow at: http://localhost:3000
+# Access Flex at: http://localhost:3001
 ####################################################################################################
 # DO NOT USE IN PRODUCTION
 #
-# This is a getting-started configuration. For production deployments, please see:
-# https://docs.factorhouse.io/kpow/installation/
+# For production deployments, contact us for a free trial:
+# Kpow: https://factorhouse.io/products/kpow
+# Flex: https://factorhouse.io/products/flex
 ####################################################################################################
 
 services:
-  # Kpow Enterprise Edition - Kafka monitoring and management UI
+  # Kpow Community Edition - Kafka monitoring and management UI
   # https://docs.factorhouse.io/kpow/
-  kpow:
-    image: factorhouse/kpow:latest
-    container_name: kpow
+  kpow-ce:
+    image: factorhouse/kpow-ce:latest
+    container_name: kpow-ce
+    pull_policy: always
     ports:
       - "3000:3000"
     networks:
       - factorhouse
+    profiles:
+      - kpow
     environment:
       # Environment name (displayed in Kpow UI)
       ENVIRONMENT_NAME: "Welcome to Kpow"
@@ -34,30 +48,6 @@ services:
       LICENSEE: "<LICENSEE>"
       LICENSE_EXPIRY: "<LICENSE_EXPIRY>"
       LICENSE_SIGNATURE: "<LICENSE_SIGNATURE>"
-
-      # General configurations
-      INFER_TOPIC_SERDES: "true"
-      REPLICATION_FACTOR: "1"
-      NUM_PARTITIONS: "1"
-
-      # Feature flags via Simple Access Control.
-      # See the full list of flags at https://docs.factorhouse.io/kpow/authorization/simple-access-control
-      ALLOW_KPOW_ADMIN: "true" # Allow users to admin panels and controls
-      ALLOW_TOPIC_INSPECT: "true" # Allow users to read topic key and value data
-      ALLOW_TOPIC_PRODUCE: "true" # Allow users to write new messages to topics
-      ALLOW_TOPIC_CREATE: "true" # Allow users to create new topics
-      ALLOW_TOPIC_EDIT: "true" # Allow users to edit topic configuration
-      ALLOW_TOPIC_DELETE: "true" # Allow users to delete topics
-      ALLOW_TOPIC_TRUNCATE: "true" # Allow users to truncate topics
-      ALLOW_TOPIC_ELECT_LEADER: "true" # Allow users to elect the leader replica of a topic partition
-      ALLOW_TOPIC_ALTER_REASSIGNMENTS: "true" # Allow users to edit the reassignments of a topic partition
-      ALLOW_GROUP_EDIT: "true" # Allow users to change consumer group offsets
-      ALLOW_GROUP_DELETE: "true" # Allow users to delete consumer groups entirely
-      ALLOW_BROKER_EDIT: "true" # Allow users to edit broker configuration
-      ALLOW_ACL_EDIT: "true" # Allow users to create and delete Kafka ACLs
-      ALLOW_QUOTA_EDIT: "true" # Allow users to create, edit and delete Kafka Quotas
-      ALLOW_BULK_ACTION: "true" # Allow users to invoke bulk actions
-
     depends_on:
       broker:
         condition: service_healthy
@@ -72,6 +62,8 @@ services:
       - "9092:9092"
     networks:
       - factorhouse
+    profiles:
+      - kpow
     environment:
       KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_NODE_ID: 1
@@ -106,6 +98,8 @@ services:
         condition: service_healthy
     networks:
       - factorhouse
+    profiles:
+      - kpow
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -132,6 +126,78 @@ services:
           
           sleep 1
         done
+
+  # Flex Community Edition - Flink monitoring and management UI
+  # https://docs.factorhouse.io/flex/
+  flex-ce:
+    image: factorhouse/flex-ce:latest
+    container_name: flex-ce
+    pull_policy: always
+    ports:
+      - "3001:3000"
+    networks:
+      - factorhouse
+    profiles:
+      - flex
+    environment:
+      # Environment name (displayed in Flex UI)
+      FLINK_ENVIRONMENT_NAME: "Welcome to Flex"
+
+      # You can replace the following with the boostrap URL of your own Flink cluster.
+      FLINK_REST_URL: "http://flink:8081"
+
+      # Your license details. Don't share these!
+      LICENSE_ID: "<LICENSE_ID>"
+      LICENSE_CODE: "<LICENSE_CODE>"
+      LICENSEE: "<LICENSEE>"
+      LICENSE_EXPIRY: "<LICENSE_EXPIRY>"
+      LICENSE_SIGNATURE: "<LICENSE_SIGNATURE>"
+    depends_on:
+      flink:
+        condition: service_healthy
+    mem_limit: 2g
+    restart: unless-stopped
+
+  # Standalone Flink Cluster
+  flink:
+    image: flink:1.20.1
+    container_name: flink
+    networks:
+      - factorhouse
+    profiles:
+      - flex
+    environment:
+      FLINK_PROPERTIES: |
+        jobmanager.rpc.address: localhost
+        taskmanager.numberOfTaskSlots: 4
+        parallelism.default: 1
+        taskmanager.memory.process.size: 1024m
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+
+        # Start Flink cluster (JobManager + TaskManager)
+        /opt/flink/bin/start-cluster.sh
+
+        # Wait until REST API is ready
+        echo "Waiting for JobManager..."
+        until curl -sf http://localhost:8081/overview > /dev/null; do
+          sleep 1
+        done
+
+        # Submit the streaming example job
+        echo "Submitting TopSpeedWindowing..."
+        /opt/flink/bin/flink run -d /opt/flink/examples/streaming/TopSpeedWindowing.jar
+
+        # Keep container alive
+        tail -f /dev/null
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/config"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   factorhouse:
