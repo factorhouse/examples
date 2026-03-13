@@ -135,7 +135,7 @@ cd projects/data-lineage-labs/flink-supplier-stats
 ./gradlew clean build
 ```
 
-This command compiles the code and packages it with all necessary dependencies into `projects/data-lineage-labs/build/libs/flink-supplier-stats-1.0.jar`.
+This command compiles the code and packages it with all necessary dependencies into `projects/data-lineage-labs/flink-supplier-stats/build/libs/flink-supplier-stats-1.0.jar`.
 
 #### Deploy the Flink job
 
@@ -240,7 +240,6 @@ This application uses Flink's Table API to ingest data from a Kafka topic into a
 This job demonstrates a robust, manual integration pattern that provides complete and accurate lifecycle tracking for Flink Table API jobs.
 
 - **Integration Method:**
-
   - **Manual orchestration:** The integration **bypasses the `OpenLineageFlinkJobListener` entirely** and uses the core `openlineage-java` client (`v1.37.0`) directly. The application's main method acts as an orchestrator, controlling _when_ to emit lineage events.
   - **Separation of concerns:** The detailed logic is delegated to dedicated helper class (`Integration.kt`), which handles constructing and emitting OpenLineage events, and is also responsible for dynamic metadata discovery.
   - **Explicit event emission:** The application uses a `try...catch...finally` block to guarantee the emission of the correct lifecycle events: a minimal `START` event before submission, a rich `RUNNING` event after submission, and a final `ABORT` or `FAIL` event based on the job's terminal state.
@@ -261,7 +260,7 @@ cd projects/data-lineage-labs/flink-iceberg-ingestion
 ./gradlew clean build
 ```
 
-This creates the application JAR at `projects/data-lineage-labs/build/libs/flink-iceberg-ingestion-1.0.jar`.
+This creates the application JAR at `projects/data-lineage-labs/flink-iceberg-ingestion/build/libs/flink-iceberg-ingestion-1.0.jar`.
 
 #### Deploy the Flink job
 
@@ -396,7 +395,6 @@ docker exec -it spark-iceberg \
 #### OpenLineage integration
 
 - **Integration method:**
-
   - **Java agent listener:** The integration uses the OpenLineage Java agent JAR, which is attached to the Spark session using the `--conf spark.extraListeners` property during submission.
   - **Automatic discovery:** The agent automatically inspects Spark's logical and physical query plans to discover input and output datasets from the SQL queries being executed.
 
