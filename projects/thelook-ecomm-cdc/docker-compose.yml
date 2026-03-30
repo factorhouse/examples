@@ -3,7 +3,7 @@ services:
     image: fh-thelook-generator
     build:
       context: ../../datagen/thelook-ecomm
-    container_name: generator
+    container_name: thelook-generator
     pull_policy: never
     command:
       - python
