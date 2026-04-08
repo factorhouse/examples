@@ -15,30 +15,6 @@ cd examples
 
 We'll use [Factor House Local](https://github.com/factorhouse/factorhouse-local) to quickly spin up Kafka and Flink environments that include **Kpow** and **Flex**. We can use either the Community or Enterprise editions of Kpow/Flex. **To begin, ensure valid licenses are available.** For details on how to request and configure a license, refer to [this section](https://github.com/factorhouse/factorhouse-local?tab=readme-ov-file#update-kpow-and-flex-licenses) of the project _README_.
 
-#### Update Flink Custom Jar Loading
-
-The Flink cluster loads custom dependency JAR files from the directories specified in the `CUSTOM_JARS_DIRS` environment variable within the `compose-flex.yml` file. However, the Hive connectors included in these custom JARs are bundled with an outdated, unshaded version of Avro, which leads to class-loading conflicts. Since this application does not depend on Hive, Hadoop, Iceberg, or similar components, we can safely comment out the `CUSTOM_JARS_DIRS` environment variable. This allows the application to manage its dependencies without conflicts.
-
-_Before:_
-
-```yaml
-x-common-environment: &flink_common_env_vars
-  AWS_REGION: us-east-1
-  HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
-  CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
-```
-
-_After:_
-
-```yaml
-x-common-environment: &flink_common_env_vars
-  AWS_REGION: us-east-1
-  HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
-  # CUSTOM_JARS_DIRS: "/tmp/hadoop;/tmp/hive;/tmp/iceberg;/tmp/parquet"
-```
-
-#### Start services:
-
 ```bash
 ## Clone the Factor House Local Repository
 git clone https://github.com/factorhouse/factorhouse-local.git
@@ -123,7 +99,6 @@ Or we can also submit the JAR using the Flex UI available at http://localhost:30
 ![](./images/submit-jar-01.png)
 
 3. **Fill out the submission form**, including:
-
    - Entry Class: `io.factorhouse.demo.MainKt`
    - Parallelism: e.g. `3`
    - Optional: Savepoint path, job arguments, etc.
