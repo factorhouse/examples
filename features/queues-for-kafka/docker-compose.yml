@@ -1,0 +1,32 @@
+services:
+  producer:
+    image: confluentinc/cp-kafka:8.1.1
+    container_name: producer
+    networks:
+      - factorhouse
+    command: >
+      bash -c "
+      echo 'Starting Continuous Producer...' &&
+      counter=1 &&
+      while true; do
+        key=\"User_$$((counter % 50))\";
+        val=\"Order_ID_$$counter\";
+        echo \"$$key:$$val\";
+        counter=$$((counter+1));
+        sleep 0.05;
+      done | kafka-console-producer --bootstrap-server kafka-1:19092 --topic queues-for-kafka-demo --property parse.key=true --property key.separator=:
+      "
+
+  consumer:
+    image: confluentinc/cp-kafka:8.1.1
+    networks:
+      - factorhouse
+    command: >
+      bash -c "
+      echo 'Starting KIP-932 Share Consumer...' &&
+      kafka-console-share-consumer --bootstrap-server kafka-1:19092 --topic queues-for-kafka-demo --group queues-for-kafka-demo-group --property print.key=true --property print.partition=true --property print.offset=true
+      "
+
+networks:
+  factorhouse:
+    external: true
