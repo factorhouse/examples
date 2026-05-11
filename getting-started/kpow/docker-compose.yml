@@ -45,6 +45,7 @@ services:
       ALLOW_KPOW_ADMIN: "true" # Allow users to admin panels and controls
       ALLOW_TOPIC_INSPECT: "true" # Allow users to read topic key and value data
       ALLOW_TOPIC_PRODUCE: "true" # Allow users to write new messages to topics
+      ALLOW_TOPIC_CLONE: "true" # Allow users to clone messages between topics
       ALLOW_TOPIC_CREATE: "true" # Allow users to create new topics
       ALLOW_TOPIC_EDIT: "true" # Allow users to edit topic configuration
       ALLOW_TOPIC_DELETE: "true" # Allow users to delete topics
