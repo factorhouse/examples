@@ -2,7 +2,7 @@
 
 This demo simulates a **"Silent Stall"** production incident. In this scenario, a Kafka producer injects a "poison pill" (malformed) message into a specific topic partition.
 
-The environment runs three consumer instances. When one of the instances consumes the malicious message, it enters a "Zombie" state—it continuously crashes and retries the same message logic while successfully sending heartbeats to the Kafka cluster. This mimics a difficult-to-diagnose issue where infrastructure looks healthy, but data processing has halted on a specific partition.
+The environment runs six consumer instances (one per partition). When one of the instances consumes the malicious message, it enters a "Zombie" state—it continuously crashes and retries the same message logic while successfully sending heartbeats to the Kafka cluster. This mimics a difficult-to-diagnose issue where infrastructure looks healthy, but data processing has halted on a specific partition.
 
 ### Getting Started
 
@@ -23,7 +23,7 @@ git clone https://github.com/factorhouse/factorhouse-local.git
 
 ## Export your license details
 export KPOW_SUFFIX="-ce"
-export KPOW_LICENSE_FILE=<path-to-your-license.yaml>
+export KPOW_LICENSE=<path-to-your-license.env>
 
 ## Start Kafka and Kpow
 docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d
@@ -33,7 +33,7 @@ docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml up -d
 
 ### Launch the Demo
 
-We will launch a producer to generate traffic and a consumer group scaled to 3 instances to process it.
+We will launch a producer to generate traffic and a consumer group scaled to 6 instances (one per partition) to process it.
 
 #### Start the Producer
 
@@ -45,7 +45,7 @@ docker compose -p producer -f ./features/rapid-kafka-diagnostics/compose-produce
 
 #### Start the Consumers
 
-Scale the consumer application to 3 instances to ensure all partitions are covered.
+Scale the consumer application to 6 instances to ensure all partitions are covered.
 
 ```bash
 docker compose -p consumer -f ./features/rapid-kafka-diagnostics/compose-consumer.yml up -d --scale consumer=6
@@ -55,7 +55,7 @@ docker compose -p consumer -f ./features/rapid-kafka-diagnostics/compose-consume
 
 1. Open Kpow.
 2. Observe that the **Consumer Group** state is `Stable` (Green).
-3. Drill down into the Consumer Group details. You will see that **Partition 2** has a growing lag, while Partitions 0 and 1 are processing normally.
+3. Drill down into the Consumer Group details. You will see that **Partition 2** has a growing lag, while Partitions 0, 1, 3, 4, and 5 are processing normally.
 4. Use **Data Inspect** to view the message at the head of the lag to identify the schema mismatch.
 
 ### Shutdown Environment
@@ -69,5 +69,5 @@ docker compose -p consumer -f ./features/rapid-kafka-diagnostics/compose-consume
   && docker compose -p kpow -f ./factorhouse-local/compose-kpow.yml down
 
 # Clean up variables
-unset KPOW_SUFFIX KPOW_LICENSE_FILE
+unset KPOW_SUFFIX KPOW_LICENSE
 ```

@@ -37,7 +37,7 @@ if __name__ == "__main__":
                 value = message.value().decode("utf8")
                 partition = message.partition()
                 logging.info(
-                    f"Reveived {value} from partition {message.partition()}, offset {message.offset()}."
+                    f"Reveived {value} from partition {message.partition()}, offset {message.offset()} for regular consumer."
                 )
                 consumer.commit(message)
     except KeyboardInterrupt:

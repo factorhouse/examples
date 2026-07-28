@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     client_conf = {
         "bootstrap.servers": BOOTSTRAP_SERVERS,
-        "group.id": f"{TOPIC_NAME}-group-{(MODEL_VERSION or 'generic')}",
+        "group.id": f"{TOPIC_NAME}-lab-01-group-{(MODEL_VERSION or 'generic')}",
         "auto.offset.reset": "earliest",
         "enable.auto.commit": False,
     }

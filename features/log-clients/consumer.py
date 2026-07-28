@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     client_conf = {
         "bootstrap.servers": BOOTSTRAP_SERVERS,
-        "group.id": f"{TOPIC_NAME}-group",
+        "group.id": f"{TOPIC_NAME}-regular-consumer-group",
         "auto.offset.reset": "earliest",
         "enable.auto.commit": False,
     }
