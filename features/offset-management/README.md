@@ -51,6 +51,8 @@ Start the producer and consumer.
 python features/offset-management/producer.py
 # consumer
 python features/offset-management/consumer.py
+# simple-consumer
+python features/offset-management/simple_consumer.py
 ```
 
 ## Shutdown environment

@@ -6,5 +6,5 @@ We recommend using these scripts in conjunction with the local development envir
 
 Explore the available data generators:
 
-- [theLook eCommerce Data Generator](./look-ecomm/)
+- [theLook eCommerce Data Generator](./thelook-ecomm/)
 - [Mobile Game User Score](./mobile-game/)

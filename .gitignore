@@ -185,3 +185,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+.idea/
+integrations/oci-streaming/deps/

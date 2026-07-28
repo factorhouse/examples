@@ -1,5 +1,11 @@
 <img width="1128" height="191" alt="LinkedIn Business (1)" src="https://github.com/user-attachments/assets/83e73899-ef5a-4123-8ed6-b0ab2c7382a2" />
 
+## Getting Started
+
+New here? Start with **[Getting Started](./getting-started/)**, a single `docker-compose.yml` gets Kpow and/or Flex running locally.
+
+Once you've got that running, [Factor House Local](https://github.com/factorhouse/factorhouse-local) is the full local development environment (Kafka, Flink, Spark, Iceberg, Pinot) that the rest of this repo, the [Labs](./fh-local-labs/), [Features](#product-features), and [Projects](#projects) below, builds on.
+
 ## Product Features
 
 <details>

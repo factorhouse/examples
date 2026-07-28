@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     conf = {
         "bootstrap.servers": BOOTSTRAP_SERVERS,
-        "group.id": f"{TOPIC_NAME}-group",  # group.id is still needed for committing offsets
+        "group.id": f"{TOPIC_NAME}-simple-consumer-group",  # group.id is still needed for committing offsets
         "auto.offset.reset": "earliest",
         "enable.auto.commit": False,
     }
@@ -49,7 +49,7 @@ if __name__ == "__main__":
             else:
                 value = message.value().decode("utf8")
                 logging.info(
-                    f"Received {value} from partition {message.partition()}, offset {message.offset()}."
+                    f"Received {value} from partition {message.partition()}, offset {message.offset()} from a simple consumer."
                 )
                 consumer.commit(message)
     except KeyboardInterrupt:
